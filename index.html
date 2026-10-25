@@ -951,7 +951,7 @@
 
   <!-- ==================== JAVASCRIPT LOGIC CORE (PRESERVED 100%) ==================== -->
   <script>
-    const GAS_SCRIPT_TEMPLATE = `// FU STUDIO - GOOGLE APPS SCRIPT (v7.1 - Đồng Bộ Đơn & Mẫu Tin Nhắn Cloud)
+    const GAS_SCRIPT_TEMPLATE = `// FU STUDIO - GOOGLE APPS SCRIPT (v7.2 - Bộ Đếm Thứ Tự & Đồng Bộ Chống Trùng Đơn)
 function doGet(e) {
   var lock = LockService.getScriptLock();
   lock.tryLock(10000);
@@ -984,8 +984,8 @@ function doPost(e) {
     if (action === 'getOrders') {
       return createJsonResponse({ status: 'success', orders: readAllOrders(sheet), settings: readAllSettings(ss) });
     } else if (action === 'saveOrder') {
-      saveOrUpdateOrder(sheet, data.order);
-      return createJsonResponse({ status: 'success' });
+      var saved = saveOrUpdateOrder(sheet, data.order);
+      return createJsonResponse({ status: 'success', order: saved });
     } else if (action === 'deleteOrder') {
       deleteOrderById(sheet, data.id);
       return createJsonResponse({ status: 'success' });
@@ -1071,7 +1071,7 @@ function readAllOrders(sheet) {
   for (var i = 1; i < values.length; i++) {
     var row = values[i];
     var id = row[0];
-    if (!id) continue;
+    if (!id && !row[1]) continue;
     var items = [];
     try { if (row[8]) items = JSON.parse(row[8]); } catch(ex) { items = []; }
     orders.push({
@@ -1105,22 +1105,37 @@ function formatDate(d) {
 function saveOrUpdateOrder(sheet, order) {
   var values = sheet.getDataRange().getValues();
   var rowIndex = -1;
-  var orderId = String(order.id);
+  var orderId = order.id ? String(order.id).trim() : '';
+  var orderCode = order.code ? String(order.code).trim().toUpperCase() : '';
   var maxId = 0;
+
   for (var i = 1; i < values.length; i++) {
-    var rowIdNum = Number(values[i][0]);
+    var rowId = String(values[i][0] || '').trim();
+    var rowCode = String(values[i][1] || '').trim().toUpperCase();
+    var rowIdNum = Number(rowId);
+
+    // Tính maxId chỉ lấy số thứ tự hợp lệ (1..999,999,999)
     if (!isNaN(rowIdNum) && rowIdNum > 0 && rowIdNum < 1000000000 && rowIdNum > maxId) {
       maxId = rowIdNum;
     }
-    if (String(values[i][0]) === orderId) {
+
+    // Khớp đơn thông minh: Khớp theo Mã Đơn (FU...) HOẶC khớp theo ID
+    if ((orderCode && rowCode === orderCode) || (orderId && rowId === orderId)) {
       rowIndex = i + 1;
+      if (!isNaN(rowIdNum) && rowIdNum > 0 && rowIdNum < 1000000000) {
+        order.id = rowIdNum;
+      }
       break;
     }
   }
 
-  // Tự động bảo vệ bộ đếm: Nếu đơn mới chưa có ID hoặc ID bị timestamp dài (> 1 tỷ) thì gán maxId + 1
-  if (rowIndex === -1 && (!order.id || Number(order.id) > 1000000000)) {
-    order.id = maxId + 1;
+  // Tự động chuẩn hóa bộ đếm: Đơn mới hoặc ID bị timestamp dài (> 1 tỷ) thì gán số thứ tự tiếp theo
+  if (rowIndex === -1 || !order.id || Number(order.id) > 1000000000) {
+    if (rowIndex === -1) {
+      order.id = maxId + 1;
+    } else {
+      order.id = (order.id && Number(order.id) < 1000000000) ? Number(order.id) : (maxId + 1);
+    }
   }
 
   var totalCost = 0;
@@ -1140,12 +1155,16 @@ function saveOrUpdateOrder(sheet, order) {
   } else {
     sheet.appendRow(rowData);
   }
+  return order;
 }
 
 function deleteOrderById(sheet, id) {
   var values = sheet.getDataRange().getValues();
+  var target = String(id || '').trim();
   for (var i = 1; i < values.length; i++) {
-    if (String(values[i][0]) === String(id)) {
+    var rowId = String(values[i][0] || '').trim();
+    var rowCode = String(values[i][1] || '').trim().toUpperCase();
+    if (rowId === target || (target && rowCode === target.toUpperCase())) {
       sheet.deleteRow(i + 1);
       break;
     }
@@ -1154,8 +1173,11 @@ function deleteOrderById(sheet, id) {
 
 function updatePaymentStatus(sheet, id, payment) {
   var values = sheet.getDataRange().getValues();
+  var target = String(id || '').trim();
   for (var i = 1; i < values.length; i++) {
-    if (String(values[i][0]) === String(id)) {
+    var rowId = String(values[i][0] || '').trim();
+    var rowCode = String(values[i][1] || '').trim().toUpperCase();
+    if (rowId === target || (target && rowCode === target.toUpperCase())) {
       sheet.getRange(i + 1, 6).setValue(payment);
       sheet.getRange(i + 1, 10).setValue(new Date());
       break;
@@ -1232,7 +1254,26 @@ function createJsonResponse(obj) {
     let currentViewMode = 'card';
     let modalCart = [];
 
-    let orders = JSON.parse(localStorage.getItem('fu_studio_xuongin_v5')) || [
+    function sanitizeOrders(list) {
+      if (!Array.isArray(list)) return [];
+      let maxId = 0;
+      list.forEach(o => {
+        const num = Number(o.id);
+        if (!isNaN(num) && num > 0 && num < 1000000000 && num > maxId) {
+          maxId = num;
+        }
+      });
+      return list.map(o => {
+        const num = Number(o.id);
+        if (isNaN(num) || num <= 0 || num > 1000000000) {
+          maxId++;
+          return { ...o, id: maxId };
+        }
+        return { ...o, id: num };
+      });
+    }
+
+    let rawStoredOrders = JSON.parse(localStorage.getItem('fu_studio_xuongin_v5')) || [
       {
         id: 1,
         code: 'FU918',
@@ -1294,6 +1335,8 @@ function createJsonResponse(obj) {
         ]
       }
     ];
+
+    let orders = sanitizeOrders(rawStoredOrders);
 
     // ================= BACKGROUND MANAGEMENT =================
     function applyBackgroundConfig() {
@@ -1527,7 +1570,7 @@ function createJsonResponse(obj) {
             if (data.settings.fu_zalo_template_batch) localStorage.setItem('fu_zalo_template_batch', data.settings.fu_zalo_template_batch);
           }
           if (Array.isArray(data.orders) && data.orders.length > 0) {
-            orders = data.orders;
+            orders = sanitizeOrders(data.orders);
             saveToStorage();
             updateWorkshopFilterOptions();
             renderAll();
@@ -1580,7 +1623,7 @@ function createJsonResponse(obj) {
             if (data.settings.fu_zalo_template_batch) localStorage.setItem('fu_zalo_template_batch', data.settings.fu_zalo_template_batch);
           }
           if (data.orders.length > 0) {
-            orders = data.orders;
+            orders = sanitizeOrders(data.orders);
             saveToStorage();
             updateWorkshopFilterOptions();
             renderAll();
@@ -1595,15 +1638,17 @@ function createJsonResponse(obj) {
     }
 
     async function sendCloudPost(payload) {
-      if (!gasUrl) return;
+      if (!gasUrl) return null;
       try {
-        await fetch(gasUrl, {
+        const res = await fetch(gasUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           body: JSON.stringify(payload)
         });
+        return await res.json();
       } catch (err) {
         console.warn('Lỗi gửi cập nhật ngầm lên Cloud:', err);
+        return null;
       }
     }
 
@@ -1966,7 +2011,9 @@ function createJsonResponse(obj) {
         return;
       }
 
-      const id = document.getElementById('orderId').value;
+      const rawId = document.getElementById('orderId').value;
+      const validEditId = (rawId && Number(rawId) < 1000000000) ? Number(rawId) : null;
+      const orderCodeVal = document.getElementById('orderCode').value.trim().toUpperCase();
       const items = modalCart.map(c => ({
         name: (c.name || '').trim() || 'Hạng mục in',
         qty: Number(c.qty) || 1,
@@ -1978,8 +2025,8 @@ function createJsonResponse(obj) {
       const deliveryDateVal = document.getElementById('deliveryDate').value || calculateDeliveryDate(printDateVal, isUrgent ? 1 : 2);
 
       const orderData = {
-        id: id ? Number(id) : getNextOrderId(),
-        code: document.getElementById('orderCode').value.trim().toUpperCase(),
+        id: validEditId || getNextOrderId(),
+        code: orderCodeVal,
         name: document.getElementById('clientName').value.trim(),
         date: printDateVal,
         deliveryDate: deliveryDateVal,
@@ -1990,9 +2037,10 @@ function createJsonResponse(obj) {
         items: items
       };
 
-      if (id) {
-        const idx = orders.findIndex(o => o.id === Number(id));
+      if (rawId) {
+        const idx = orders.findIndex(o => o.id === Number(rawId) || (o.code && o.code.toUpperCase() === orderCodeVal));
         if (idx !== -1) orders[idx] = orderData;
+        else orders.unshift(orderData);
       } else {
         orders.unshift(orderData);
       }
@@ -2004,7 +2052,12 @@ function createJsonResponse(obj) {
 
       if (gasUrl) {
         showToast('Đang lưu đồng bộ lên Google Sheet...', 'info');
-        sendCloudPost({ action: 'saveOrder', order: orderData }).then(() => {
+        sendCloudPost({ action: 'saveOrder', order: orderData }).then((resData) => {
+          if (resData && resData.order && resData.order.id) {
+            orderData.id = resData.order.id;
+            saveToStorage();
+            renderAll();
+          }
           showToast('Đã lưu đơn lên Google Sheet ✅', 'success');
         });
       }
