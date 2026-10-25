@@ -1,0 +1,2639 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FU STUDIO — Atelier Print Lab & Quản Lý Công Nợ Xưởng v7.0 Glass</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-canvas: #F8F9FA;
+      --card-bg: rgba(255, 255, 255, 0.82);
+      --ink-primary: #121316;
+      --ink-secondary: #52525B;
+      --ink-tertiary: #71717A;
+      --border-glass: rgba(255, 255, 255, 0.85);
+      --border-subtle: rgba(228, 228, 231, 0.8);
+      --border-strong: #27272A;
+      --studio-obsidian: #090A0C;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg-canvas);
+      color: var(--ink-primary);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      min-height: 100vh;
+      position: relative;
+    }
+
+    .font-brand {
+      font-family: 'Cinzel', Georgia, serif;
+    }
+
+    .font-mono-val {
+      font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+    }
+
+    .tabular-nums {
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Fixed artistic blurred background */
+    #appBackgroundContainer {
+      position: fixed;
+      inset: 0;
+      z-index: -10;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    #bgImage {
+      position: absolute;
+      inset: -28px;
+      background-size: cover;
+      background-position: center;
+      transition: background-image 0.6s ease-in-out, filter 0.3s ease, opacity 0.3s ease;
+      will-change: transform, filter;
+    }
+
+    #bgOverlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(248, 249, 250, 0.62);
+      backdrop-filter: saturate(120%);
+      -webkit-backdrop-filter: saturate(120%);
+    }
+
+    /* Frosted Glass Paneling */
+    .glass-panel {
+      background: rgba(255, 255, 255, 0.82) !important;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.85) !important;
+      box-shadow: 0 1px 3px 0 rgba(18, 19, 22, 0.03), 0 1px 2px -1px rgba(18, 19, 22, 0.03);
+    }
+
+    /* Studio Card with Frosted Glass */
+    .studio-card {
+      background: rgba(255, 255, 255, 0.82);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border: 1px solid rgba(255, 255, 255, 0.85);
+      box-shadow: 0 1px 3px 0 rgba(18, 19, 22, 0.03), 0 1px 2px -1px rgba(18, 19, 22, 0.03);
+      transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease, border-color 0.2s ease;
+    }
+    .studio-card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(212, 212, 216, 0.95);
+      box-shadow: 0 4px 12px -2px rgba(18, 19, 22, 0.06);
+    }
+
+    /* Minimal studio scrollbar */
+    .custom-scrollbar::-webkit-scrollbar { width: 4px; height: 4px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #D4D4D8; border-radius: 2px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #A1A1AA; }
+
+    /* POS Button Touch feedback */
+    .pos-btn {
+      transition: all 0.12s ease;
+    }
+    .pos-btn:active {
+      transform: scale(0.985);
+    }
+
+    @keyframes spin-sync {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .animate-spin-fast {
+      animation: spin-sync 0.75s linear infinite;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col selection:bg-zinc-900 selection:text-zinc-100">
+
+  <!-- Fixed Artistic Blurred Background Layer (Frosted Glass backdrop) -->
+  <div id="appBackgroundContainer">
+    <div id="bgImage"></div>
+    <div id="bgOverlay"></div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+  <!-- Top Navigation Bar: Minimal Luxury Frosted Glass Style -->
+  <header class="glass-panel border-b border-white/80 sticky top-0 z-30">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex flex-wrap justify-between items-center gap-4">
+      
+      <!-- Brand & Studio Identity -->
+      <div class="flex items-center gap-3.5">
+        <div class="w-10 h-10 rounded-lg bg-zinc-950 text-zinc-100 flex items-center justify-center border border-zinc-800 shadow-xs">
+          <i class="fa-solid fa-camera-retro text-sm"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2.5">
+            <h1 class="text-base font-brand font-bold tracking-wider text-zinc-950 uppercase">FU STUDIO</h1>
+            <span class="text-xs font-mono-val font-semibold px-2 py-0.5 rounded bg-white/70 text-zinc-700 border border-zinc-200/80 shadow-2xs">v7.0 Glass</span>
+          </div>
+          <p class="text-xs text-zinc-500 font-medium">Hệ thống quản lý in ấn & đối soát công nợ xưởng</p>
+        </div>
+      </div>
+
+      <!-- Action Tools & Header Controls -->
+      <div class="flex items-center gap-2 flex-wrap">
+        
+        <!-- View Switcher (Card vs Table) -->
+        <div class="hidden sm:flex items-center bg-zinc-100/70 p-0.5 rounded-lg border border-zinc-200/80 mr-1 backdrop-blur-xs">
+          <button type="button" id="btnViewCard" onclick="switchView('card')" class="px-2.5 py-1.5 rounded-md text-xs font-medium transition flex items-center gap-1.5 bg-white text-zinc-900 shadow-xs cursor-pointer">
+            <i class="fa-solid fa-grip text-xs"></i> Thẻ Studio
+          </button>
+          <button type="button" id="btnViewTable" onclick="switchView('table')" class="px-2.5 py-1.5 rounded-md text-xs font-medium transition flex items-center gap-1.5 text-zinc-500 hover:text-zinc-900 cursor-pointer">
+            <i class="fa-solid fa-table-list text-xs"></i> Bảng Gọn
+          </button>
+        </div>
+
+        <!-- Background Presets Modal Trigger (Đổi Nền Mờ) -->
+        <button type="button" onclick="openBgModal()" class="bg-white/80 hover:bg-white text-zinc-700 border border-zinc-200/80 px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5 transition cursor-pointer shadow-xs">
+          <i class="fa-solid fa-wand-magic-sparkles text-amber-600 text-xs"></i>
+          <span>Đổi Nền Mờ</span>
+        </button>
+
+        <!-- Google Sheet Cloud Sync Button -->
+        <button type="button" id="btnCloudSync" onclick="openCloudModal()" class="bg-white/80 hover:bg-white text-zinc-700 border border-zinc-200/80 px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-2 transition cursor-pointer shadow-xs">
+          <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+          <span>Nối Google Sheet</span>
+        </button>
+
+        <!-- Quick Refresh from Cloud Button -->
+        <button type="button" onclick="syncFromCloud(true)" class="bg-white/80 hover:bg-white text-zinc-600 hover:text-zinc-900 w-8 h-8 rounded-lg text-xs flex items-center justify-center border border-zinc-200/80 shadow-xs transition cursor-pointer" title="Đồng bộ dữ liệu mới nhất từ Google Sheet">
+          <i id="syncIcon" class="fa-solid fa-arrows-rotate text-xs"></i>
+        </button>
+
+        <!-- Catalog / Price Settings -->
+        <button type="button" onclick="openCatalogModal()" class="bg-white/80 hover:bg-white text-zinc-700 px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5 border border-zinc-200/80 shadow-xs transition cursor-pointer">
+          <i class="fa-solid fa-sliders text-zinc-500 text-xs"></i> <span class="hidden md:inline">Bảng Giá Mẫu</span>
+        </button>
+
+        <!-- Export CSV Button -->
+        <button type="button" onclick="exportCSV()" class="bg-white/80 hover:bg-white text-zinc-700 px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5 border border-zinc-200/80 shadow-xs transition cursor-pointer">
+          <i class="fa-solid fa-file-arrow-down text-zinc-500 text-xs"></i> <span class="hidden md:inline">Xuất File</span>
+        </button>
+
+        <!-- New Order Action Button (Minimal Luxury Obsidian Button) -->
+        <button type="button" onclick="openModal()" class="bg-zinc-950 hover:bg-zinc-800 text-zinc-100 px-3.5 py-1.5 rounded-lg text-xs font-medium flex items-center gap-2 shadow-xs transition cursor-pointer border border-zinc-900">
+          <i class="fa-solid fa-plus text-xs text-zinc-300"></i> Lên Đơn Mới
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Layout -->
+  <main class="max-w-7xl mx-auto w-full px-4 sm:px-6 py-6 space-y-6 flex-1">
+    
+    <!-- KPI Summary Bento Cards: Frosted Glass & Editorial Type-First -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      
+      <!-- Card 1: Tổng chi phí in -->
+      <div class="glass-panel p-5 rounded-xl shadow-xs flex flex-col justify-between">
+        <div class="flex items-center justify-between">
+          <span class="text-xs text-zinc-600 font-medium">Tổng chi phí in ấn</span>
+        </div>
+        <div class="mt-2">
+          <div class="text-3xl font-light tracking-tight text-zinc-950 tabular-nums font-mono-val" id="stat-total-cost">0 đ</div>
+          <div class="inline-flex items-center gap-1.5 text-xs text-zinc-600 font-mono-val mt-2">
+            <i class="fa-regular fa-folder-closed text-xs text-zinc-500"></i>
+            <span id="stat-total-orders">0 đơn hàng</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 2: Công nợ xưởng (Purposeful Data Indication, Subtle Rose Tint & Glass) -->
+      <div class="glass-panel p-5 rounded-xl shadow-xs flex flex-col justify-between border-rose-200/70">
+        <div class="flex items-center justify-between">
+          <span class="text-xs text-rose-700 font-semibold flex items-center gap-1.5">
+            <span class="w-1.5 h-1.5 rounded-full bg-rose-600"></span> Công nợ xưởng chưa tất toán
+          </span>
+        </div>
+        <div class="mt-2">
+          <div class="text-3xl font-light tracking-tight text-rose-700 tabular-nums font-mono-val" id="stat-debt">0 đ</div>
+          <div class="text-xs text-zinc-600 mt-2 flex items-center gap-1.5">
+            <i class="fa-solid fa-arrow-pointer text-xs text-zinc-400"></i>
+            <span>Chạm nhãn công nợ trên từng đơn để gạch nợ 1 lần duy nhất</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Smart Filter & Search Bar: Frosted Glass -->
+    <div class="glass-panel p-3 rounded-xl shadow-xs flex flex-col lg:flex-row gap-3 items-stretch lg:items-center justify-between">
+      
+      <!-- Quick Status Filter (Lọc theo công nợ) -->
+      <div class="flex items-center gap-1.5 overflow-x-auto pb-1 lg:pb-0 custom-scrollbar">
+        <button type="button" onclick="setQuickPaymentFilter('')" data-pay="" class="pay-pill bg-zinc-900 text-white text-xs font-medium px-3.5 py-1.5 rounded-md transition whitespace-nowrap flex items-center gap-2 cursor-pointer shadow-xs border border-zinc-900">
+          Tất cả đơn
+        </button>
+        <button type="button" onclick="setQuickPaymentFilter('Chưa thanh toán')" data-pay="Chưa thanh toán" class="pay-pill bg-white/80 hover:bg-white text-zinc-600 hover:text-zinc-900 text-xs font-medium px-3.5 py-1.5 rounded-md transition whitespace-nowrap flex items-center gap-1.5 cursor-pointer border border-zinc-200/80 shadow-2xs">
+          <span class="w-1.5 h-1.5 rounded-full bg-rose-600"></span> Chưa thanh toán (Nợ xưởng)
+        </button>
+        <button type="button" onclick="setQuickPaymentFilter('Đã thanh toán')" data-pay="Đã thanh toán" class="pay-pill bg-white/80 hover:bg-white text-zinc-600 hover:text-zinc-900 text-xs font-medium px-3.5 py-1.5 rounded-md transition whitespace-nowrap flex items-center gap-1.5 cursor-pointer border border-zinc-200/80 shadow-2xs">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span> Đã thanh toán
+        </button>
+      </div>
+
+      <!-- Search, Month & Workshop Selectors -->
+      <div class="flex flex-wrap items-center gap-2">
+        <div class="relative flex-1 min-w-[200px]">
+          <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 text-xs"></i>
+          <input type="text" id="searchInput" oninput="renderAll()" placeholder="Tìm mã FU, Dâu Rể..." class="w-full pl-8 pr-3 py-1.5 text-xs font-medium bg-white/70 border border-zinc-200/80 rounded-md focus:bg-white focus:border-zinc-900 outline-none transition backdrop-blur-xs">
+        </div>
+
+        <!-- Workshop Filter (Lọc theo xưởng) -->
+        <select id="filterWorkshop" onchange="renderAll()" class="text-xs font-medium border border-zinc-200/80 rounded-md px-2.5 py-1.5 bg-white/70 text-zinc-700 outline-none focus:bg-white focus:border-zinc-900 cursor-pointer backdrop-blur-xs">
+          <option value="">Tất cả xưởng</option>
+          <option value="TPS">Xưởng TPS</option>
+          <option value="Xưởng Khung">Xưởng Khung</option>
+          <option value="Lab Sài Gòn">Lab Sài Gòn</option>
+        </select>
+
+        <select id="filterMonth" onchange="renderAll()" class="text-xs font-medium border border-zinc-200/80 rounded-md px-2.5 py-1.5 bg-white/70 text-zinc-700 outline-none focus:bg-white focus:border-zinc-900 cursor-pointer backdrop-blur-xs">
+          <option value="">Toàn bộ tháng</option>
+          <option value="1">Tháng 01</option>
+          <option value="2">Tháng 02</option>
+          <option value="3">Tháng 03</option>
+          <option value="4">Tháng 04</option>
+          <option value="5">Tháng 05</option>
+          <option value="6">Tháng 06</option>
+          <option value="7">Tháng 07</option>
+          <option value="8">Tháng 08</option>
+          <option value="9">Tháng 09</option>
+          <option value="10">Tháng 10</option>
+          <option value="11">Tháng 11</option>
+          <option value="12">Tháng 12</option>
+        </select>
+
+        <button type="button" onclick="resetFilters()" class="text-xs text-zinc-400 hover:text-zinc-700 px-2 py-1.5 cursor-pointer transition" title="Xoá bộ lọc">
+          <i class="fa-solid fa-rotate-right"></i>
+        </button>
+
+        <div class="h-4 w-px bg-zinc-200/80 mx-0.5 hidden sm:block"></div>
+
+        <!-- Nút Tổng Hợp Zalo Toàn Bộ Đơn Đang Lọc -->
+        <button type="button" onclick="openBatchZaloModal()" class="text-xs font-medium px-2.5 py-1.5 rounded-md bg-white/80 hover:bg-white text-zinc-800 border border-zinc-200/80 shadow-2xs transition flex items-center gap-1.5 cursor-pointer backdrop-blur-xs hover:border-zinc-400" title="Tổng hợp toàn bộ các đơn đang lọc thành 1 tin nhắn gửi Zalo cho xưởng">
+          <i class="fa-solid fa-comments text-sky-600 text-xs"></i>
+          <span>Tổng hợp Zalo</span>
+        </button>
+
+        <!-- Nút Cài Đặt Mẫu Tin Nhắn Mặc Định -->
+        <button type="button" onclick="openZaloConfigModal()" class="text-xs font-medium px-2.5 py-1.5 rounded-md bg-white/80 hover:bg-white text-zinc-600 hover:text-zinc-900 border border-zinc-200/80 shadow-2xs transition flex items-center gap-1.5 cursor-pointer backdrop-blur-xs hover:border-zinc-400" title="Cài đặt mẫu tin nhắn Zalo mặc định">
+          <i class="fa-solid fa-sliders text-zinc-500 text-xs"></i>
+          <span>Mẫu tin</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- VIEW 1: MODERN STUDIO CARDS GRID (Default) -->
+    <div id="cardViewContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 items-start">
+      <!-- Dynamic Cards Rendered by JS -->
+    </div>
+
+    <!-- VIEW 2: COMPACT EDITORIAL TABLE VIEW (Frosted Glass) -->
+    <div id="tableViewContainer" class="hidden glass-panel rounded-xl shadow-xs overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm text-zinc-700">
+          <thead class="bg-white/40 text-xs font-mono-val font-medium text-zinc-600 border-b border-zinc-200/70">
+            <tr>
+              <th class="py-3 px-4">Hợp đồng / Dâu rể</th>
+              <th class="py-3 px-4">Ngày gửi</th>
+              <th class="py-3 px-4">Chi tiết sản phẩm in</th>
+              <th class="py-3 px-4 text-right">Tổng tiền</th>
+              <th class="py-3 px-4 text-center">Công nợ xưởng</th>
+              <th class="py-3 px-4 text-center">Thao tác</th>
+            </tr>
+          </thead>
+          <tbody id="orderTableBody" class="divide-y divide-zinc-100/80 font-medium"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div id="emptyState" class="hidden glass-panel rounded-xl border border-dashed border-zinc-300 text-center py-16 px-4">
+      <div class="w-12 h-12 rounded-lg bg-white/80 text-zinc-400 flex items-center justify-center mx-auto mb-3 text-lg border border-zinc-200">
+        <i class="fa-regular fa-folder-open"></i>
+      </div>
+      <h3 class="text-sm font-semibold text-zinc-800">Chưa có đơn in nào khớp với bộ lọc</h3>
+      <p class="text-xs text-zinc-400 mt-1">Đổi từ khoá tìm kiếm hoặc bấm "Lên Đơn Mới" ở góc trên.</p>
+    </div>
+
+  </main>
+
+  <!-- ==================== MODAL ĐỔI NỀN MỜ NGHỆ THUẬT (BACKGROUND PRESETS) ==================== -->
+  <div id="bgModal" class="fixed inset-0 bg-zinc-950/40 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white/95 backdrop-blur-2xl rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] flex flex-col overflow-hidden border border-white/80">
+      
+      <!-- Modal Header -->
+      <div class="bg-zinc-950 text-zinc-100 px-6 py-4 flex justify-between items-center border-b border-zinc-800">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 rounded-md bg-zinc-800 text-amber-400 flex items-center justify-center text-xs border border-zinc-700">
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+          </div>
+          <div>
+            <h3 class="font-semibold text-sm tracking-tight text-white">Tuỳ Biến Nền Mờ Nghệ Thuật (Frosted Glass)</h3>
+            <p class="text-xs text-zinc-400">Chọn ảnh mẫu tone cưới editorial hoặc dán đường dẫn ảnh riêng của studio</p>
+          </div>
+        </div>
+        <button type="button" onclick="closeBgModal()" class="w-7 h-7 rounded-md hover:bg-zinc-800 text-zinc-400 hover:text-white flex items-center justify-center transition cursor-pointer">
+          <i class="fa-solid fa-xmark text-xs"></i>
+        </button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="p-6 overflow-y-auto space-y-5 flex-1 custom-scrollbar">
+        
+        <!-- Preset Gallery Grid -->
+        <div>
+          <label class="block text-xs font-semibold text-zinc-700 uppercase tracking-wider mb-2.5">Bộ Sưu Tập Nền Mẫu Studio</label>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-3" id="bgPresetsGrid">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+
+        <!-- Custom Image URL -->
+        <div class="pt-2 border-t border-zinc-200/80">
+          <label class="block text-xs font-semibold text-zinc-700 uppercase tracking-wider mb-1.5">Hoặc Dán Link Ảnh Riêng Của Studio</label>
+          <div class="flex items-center gap-2">
+            <input type="url" id="customBgUrlInput" placeholder="https://example.com/anh-studio-cuoi.jpg" class="flex-1 text-xs border border-zinc-300 rounded-lg px-3 py-2 outline-none focus:border-zinc-900 bg-white transition">
+            <button type="button" onclick="applyCustomBgUrl()" class="px-4 py-2 bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-medium rounded-lg transition cursor-pointer whitespace-nowrap">
+              Áp Dụng
+            </button>
+          </div>
+          <p class="text-xs text-zinc-400 mt-1">Hỗ trợ mọi link ảnh định dạng JPG, PNG hoặc Unsplash chất lượng cao.</p>
+        </div>
+
+        <!-- Blur & Opacity Sliders -->
+        <div class="pt-2 border-t border-zinc-200/80 grid grid-cols-1 sm:grid-cols-2 gap-4 bg-zinc-50/70 p-4 rounded-xl border border-zinc-200/70">
+          <div>
+            <div class="flex justify-between items-center mb-1.5">
+              <span class="text-xs font-semibold text-zinc-700">Độ Mờ Sâu (Blur)</span>
+              <span id="blurValDisplay" class="text-xs font-mono-val text-zinc-600">36px</span>
+            </div>
+            <input type="range" id="blurSlider" min="10" max="60" value="36" oninput="updateBgBlur(this.value)" class="w-full accent-zinc-900 cursor-pointer">
+          </div>
+
+          <div>
+            <div class="flex justify-between items-center mb-1.5">
+              <span class="text-xs font-semibold text-zinc-700">Độ Đậm Của Ảnh (Opacity)</span>
+              <span id="opacityValDisplay" class="text-xs font-mono-val text-zinc-600">45%</span>
+            </div>
+            <input type="range" id="opacitySlider" min="15" max="85" value="45" oninput="updateBgOpacity(this.value)" class="w-full accent-zinc-900 cursor-pointer">
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="p-4 bg-zinc-50 border-t border-zinc-200 flex justify-between items-center">
+        <button type="button" onclick="resetDefaultBg()" class="text-xs font-medium text-rose-600 hover:underline cursor-pointer">Khôi phục nền mặc định</button>
+        <button type="button" onclick="closeBgModal()" class="px-5 py-2 bg-zinc-900 text-white text-xs font-medium rounded-lg cursor-pointer hover:bg-zinc-800 transition">Đóng</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL XEM & SOẠN TIN NHẮN GỬI ZALO XƯỞNG ==================== -->
+  <div id="zaloModal" class="fixed inset-0 bg-zinc-950/40 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white/95 backdrop-blur-2xl rounded-2xl shadow-2xl max-w-xl w-full max-h-[90vh] flex flex-col overflow-hidden border border-white/80">
+      
+      <!-- Modal Header -->
+      <div class="bg-zinc-950 text-zinc-100 px-6 py-4 flex justify-between items-center border-b border-zinc-800">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 rounded-md bg-sky-500/20 text-sky-400 flex items-center justify-center text-xs border border-sky-500/30">
+            <i class="fa-solid fa-paper-plane text-xs"></i>
+          </div>
+          <div>
+            <h3 class="font-semibold text-sm tracking-tight text-white" id="zaloModalTitle">Xem & Soạn Tin Nhắn Gửi Xưởng</h3>
+            <p class="text-xs text-zinc-400">Chỉnh sửa nội dung dặn dò thợ in trước khi sao chép gửi Zalo</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <button type="button" onclick="openZaloConfigModal()" class="text-xs text-zinc-300 hover:text-white px-2.5 py-1 rounded-md bg-zinc-900 hover:bg-zinc-800 transition flex items-center gap-1.5 cursor-pointer border border-zinc-700" title="Cài đặt mẫu tin nhắn mặc định">
+            <i class="fa-solid fa-sliders text-xs text-amber-400"></i>
+            <span>Cài đặt mẫu</span>
+          </button>
+          <button type="button" onclick="closeZaloModal()" class="w-7 h-7 rounded-md hover:bg-zinc-800 text-zinc-400 hover:text-white flex items-center justify-center transition cursor-pointer">
+            <i class="fa-solid fa-xmark text-xs"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="p-6 overflow-y-auto space-y-4 flex-1 custom-scrollbar">
+        <!-- Quick Meta Pill Strip -->
+        <div class="flex flex-wrap items-center gap-2 p-3 bg-zinc-50/80 rounded-xl border border-zinc-200/80 text-xs font-mono-val">
+          <span class="px-2 py-0.5 rounded bg-zinc-950 text-zinc-100 font-semibold" id="zaloMetaCode">FU918</span>
+          <span class="text-zinc-700 font-semibold" id="zaloMetaName">BI & VIVIAN</span>
+          <span class="text-zinc-300">•</span>
+          <span class="text-zinc-600" id="zaloMetaWorkshop">TPS</span>
+          <span class="text-zinc-300">•</span>
+          <span class="text-zinc-900 font-bold" id="zaloMetaTotal">0 đ</span>
+        </div>
+
+        <div>
+          <div class="flex items-center justify-between mb-1.5">
+            <label class="text-xs font-semibold text-zinc-700">Nội dung tin nhắn gửi Zalo thợ in</label>
+            <div class="flex items-center gap-2">
+              <button type="button" onclick="reloadCurrentZaloMessage()" class="text-xs text-sky-700 hover:text-sky-900 transition flex items-center gap-1 cursor-pointer font-medium hover:underline" title="Khôi phục lại nội dung theo mẫu tin mặc định">
+                <i class="fa-solid fa-rotate-left text-xs"></i> <span>Điền lại theo mẫu</span>
+              </button>
+              <span class="text-zinc-300">•</span>
+              <button type="button" onclick="openZaloConfigModal()" class="text-xs text-zinc-600 hover:text-zinc-950 transition flex items-center gap-1 cursor-pointer font-medium hover:underline" title="Chỉnh sửa mẫu tin mặc định trong cài đặt">
+                <i class="fa-solid fa-sliders text-xs"></i> <span>Sửa mẫu</span>
+              </button>
+            </div>
+          </div>
+          <textarea id="zaloMessageContent" rows="10" class="w-full text-xs font-mono-val border border-zinc-300 rounded-xl p-3.5 outline-none focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900 bg-white transition leading-relaxed resize-y custom-scrollbar"></textarea>
+        </div>
+
+        <div class="p-3 bg-sky-50/70 border border-sky-200/70 rounded-xl flex items-start gap-2.5 text-xs text-sky-900">
+          <i class="fa-solid fa-circle-info text-sky-600 mt-0.5"></i>
+          <p class="leading-relaxed">
+            Tin nhắn đã được định dạng chuẩn sẵn. Bạn có thể gõ thêm ghi chú dặn dò thợ (thời gian cần gấp, ép lụa hay tráng gương, lưu ý màu da...) rồi bấm <b>Sao Chép Tin Nhắn</b> để dán ngay qua khung chat Zalo xưởng.
+          </p>
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="p-4 bg-zinc-50/90 border-t border-zinc-200 flex justify-between items-center gap-2">
+        <a href="https://chat.zalo.me/" target="_blank" rel="noopener noreferrer" class="text-xs font-medium text-sky-700 hover:text-sky-900 flex items-center gap-1.5 hover:underline">
+          <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i> Mở Zalo Web
+        </a>
+        <div class="flex items-center gap-2">
+          <button type="button" onclick="closeZaloModal()" class="px-4 py-2 text-xs font-medium text-zinc-600 hover:bg-zinc-200/60 rounded-lg transition cursor-pointer">
+            Đóng
+          </button>
+          <button type="button" onclick="copyZaloMessageFromModal()" class="px-5 py-2 bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-medium rounded-lg transition cursor-pointer shadow-xs flex items-center gap-2 border border-zinc-900">
+            <i class="fa-regular fa-copy text-xs text-zinc-300"></i>
+            <span>Sao Chép Tin Nhắn</span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ==================== MODAL CÀI ĐẶT MẪU TIN NHẮN ZALO ==================== -->
+  <div id="zaloConfigModal" class="fixed inset-0 bg-zinc-950/40 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white/95 backdrop-blur-2xl rounded-2xl shadow-2xl max-w-2xl w-full max-h-[92vh] flex flex-col overflow-hidden border border-white/80">
+      
+      <!-- Modal Header -->
+      <div class="bg-zinc-950 text-zinc-100 px-6 py-4 flex justify-between items-center border-b border-zinc-800">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 rounded-md bg-amber-500/20 text-amber-400 flex items-center justify-center text-xs border border-amber-500/30">
+            <i class="fa-solid fa-sliders text-xs"></i>
+          </div>
+          <div>
+            <h3 class="font-semibold text-sm tracking-tight text-white">Cài Đặt Mẫu Tin Nhắn Gửi Xưởng</h3>
+            <p class="text-xs text-zinc-400">Tùy biến khung mẫu tin nhắn mặc định tự động áp dụng cho tất cả đơn</p>
+          </div>
+        </div>
+        <button type="button" onclick="closeZaloConfigModal()" class="w-7 h-7 rounded-md hover:bg-zinc-800 text-zinc-400 hover:text-white flex items-center justify-center transition cursor-pointer">
+          <i class="fa-solid fa-xmark text-xs"></i>
+        </button>
+      </div>
+
+      <!-- Tab Switcher -->
+      <div class="flex items-center gap-2 px-6 pt-4 pb-2 border-b border-zinc-200/80 bg-zinc-50/50">
+        <button type="button" id="tabBtnSingle" onclick="switchZaloConfigTab('single')" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-zinc-950 text-white transition cursor-pointer shadow-xs">
+          Mẫu Đơn Lẻ (Từng Đơn)
+        </button>
+        <button type="button" id="tabBtnBatch" onclick="switchZaloConfigTab('batch')" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-white text-zinc-600 hover:text-zinc-900 border border-zinc-200 transition cursor-pointer">
+          Mẫu Tổng Hợp Toàn Bộ Đơn
+        </button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="p-6 overflow-y-auto space-y-4 flex-1 custom-scrollbar">
+        <!-- Cloud Sync Status Banner -->
+        <div class="flex items-center justify-between p-2.5 bg-emerald-50/90 border border-emerald-200/90 rounded-xl text-xs text-emerald-800">
+          <div class="flex items-center gap-2">
+            <i class="fa-solid fa-cloud-arrow-up text-emerald-600"></i>
+            <span>Mẫu tin sẽ được <b>đồng bộ lên Google Sheet</b> để máy khác tự động nhận được!</span>
+          </div>
+          <div class="flex items-center gap-2 shrink-0">
+            <button type="button" onclick="copyZaloConfigCode()" class="text-xs text-emerald-800 hover:text-emerald-950 underline cursor-pointer" title="Sao chép toàn bộ mã cấu hình mẫu để chuyển máy thủ công nhanh">Sao chép mã</button>
+            <span class="text-emerald-300">•</span>
+            <button type="button" onclick="importZaloConfigCode()" class="text-xs text-emerald-800 hover:text-emerald-950 underline cursor-pointer" title="Dán mã cấu hình từ máy khác">Dán mã</button>
+          </div>
+        </div>
+        
+        <!-- TAG CHIPS FOR SINGLE -->
+        <div id="chipsSectionSingle">
+          <div class="flex items-center justify-between mb-1.5">
+            <label class="text-xs font-semibold text-zinc-700">Thẻ dữ liệu tự động (Bấm 1 chạm để chèn vào vị trí con trỏ):</label>
+            <span class="text-xs text-zinc-400">Click để chèn</span>
+          </div>
+          <div class="flex flex-wrap gap-1.5 p-2.5 bg-zinc-100/80 rounded-xl border border-zinc-200/80 text-xs">
+            <button type="button" onclick="insertTagToZaloConfig('{MA_DON}')" class="px-2 py-1 rounded bg-white hover:bg-zinc-200 text-zinc-800 font-mono-val border border-zinc-200 transition cursor-pointer" title="Mã đơn in (VD: FU918)">+ {MA_DON}</button>
+            <button type="button" onclick="insertTagToZaloConfig('{DAU_RE}')" class="px-2 py-1 rounded bg-white hover:bg-zinc-200 text-zinc-800 font-mono-val border border-zinc-200 transition cursor-pointer" title="Tên Cô dâu & Chú rể">+ {DAU_RE}</button>
+            <button type="button" onclick="insertTagToZaloConfig('{XUONG}')" class="px-2 py-1 rounded bg-white hover:bg-zinc-200 text-zinc-800 font-mono-val border border-zinc-200 transition cursor-pointer" title="Tên xưởng in">+ {XUONG}</button>
+            <button type="button" onclick="insertTagToZaloConfig('{NGAY}')" class="px-2 py-1 rounded bg-white hover:bg-zinc-200 text-zinc-800 font-mono-val border border-zinc-200 transition cursor-pointer" title="Ngày gửi in">+ {NGAY}</button>
+            <button type="button" onclick="insertTagToZaloConfig('{NGAY_NHAN}')" class="px-2 py-1 rounded bg-white hover:bg-zinc-200 text-emerald-800 font-mono-val border border-emerald-200 transition cursor-pointer" title="Ngày nhận hình (Mặc định +2 ngày hoặc 1 ngày nếu in gấp)">+ {NGAY_NHAN}</button>
+            <button type="button" onclick="insertTagToZaloConfig('{TINH_TRANG_GAP}')" class="px-2 py-1 rounded bg-white hover:bg-zinc-200 text-rose-700 font-mono-val border border-rose-200 transition cursor-pointer" title="Thẻ báo [⚡ IN GẤP] nếu là đơn gấp">+ {TINH_TRANG_GAP}</button>
+            <button type="button" onclick="insertTagToZaloConfig('{DANH_SACH_MON}')" class="px-2 py-1 rounded bg-white hover:bg-zinc-200 text-zinc-800 font-mono-val border border-zinc-200 transition cursor-pointer" title="Danh sách sản phẩm in kèm số lượng">+ {DANH_SACH_MON}</button>
+            <button type="button" onclick="insertTagToZaloConfig('{LINK_DRIVE}')" class="px-2 py-1 rounded bg-white hover:bg-zinc-200 text-zinc-800 font-mono-val border border-zinc-200 transition cursor-pointer" title="Link folder Google Drive">+ {LINK_DRIVE}</button>
+            <button type="button" onclick="insertTagToZaloConfig('{TONG_TIEN}')" class="px-2 py-1 rounded bg-white hover:bg-zinc-200 text-zinc-800 font-mono-val border border-zinc-200 transition cursor-pointer" title="Tổng tiền đơn xưởng">+ {TONG_TIEN}</button>
+            <button type="button" onclick="insertTagToZaloConfig('{GHI_CHU}')" class="px-2 py-1 rounded bg-white hover:bg-zinc-200 text-zinc-800 font-mono-val border border-zinc-200 transition cursor-pointer" title="Ghi chú đơn">+ {GHI_CHU}</button>
+          </div>
+        </div>
+
+        <!-- TAG CHIPS FOR BATCH -->
+        <div id="chipsSectionBatch" class="hidden">
+          <div class="flex items-center justify-between mb-1.5">
+            <label class="text-xs font-semibold text-zinc-700">Thẻ dữ liệu tổng hợp (Bấm 1 chạm để chèn):</label>
+            <span class="text-xs text-zinc-400">Click để chèn</span>
+          </div>
+          <div class="flex flex-wrap gap-1.5 p-2.5 bg-zinc-100/80 rounded-xl border border-zinc-200/80 text-xs">
+            <button type="button" onclick="insertTagToZaloConfig('{XUONG}')" class="px-2 py-1 rounded bg-white hover:bg-zinc-200 text-zinc-800 font-mono-val border border-zinc-200 transition cursor-pointer" title="Tên xưởng đang lọc hoặc Tất cả xưởng">+ {XUONG}</button>
+            <button type="button" onclick="insertTagToZaloConfig('{NGAY_HIEN_TAI}')" class="px-2 py-1 rounded bg-white hover:bg-zinc-200 text-zinc-800 font-mono-val border border-zinc-200 transition cursor-pointer" title="Ngày hôm nay">+ {NGAY_HIEN_TAI}</button>
+            <button type="button" onclick="insertTagToZaloConfig('{SO_LUONG_DON}')" class="px-2 py-1 rounded bg-white hover:bg-zinc-200 text-zinc-800 font-mono-val border border-zinc-200 transition cursor-pointer" title="Tổng số đơn đang gửi">+ {SO_LUONG_DON}</button>
+            <button type="button" onclick="insertTagToZaloConfig('{TONG_TIEN_TOAN_BO}')" class="px-2 py-1 rounded bg-white hover:bg-zinc-200 text-zinc-800 font-mono-val border border-zinc-200 transition cursor-pointer" title="Tổng tiền tất cả các đơn">+ {TONG_TIEN_TOAN_BO}</button>
+            <button type="button" onclick="insertTagToZaloConfig('{DANH_SACH_TAT_CA_DON}')" class="px-2 py-1 rounded bg-white hover:bg-zinc-200 text-zinc-800 font-mono-val border border-zinc-200 transition cursor-pointer" title="Danh sách chi tiết từng đơn hàng gom lại">+ {DANH_SACH_TAT_CA_DON}</button>
+          </div>
+        </div>
+
+        <!-- TEXTAREA SECTION -->
+        <div>
+          <label class="block text-xs font-semibold text-zinc-700 mb-1.5 flex items-center justify-between">
+            <span id="configTextareaLabel">Nội dung mẫu mặc định (Đơn lẻ)</span>
+            <span class="text-xs text-zinc-400 font-normal">Tự động lưu vào trình duyệt máy này</span>
+          </label>
+          <textarea id="cfgZaloSingleTemplate" rows="9" class="w-full text-xs font-mono-val border border-zinc-300 rounded-xl p-3.5 outline-none focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900 bg-white transition leading-relaxed resize-y custom-scrollbar"></textarea>
+          <textarea id="cfgZaloBatchTemplate" rows="9" class="w-full text-xs font-mono-val border border-zinc-300 rounded-xl p-3.5 outline-none focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900 bg-white transition leading-relaxed resize-y custom-scrollbar hidden"></textarea>
+        </div>
+
+        <!-- Hướng dẫn & Lưu ý -->
+        <div class="p-3 bg-zinc-50 border border-zinc-200 rounded-xl flex items-start gap-2.5 text-xs text-zinc-600">
+          <i class="fa-solid fa-lightbulb text-amber-500 mt-0.5"></i>
+          <p class="leading-relaxed">
+            Mẫu này sẽ được dùng làm <b>khung mặc định</b> mỗi khi bạn bấm nút Zalo trên đơn hàng hoặc nút "Tổng hợp Zalo". Bạn có thể tùy chỉnh lời dặn dò, quy cách đóng gói, profile màu theo chuẩn riêng của studio.
+          </p>
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="p-4 bg-zinc-50/90 border-t border-zinc-200 flex justify-between items-center gap-2">
+        <button type="button" onclick="resetZaloConfigToDefault()" class="text-xs font-medium text-rose-700 hover:text-rose-900 flex items-center gap-1.5 cursor-pointer hover:underline">
+          <i class="fa-solid fa-rotate-left text-xs"></i> Khôi phục mẫu gốc
+        </button>
+        <div class="flex items-center gap-2">
+          <button type="button" onclick="closeZaloConfigModal()" class="px-4 py-2 text-xs font-medium text-zinc-600 hover:bg-zinc-200/60 rounded-lg transition cursor-pointer">
+            Đóng
+          </button>
+          <button type="button" onclick="saveZaloConfig()" class="px-5 py-2 bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-medium rounded-lg transition cursor-pointer shadow-xs flex items-center gap-2 border border-zinc-900">
+            <i class="fa-solid fa-check text-xs text-emerald-400"></i>
+            <span>Lưu Mẫu Mặc Định</span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ==================== MODAL KẾT NỐI GOOGLE SHEET (CLOUD BACKEND) ==================== -->
+  <div id="cloudModal" class="fixed inset-0 bg-zinc-950/40 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white/95 backdrop-blur-2xl rounded-2xl shadow-2xl max-w-xl w-full max-h-[90vh] flex flex-col overflow-hidden border border-white/80">
+      
+      <!-- Modal Header -->
+      <div class="bg-zinc-950 text-zinc-100 px-6 py-4 flex justify-between items-center border-b border-zinc-800">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 rounded-md bg-zinc-800 text-zinc-100 flex items-center justify-center text-xs border border-zinc-700">
+            <i class="fa-solid fa-cloud"></i>
+          </div>
+          <div>
+            <h3 class="font-semibold text-sm tracking-tight text-white">Kết Nối Đám Mây Google Sheets</h3>
+            <p class="text-xs text-zinc-400">Đồng bộ hai chiều dữ liệu giữa nhiều thiết bị</p>
+          </div>
+        </div>
+        <button type="button" onclick="closeCloudModal()" class="w-7 h-7 rounded-md hover:bg-zinc-800 text-zinc-400 hover:text-white flex items-center justify-center transition cursor-pointer">
+          <i class="fa-solid fa-xmark text-xs"></i>
+        </button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="p-6 overflow-y-auto space-y-5 flex-1 custom-scrollbar">
+        <div>
+          <label class="block text-xs font-mono-val text-zinc-600 font-semibold mb-2">Đường link Web App Google Apps Script</label>
+          <div class="flex items-center gap-2">
+            <input type="url" id="gasUrlInput" placeholder="https://script.google.com/macros/s/.../exec" class="flex-1 text-xs font-mono-val border border-zinc-200 rounded-md px-3 py-2 outline-none focus:border-zinc-900 bg-white transition">
+            <button type="button" onclick="testAndSaveGasUrl()" class="px-3.5 py-2 bg-zinc-950 hover:bg-zinc-800 text-zinc-100 text-xs font-medium rounded-md transition cursor-pointer whitespace-nowrap border border-zinc-900">
+              Kiểm Tra & Lưu
+            </button>
+          </div>
+          <p class="text-xs text-zinc-400 mt-1.5">Dán đường dẫn triển khai Web App từ Google Sheets của bạn vào đây.</p>
+        </div>
+
+        <div class="bg-zinc-50 border border-zinc-200 rounded-lg p-4 space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold text-zinc-900 flex items-center gap-1.5">
+              <i class="fa-solid fa-cloud-arrow-up text-zinc-600"></i> Đẩy dữ liệu hiện có lên Sheet
+            </span>
+            <button type="button" onclick="pushAllOrdersToSheet()" class="px-2.5 py-1 bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-medium rounded-md transition cursor-pointer">
+              Tải lên ngay
+            </button>
+          </div>
+          <p class="text-xs text-zinc-500 leading-relaxed">
+            Nếu máy tính này đang có sẵn các đơn in mẫu hoặc đơn cũ trong LocalStorage, bấm nút này để đẩy toàn bộ lên Google Sheet làm dữ liệu chung cho các máy khác.
+          </p>
+        </div>
+
+        <div class="border-t border-zinc-100 pt-4 space-y-2.5">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold text-zinc-800 uppercase tracking-wide">3 Bước Nối Sheet Trong 1 Phút</span>
+            <button type="button" onclick="copyGasScript()" class="text-xs font-medium text-zinc-600 hover:text-zinc-900 flex items-center gap-1 cursor-pointer bg-zinc-100 px-2.5 py-1 rounded border border-zinc-200">
+              <i class="fa-regular fa-copy text-xs"></i> Sao chép mã Script
+            </button>
+          </div>
+          <ol class="text-xs text-zinc-600 space-y-2 list-decimal list-inside leading-relaxed bg-zinc-50 p-3.5 rounded-lg border border-zinc-200">
+            <li>Mở file Google Sheet mới trên Google Drive &gt; Chọn <b>Tiện ích mở rộng (Extensions)</b> &gt; <b>Apps Script</b>.</li>
+            <li>Xoá hết code cũ trong đó, bấm nút <b>Sao chép mã Script</b> ở trên rồi dán vào. Nhấn biểu tượng lưu 💾.</li>
+            <li>Bấm <b>Triển khai (Deploy)</b> &gt; <b>Triển khai mới (New deployment)</b> &gt; Loại: <b>Ứng dụng web (Web app)</b>. Ở mục <i>Ai có quyền truy cập (Who has access)</i> chọn <b>Bất kỳ ai (Anyone)</b>. Bấm Triển khai và copy link dán vào ô trên!</li>
+          </ol>
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="p-4 bg-zinc-50 border-t border-zinc-200 flex justify-between items-center">
+        <button type="button" onclick="disconnectGas()" class="text-xs font-medium text-rose-600 hover:underline cursor-pointer">Ngắt kết nối Sheet (Dùng máy này)</button>
+        <button type="button" onclick="closeCloudModal()" class="px-4 py-1.5 bg-zinc-900 text-white text-xs font-medium rounded-md cursor-pointer hover:bg-zinc-800 transition">Đóng</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL TẠO / SỬA ĐƠN IN (STUDIO POS ARCHITECTURAL) ==================== -->
+  <div id="orderModal" class="fixed inset-0 bg-zinc-950/40 backdrop-blur-md z-50 hidden flex items-center justify-center p-2 sm:p-4">
+    <div class="bg-white/95 backdrop-blur-2xl rounded-2xl shadow-2xl max-w-6xl w-full max-h-[94vh] flex flex-col overflow-hidden border border-white/80">
+      
+      <!-- Modal Top Header -->
+      <div class="bg-zinc-950 text-zinc-100 px-6 py-3.5 flex justify-between items-center shrink-0 border-b border-zinc-800">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 rounded-md bg-zinc-800 text-zinc-200 flex items-center justify-center text-xs border border-zinc-700">
+            <i class="fa-solid fa-pen-nib"></i>
+          </div>
+          <div>
+            <h3 class="font-semibold text-sm tracking-tight text-white" id="modalTitle">Lên Đơn In Gửi Xưởng</h3>
+            <p class="text-xs text-zinc-400">Chọn combo chạm nhanh hoặc chạm từng sản phẩm để tạo phiếu kê</p>
+          </div>
+        </div>
+        <button type="button" onclick="closeModal()" class="w-7 h-7 rounded-md hover:bg-zinc-800 text-zinc-400 hover:text-white flex items-center justify-center transition cursor-pointer">
+          <i class="fa-solid fa-xmark text-xs"></i>
+        </button>
+      </div>
+
+      <!-- Modal Form Body -->
+      <form id="orderForm" onsubmit="saveOrder(event)" class="flex-1 overflow-y-auto p-4 sm:p-6 custom-scrollbar space-y-4 bg-zinc-50/50">
+        <input type="hidden" id="orderId">
+
+        <!-- Customer & Order Information Bar -->
+        <div class="bg-white p-4 rounded-xl border border-zinc-200/90 shadow-xs space-y-3">
+          <!-- Row 1: Code, Client Name, Workshop -->
+          <div class="grid grid-cols-1 sm:grid-cols-12 gap-3">
+            <div class="sm:col-span-3">
+              <label class="block text-xs font-mono-val font-semibold text-zinc-600 mb-1">Mã hợp đồng *</label>
+              <input type="text" id="orderCode" placeholder="VD: FU935" required class="w-full text-xs font-mono-val font-semibold text-zinc-900 border border-zinc-200 rounded-md px-3 py-1.5 outline-none focus:border-zinc-900 bg-zinc-50/50 focus:bg-white transition uppercase">
+            </div>
+            <div class="sm:col-span-6">
+              <label class="block text-xs font-mono-val font-semibold text-zinc-600 mb-1">Tên Dâu — Rể *</label>
+              <input type="text" id="clientName" placeholder="VD: ĐẠT & THƯ" required class="w-full text-xs font-semibold text-zinc-900 border border-zinc-200 rounded-md px-3 py-1.5 outline-none focus:border-zinc-900 bg-zinc-50/50 focus:bg-white transition">
+            </div>
+            <div class="sm:col-span-3">
+              <label class="block text-xs font-mono-val font-semibold text-zinc-600 mb-1">Xưởng gia công</label>
+              <input type="text" id="workshopName" placeholder="TPS" value="TPS" class="w-full text-xs font-semibold text-zinc-700 border border-zinc-200 rounded-md px-3 py-1.5 outline-none focus:border-zinc-900 bg-zinc-50/50 focus:bg-white transition">
+            </div>
+          </div>
+
+          <!-- Row 2: Dates (Gửi & Nhận hình + nút In Gấp 1 ngày) & Drive Link -->
+          <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 items-end pt-2 border-t border-zinc-100">
+            <div class="sm:col-span-3">
+              <label class="block text-xs font-mono-val font-semibold text-zinc-600 mb-1">Ngày gửi in *</label>
+              <input type="date" id="printDate" onchange="onPrintDateChange()" required class="w-full text-xs font-mono-val text-zinc-700 border border-zinc-200 rounded-md px-3 py-1.5 outline-none focus:border-zinc-900 bg-zinc-50/50 focus:bg-white transition">
+            </div>
+
+            <div class="sm:col-span-4">
+              <div class="flex items-center justify-between mb-1">
+                <label class="text-xs font-mono-val font-semibold text-zinc-600">Ngày nhận hình</label>
+                <div class="flex items-center gap-1">
+                  <button type="button" id="btnDeliveryNormal" onclick="setDeliveryPreset(2)" class="px-2 py-0.5 rounded text-xs font-semibold bg-zinc-900 text-white shadow-2xs cursor-pointer transition" title="Chuẩn: 2 ngày sau khi gửi in">📅 Chuẩn (+2 ngày)</button>
+                  <button type="button" id="btnDeliveryUrgent" onclick="setDeliveryPreset(1)" class="px-2 py-0.5 rounded text-xs font-medium bg-zinc-100 text-zinc-600 hover:text-rose-700 hover:bg-rose-50 cursor-pointer transition" title="In gấp: giao liền trong 1 ngày">⚡ In gấp (1 ngày)</button>
+                </div>
+              </div>
+              <div class="relative">
+                <input type="date" id="deliveryDate" class="w-full text-xs font-mono-val text-zinc-800 border border-zinc-200 rounded-md px-3 py-1.5 outline-none focus:border-zinc-900 bg-zinc-50/50 focus:bg-white transition">
+                <input type="checkbox" id="isUrgent" class="hidden">
+              </div>
+            </div>
+
+            <div class="sm:col-span-5">
+              <label class="block text-xs font-mono-val font-semibold text-zinc-600 mb-1 flex items-center justify-between">
+                <span class="flex items-center gap-1"><i class="fa-brands fa-google-drive text-emerald-600 text-xs"></i> Link Drive file in</span>
+                <span class="text-xs text-zinc-400 font-normal">Tùy chọn</span>
+              </label>
+              <input type="url" id="driveUrl" placeholder="https://drive.google.com/..." class="w-full text-xs border border-zinc-200 rounded-md px-3 py-1.5 outline-none focus:border-zinc-900 bg-zinc-50/50 focus:bg-white transition">
+            </div>
+          </div>
+        </div>
+
+        <!-- 2-Column POS Layout -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
+          
+          <!-- LEFT COLUMN (7 cols): COMBOS & PRODUCT TILES -->
+          <div class="lg:col-span-7 space-y-4">
+            
+            <!-- Block 1: 1-Tap Combos -->
+            <div class="bg-white p-4 rounded-lg border border-zinc-200 shadow-xs space-y-3">
+              <div class="flex items-center justify-between border-b border-zinc-100 pb-2">
+                <div class="flex items-center gap-2">
+                  <span class="w-5 h-5 rounded bg-zinc-100 text-zinc-700 flex items-center justify-center text-xs font-mono-val font-semibold">1</span>
+                  <span class="text-xs font-semibold text-zinc-900">Combo chọn nhanh</span>
+                </div>
+                <button type="button" onclick="clearCart()" class="text-xs font-medium text-zinc-400 hover:text-rose-600 flex items-center gap-1 cursor-pointer transition">
+                  <i class="fa-regular fa-trash-can text-xs"></i> Xoá giỏ
+                </button>
+              </div>
+
+              <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                <button type="button" onclick="applyCombo('2_cong_guong')" class="pos-btn text-left p-2.5 rounded-lg border border-zinc-200 hover:border-zinc-900 bg-zinc-50/40 hover:bg-zinc-900 group cursor-pointer transition-all">
+                  <div class="flex items-center justify-between">
+                    <span class="text-xs font-semibold text-zinc-900 group-hover:text-white">2 Cổng Tráng Gương</span>
+                  </div>
+                  <div class="text-xs text-zinc-500 group-hover:text-zinc-300 mt-1">2 tấm 60x90 Tráng gương</div>
+                </button>
+
+                <button type="button" onclick="applyCombo('1_guong_1_go')" class="pos-btn text-left p-2.5 rounded-lg border border-zinc-200 hover:border-zinc-900 bg-zinc-50/40 hover:bg-zinc-900 group cursor-pointer transition-all">
+                  <div class="flex items-center justify-between">
+                    <span class="text-xs font-semibold text-zinc-900 group-hover:text-white">1 Gương + 1 Ép Gỗ</span>
+                  </div>
+                  <div class="text-xs text-zinc-500 group-hover:text-zinc-300 mt-1">1 Cổng gương + 1 Cổng gỗ</div>
+                </button>
+
+                <button type="button" onclick="applyCombo('combo_tiec_cuoi')" class="pos-btn text-left p-2.5 rounded-lg border border-zinc-200 hover:border-zinc-900 bg-zinc-50/40 hover:bg-zinc-900 group cursor-pointer transition-all">
+                  <div class="flex items-center justify-between">
+                    <span class="text-xs font-semibold text-zinc-900 group-hover:text-white">Trọn Gói Cưới Chuẩn</span>
+                  </div>
+                  <div class="text-xs text-zinc-500 group-hover:text-zinc-300 mt-1">1 AB 30x30 + 1 Cổng + 5 Bàn</div>
+                </button>
+
+                <button type="button" onclick="applyCombo('combo_2_cong_5_ban')" class="pos-btn text-left p-2.5 rounded-lg border border-zinc-200 hover:border-zinc-900 bg-zinc-50/40 hover:bg-zinc-900 group cursor-pointer transition-all">
+                  <div class="flex items-center justify-between">
+                    <span class="text-xs font-semibold text-zinc-900 group-hover:text-white">2 Cổng + 5 Ảnh Bàn</span>
+                  </div>
+                  <div class="text-xs text-zinc-500 group-hover:text-zinc-300 mt-1">Khách đổi AB lấy 2 cổng</div>
+                </button>
+
+                <button type="button" onclick="applyCombo('only_10_ban')" class="pos-btn text-left p-2.5 rounded-lg border border-zinc-200 hover:border-zinc-900 bg-zinc-50/40 hover:bg-zinc-900 group cursor-pointer transition-all">
+                  <div class="flex items-center justify-between">
+                    <span class="text-xs font-semibold text-zinc-900 group-hover:text-white">In Lẻ 10 Ảnh Bàn</span>
+                  </div>
+                  <div class="text-xs text-zinc-500 group-hover:text-zinc-300 mt-1">10 tấm 13x18 Ép gỗ</div>
+                </button>
+
+                <button type="button" onclick="addCustomRowToCart()" class="pos-btn text-left p-2.5 rounded-lg border border-dashed border-zinc-300 hover:border-zinc-900 bg-white hover:bg-zinc-50 group cursor-pointer transition-all">
+                  <div class="flex items-center justify-between">
+                    <span class="text-xs font-semibold text-zinc-700">+ Tự Gõ Món Lạ</span>
+                    <i class="fa-solid fa-pen-nib text-xs text-zinc-500"></i>
+                  </div>
+                  <div class="text-xs text-zinc-500 mt-1">Kích thước / yêu cầu riêng</div>
+                </button>
+              </div>
+            </div>
+
+            <!-- Block 2: Individual Item Catalog -->
+            <div class="bg-white p-4 rounded-lg border border-zinc-200 shadow-xs space-y-3">
+              <div class="flex flex-wrap items-center justify-between gap-2 border-b border-zinc-100 pb-2">
+                <div class="flex items-center gap-2">
+                  <span class="w-5 h-5 rounded bg-zinc-950 text-white flex items-center justify-center text-xs font-mono-val font-semibold">2</span>
+                  <span class="text-xs font-semibold text-zinc-900">Chọn lẻ từng món (chạm +1)</span>
+                </div>
+
+                <!-- Category Filter Pills -->
+                <div class="flex flex-wrap gap-1" id="categoryTabs">
+                  <button type="button" onclick="filterCatalog('ALL')" data-cat="ALL" class="cat-tab bg-zinc-900 text-white text-xs px-2.5 py-1 rounded-md font-medium transition cursor-pointer border border-zinc-900">Tất cả</button>
+                  <button type="button" onclick="filterCatalog('ANH_CONG')" data-cat="ANH_CONG" class="cat-tab bg-white text-zinc-600 text-xs px-2.5 py-1 rounded-md font-medium hover:bg-zinc-100 transition cursor-pointer border border-zinc-200">Ảnh Cổng</button>
+                  <button type="button" onclick="filterCatalog('ALBUM')" data-cat="ALBUM" class="cat-tab bg-white text-zinc-600 text-xs px-2.5 py-1 rounded-md font-medium hover:bg-zinc-100 transition cursor-pointer border border-zinc-200">Album & Hộp</button>
+                  <button type="button" onclick="filterCatalog('ANH_LE')" data-cat="ANH_LE" class="cat-tab bg-white text-zinc-600 text-xs px-2.5 py-1 rounded-md font-medium hover:bg-zinc-100 transition cursor-pointer border border-zinc-200">Ảnh Lẻ / Bàn</button>
+                </div>
+              </div>
+
+              <!-- Product Grid -->
+              <div id="quickCatalogGrid" class="grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-[260px] overflow-y-auto pr-1 custom-scrollbar">
+                <!-- Rendered by JS -->
+              </div>
+            </div>
+
+          </div>
+
+          <!-- RIGHT COLUMN (5 cols): RECEIPT / ORDER CART -->
+          <div class="lg:col-span-5 bg-white rounded-lg border border-zinc-200 shadow-xs flex flex-col overflow-hidden">
+            <div class="bg-zinc-950 text-zinc-200 px-4 py-3 flex justify-between items-center border-b border-zinc-800">
+              <div class="flex items-center gap-2">
+                <i class="fa-solid fa-layer-group text-zinc-400 text-xs"></i>
+                <span class="text-xs font-semibold text-white">Phiếu kê đơn in</span>
+              </div>
+              <span id="cartCountBadge" class="bg-zinc-800 text-zinc-200 text-xs font-mono-val px-2 py-0.5 rounded border border-zinc-700">0 món</span>
+            </div>
+
+            <!-- Cart List -->
+            <div id="cartItemsContainer" class="p-4 space-y-2.5 max-h-[340px] overflow-y-auto custom-scrollbar divide-y divide-zinc-100">
+              <!-- Rendered by JS -->
+            </div>
+
+            <!-- Cart Summary & Payment Status -->
+            <div class="p-4 bg-zinc-50/80 border-t border-zinc-200 space-y-3">
+              <div class="flex justify-between items-baseline">
+                <span class="text-xs font-mono-val text-zinc-600 font-semibold">Tổng chi phí:</span>
+                <span class="text-2xl font-light text-zinc-950 tabular-nums font-mono-val" id="modalTotalPreview">0 đ</span>
+              </div>
+
+              <div class="pt-2 border-t border-zinc-200">
+                <label class="block text-xs font-mono-val text-zinc-600 font-semibold mb-1">Trạng thái thanh toán xưởng</label>
+                <select id="paymentStatus" class="w-full text-xs font-semibold border border-zinc-200 rounded-md px-3 py-2 outline-none bg-white text-zinc-900 shadow-xs focus:border-zinc-900 cursor-pointer">
+                  <option value="Chưa thanh toán">🔴 Chưa thanh toán (Ghi nhận nợ xưởng)</option>
+                  <option value="Đã thanh toán">🟢 Đã thanh toán (Tất toán xong)</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Modal Action Footer -->
+        <div class="pt-3 flex justify-end gap-2.5 border-t border-zinc-200">
+          <button type="button" onclick="closeModal()" class="px-4 py-2 text-xs font-medium text-zinc-600 hover:bg-zinc-200/60 rounded-md transition cursor-pointer">Hủy bỏ</button>
+          <button type="submit" class="px-5 py-2 text-xs bg-zinc-950 hover:bg-zinc-800 text-white font-medium rounded-md shadow-xs flex items-center gap-2 transition cursor-pointer border border-zinc-900">
+            <i class="fa-solid fa-check text-zinc-300 text-xs"></i> Lưu Đơn Hàng
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL QUẢN LÝ BẢNG GIÁ MẪU ==================== -->
+  <div id="catalogModal" class="fixed inset-0 bg-zinc-950/40 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white/95 backdrop-blur-2xl rounded-2xl shadow-2xl max-w-xl w-full max-h-[85vh] flex flex-col overflow-hidden border border-white/80">
+      
+      <div class="bg-zinc-950 text-zinc-100 px-6 py-4 flex justify-between items-center border-b border-zinc-800">
+        <div>
+          <h3 class="font-semibold text-sm tracking-tight text-white">Cấu Hình Bảng Giá Xưởng Mẫu</h3>
+          <p class="text-xs text-zinc-400">Thêm sản phẩm mới hoặc điều chỉnh đơn giá gia công mặc định</p>
+        </div>
+        <button type="button" onclick="closeCatalogModal()" class="w-7 h-7 rounded-md hover:bg-zinc-800 text-zinc-400 hover:text-white flex items-center justify-center transition cursor-pointer">
+          <i class="fa-solid fa-xmark text-xs"></i>
+        </button>
+      </div>
+
+      <div class="p-5 overflow-y-auto space-y-4 flex-1 custom-scrollbar">
+        <!-- Khung Thêm Sản Phẩm Mới Vào Bảng Giá -->
+        <div class="bg-zinc-50 p-3.5 rounded-xl border border-zinc-200">
+          <div class="text-xs font-semibold text-zinc-700 mb-2 flex items-center gap-1.5">
+            <i class="fa-solid fa-plus-circle text-zinc-500 text-xs"></i>
+            <span>Thêm sản phẩm mới vào bảng giá</span>
+          </div>
+          <div class="grid grid-cols-12 gap-2 items-end">
+            <div class="col-span-5">
+              <label class="block text-xs font-mono-val font-semibold text-zinc-600 mb-1">Tên sản phẩm *</label>
+              <input type="text" id="newCatName" placeholder="VD: Cổng Khung Nổi 60x90" class="w-full text-xs border border-zinc-200 rounded-md px-2.5 py-1.5 outline-none bg-white font-medium focus:border-zinc-900">
+            </div>
+            <div class="col-span-3">
+              <label class="block text-xs font-mono-val font-semibold text-zinc-600 mb-1">Nhóm phân loại</label>
+              <select id="newCatGroup" class="w-full text-xs border border-zinc-200 rounded-md px-2 py-1.5 bg-white outline-none font-medium focus:border-zinc-900 cursor-pointer">
+                <option value="ANH_CONG">Ảnh Cổng</option>
+                <option value="ALBUM">Album & Hộp</option>
+                <option value="ANH_LE">Ảnh Lẻ / Bàn</option>
+              </select>
+            </div>
+            <div class="col-span-2">
+              <label class="block text-xs font-mono-val font-semibold text-zinc-600 mb-1">Giá xưởng</label>
+              <input type="number" id="newCatPrice" placeholder="300000" class="w-full text-xs border border-zinc-200 rounded-md px-2 py-1.5 outline-none bg-white font-mono-val focus:border-zinc-900">
+            </div>
+            <div class="col-span-2">
+              <button type="button" onclick="addNewCatalogItem()" class="w-full bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-medium py-1.5 rounded-md cursor-pointer transition shadow-2xs">+ Thêm</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Thanh Lọc Danh Sách Bảng Giá Theo Nhóm -->
+        <div class="flex items-center justify-between pt-1">
+          <div class="text-xs font-semibold text-zinc-700 flex items-center gap-1.5">
+            <i class="fa-solid fa-list-check text-zinc-500 text-xs"></i>
+            <span>Danh sách bảng giá hiện tại</span>
+          </div>
+          <div class="flex items-center gap-1 bg-zinc-100 p-0.5 rounded-lg border border-zinc-200/80">
+            <button type="button" onclick="filterCatalogManage('ALL')" id="catTabManage_ALL" class="cat-manage-pill px-2.5 py-1 rounded text-xs font-semibold bg-zinc-950 text-white transition cursor-pointer">Tất cả</button>
+            <button type="button" onclick="filterCatalogManage('ANH_CONG')" id="catTabManage_ANH_CONG" class="cat-manage-pill px-2.5 py-1 rounded text-xs font-medium text-zinc-600 hover:text-zinc-900 transition cursor-pointer">Ảnh Cổng</button>
+            <button type="button" onclick="filterCatalogManage('ALBUM')" id="catTabManage_ALBUM" class="cat-manage-pill px-2.5 py-1 rounded text-xs font-medium text-zinc-600 hover:text-zinc-900 transition cursor-pointer">Album & Hộp</button>
+            <button type="button" onclick="filterCatalogManage('ANH_LE')" id="catTabManage_ANH_LE" class="cat-manage-pill px-2.5 py-1 rounded text-xs font-medium text-zinc-600 hover:text-zinc-900 transition cursor-pointer">Ảnh Lẻ</button>
+          </div>
+        </div>
+
+        <div id="catalogManageList" class="divide-y divide-zinc-100 border border-zinc-200 rounded-lg overflow-hidden"></div>
+      </div>
+
+      <div class="p-4 bg-zinc-50 border-t border-zinc-200 flex justify-between items-center">
+        <button type="button" onclick="resetDefaultCatalog()" class="text-xs font-medium text-rose-600 hover:underline cursor-pointer">Khôi phục mặc định</button>
+        <button type="button" onclick="closeCatalogModal()" class="px-4 py-1.5 bg-zinc-900 text-white text-xs font-medium rounded-md cursor-pointer hover:bg-zinc-800 transition">Đóng lại</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== JAVASCRIPT LOGIC CORE (PRESERVED 100%) ==================== -->
+  <script>
+    const GAS_SCRIPT_TEMPLATE = `// FU STUDIO - GOOGLE APPS SCRIPT (v7.1 - Đồng Bộ Đơn & Mẫu Tin Nhắn Cloud)
+function doGet(e) {
+  var lock = LockService.getScriptLock();
+  lock.tryLock(10000);
+  try {
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var sheet = getOrCreateSheet(ss);
+    var action = (e && e.parameter && e.parameter.action) ? e.parameter.action : 'getOrders';
+    if (action === 'getOrders') {
+      var orders = readAllOrders(sheet);
+      var settings = readAllSettings(ss);
+      return createJsonResponse({ status: 'success', orders: orders, settings: settings });
+    }
+    return createJsonResponse({ status: 'error', message: 'Action invalid' });
+  } catch(err) {
+    return createJsonResponse({ status: 'error', message: err.toString() });
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+function doPost(e) {
+  var lock = LockService.getScriptLock();
+  lock.tryLock(10000);
+  try {
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var sheet = getOrCreateSheet(ss);
+    var data = JSON.parse(e.postData.contents);
+    var action = data.action;
+
+    if (action === 'getOrders') {
+      return createJsonResponse({ status: 'success', orders: readAllOrders(sheet), settings: readAllSettings(ss) });
+    } else if (action === 'saveOrder') {
+      saveOrUpdateOrder(sheet, data.order);
+      return createJsonResponse({ status: 'success' });
+    } else if (action === 'deleteOrder') {
+      deleteOrderById(sheet, data.id);
+      return createJsonResponse({ status: 'success' });
+    } else if (action === 'togglePayment') {
+      updatePaymentStatus(sheet, data.id, data.payment);
+      return createJsonResponse({ status: 'success' });
+    } else if (action === 'saveSettings') {
+      saveSettings(ss, data.settings || {});
+      return createJsonResponse({ status: 'success' });
+    } else if (action === 'bulkSave') {
+      (data.orders || []).forEach(function(o) { saveOrUpdateOrder(sheet, o); });
+      if (data.settings) saveSettings(ss, data.settings);
+      return createJsonResponse({ status: 'success' });
+    }
+    return createJsonResponse({ status: 'error', message: 'Action not supported' });
+  } catch(err) {
+    return createJsonResponse({ status: 'error', message: err.toString() });
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+function getOrCreateSheet(ss) {
+  var sheet = ss.getSheetByName('Đơn In Fu Studio');
+  if (!sheet) {
+    sheet = ss.insertSheet('Đơn In Fu Studio');
+    var headers = ['ID', 'Mã Đơn', 'Tên Dâu Rể', 'Ngày Gửi', 'Xưởng', 'Công Nợ', 'Tổng Tiền', 'Sản Phẩm In', 'Dữ Liệu JSON', 'Cập Nhật Lúc', 'Link Drive', 'Ngày Nhận', 'In Gấp'];
+    sheet.appendRow(headers);
+    sheet.getRange(1, 1, 1, headers.length).setFontWeight('bold').setBackground('#0F172A').setFontColor('#F8FAFC');
+    sheet.setFrozenRows(1);
+  }
+  return sheet;
+}
+
+function getOrCreateSettingsSheet(ss) {
+  var sheet = ss.getSheetByName('Cài Đặt Fu Studio');
+  if (!sheet) {
+    sheet = ss.insertSheet('Cài Đặt Fu Studio');
+    var headers = ['Khóa (Key)', 'Giá Trị (Value)', 'Cập Nhật Lúc'];
+    sheet.appendRow(headers);
+    sheet.getRange(1, 1, 1, headers.length).setFontWeight('bold').setBackground('#0F172A').setFontColor('#F8FAFC');
+    sheet.setFrozenRows(1);
+  }
+  return sheet;
+}
+
+function readAllSettings(ss) {
+  var sheet = getOrCreateSettingsSheet(ss);
+  var values = sheet.getDataRange().getValues();
+  var settings = {};
+  for (var i = 1; i < values.length; i++) {
+    var k = String(values[i][0] || '').trim();
+    if (k) settings[k] = String(values[i][1] || '');
+  }
+  return settings;
+}
+
+function saveSettings(ss, settingsObj) {
+  var sheet = getOrCreateSettingsSheet(ss);
+  var values = sheet.getDataRange().getValues();
+  var map = {};
+  for (var i = 1; i < values.length; i++) {
+    var k = String(values[i][0] || '').trim();
+    if (k) map[k] = i + 1;
+  }
+  for (var key in settingsObj) {
+    if (settingsObj.hasOwnProperty(key)) {
+      var val = settingsObj[key];
+      if (map[key]) {
+        sheet.getRange(map[key], 2, 1, 2).setValues([[val, new Date()]]);
+      } else {
+        sheet.appendRow([key, val, new Date()]);
+        map[key] = sheet.getLastRow();
+      }
+    }
+  }
+}
+
+function readAllOrders(sheet) {
+  var values = sheet.getDataRange().getValues();
+  if (values.length <= 1) return [];
+  var orders = [];
+  for (var i = 1; i < values.length; i++) {
+    var row = values[i];
+    var id = row[0];
+    if (!id) continue;
+    var items = [];
+    try { if (row[8]) items = JSON.parse(row[8]); } catch(ex) { items = []; }
+    orders.push({
+      id: Number(id) || id,
+      code: String(row[1] || ''),
+      name: String(row[2] || ''),
+      date: formatDate(row[3]),
+      workshop: String(row[4] || 'TPS'),
+      payment: String(row[5] || 'Chưa thanh toán'),
+      items: items,
+      driveUrl: String(row[10] || ''),
+      deliveryDate: formatDate(row[11]),
+      isUrgent: String(row[12] || '').toUpperCase() === 'GẤP'
+    });
+  }
+  orders.reverse();
+  return orders;
+}
+
+function formatDate(d) {
+  if (!d) return '';
+  if (d instanceof Date) {
+    var yyyy = d.getFullYear();
+    var mm = String(d.getMonth() + 1).padStart(2, '0');
+    var dd = String(d.getDate()).padStart(2, '0');
+    return yyyy + '-' + mm + '-' + dd;
+  }
+  return String(d).split('T')[0];
+}
+
+function saveOrUpdateOrder(sheet, order) {
+  var values = sheet.getDataRange().getValues();
+  var rowIndex = -1;
+  var orderId = String(order.id);
+  for (var i = 1; i < values.length; i++) {
+    if (String(values[i][0]) === orderId) {
+      rowIndex = i + 1;
+      break;
+    }
+  }
+  var totalCost = 0;
+  var itemsSummary = [];
+  (order.items || []).forEach(function(it) {
+    totalCost += (Number(it.qty) || 1) * (Number(it.price) || 0);
+    itemsSummary.push(it.qty + 'x ' + it.name);
+  });
+  var rowData = [
+    order.id, order.code, order.name, order.date, order.workshop || 'TPS',
+    order.payment || 'Chưa thanh toán', totalCost, itemsSummary.join(' | '),
+    JSON.stringify(order.items || []), new Date(), order.driveUrl || '',
+    order.deliveryDate || '', order.isUrgent ? 'GẤP' : 'Thường'
+  ];
+  if (rowIndex > 0) {
+    sheet.getRange(rowIndex, 1, 1, rowData.length).setValues([rowData]);
+  } else {
+    sheet.appendRow(rowData);
+  }
+}
+
+function deleteOrderById(sheet, id) {
+  var values = sheet.getDataRange().getValues();
+  for (var i = 1; i < values.length; i++) {
+    if (String(values[i][0]) === String(id)) {
+      sheet.deleteRow(i + 1);
+      break;
+    }
+  }
+}
+
+function updatePaymentStatus(sheet, id, payment) {
+  var values = sheet.getDataRange().getValues();
+  for (var i = 1; i < values.length; i++) {
+    if (String(values[i][0]) === String(id)) {
+      sheet.getRange(i + 1, 6).setValue(payment);
+      sheet.getRange(i + 1, 10).setValue(new Date());
+      break;
+    }
+  }
+}
+
+function createJsonResponse(obj) {
+  return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(ContentService.MimeType.JSON);
+}`;
+
+    const DEFAULT_CATALOG = [
+      { id: 'c1', name: "Ảnh Cổng Tráng Gương 60x90", price: 295000, category: "ANH_CONG" },
+      { id: 'c2', name: "Ảnh Cổng Ép Gỗ 60x90", price: 220000, category: "ANH_CONG" },
+      { id: 'c3', name: "Ảnh Cổng Pha Lê 60x90", price: 380000, category: "ANH_CONG" },
+      { id: 'c4', name: "Ảnh Cổng Tráng Gương 50x75", price: 240000, category: "ANH_CONG" },
+      { id: 'c5', name: "Ảnh Cổng Ép Gỗ 50x75", price: 180000, category: "ANH_CONG" },
+      { id: 'a1', name: "Album Photobook 30x30 (30 trang)", price: 544000, category: "ALBUM" },
+      { id: 'a2', name: "Album Photobook 25x25 (30 trang)", price: 416000, category: "ALBUM" },
+      { id: 'a3', name: "Album Mở Phẳng 25x25", price: 223200, category: "ALBUM" },
+      { id: 'a4', name: "Hộp Album Gỗ / Da", price: 139500, category: "ALBUM" },
+      { id: 'l1', name: "Ảnh Lẻ Để Bàn 13x18 Ép Gỗ", price: 27540, category: "ANH_LE" },
+      { id: 'l2', name: "Ảnh Lẻ Để Bàn 13x18 Tráng Gương", price: 38000, category: "ANH_LE" },
+      { id: 'l3', name: "Ảnh Lẻ Để Bàn 15x21 Ép Gỗ", price: 35000, category: "ANH_LE" },
+      { id: 'l4', name: "Ảnh Lẻ Rửa Giấy Lụa 13x18", price: 6000, category: "ANH_LE" },
+      { id: 'l5', name: "Ảnh Treo Cây Kẹp Gỗ (In rời)", price: 2250, category: "ANH_LE" }
+    ];
+
+    // Curated Wedding Editorial Background Presets
+    const BG_PRESETS = [
+      {
+        id: 'warm_editorial',
+        name: 'Ấm Áp Cưới Editorial',
+        url: 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=2000&q=80',
+        thumb: 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=320&q=80'
+      },
+      {
+        id: 'champagne_silk',
+        name: 'Lụa Champagne & Hoa Cưới',
+        url: 'https://images.unsplash.com/photo-1520854221256-17451cc331bf?auto=format&fit=crop&w=2000&q=80',
+        thumb: 'https://images.unsplash.com/photo-1520854221256-17451cc331bf?auto=format&fit=crop&w=320&q=80'
+      },
+      {
+        id: 'velvet_film',
+        name: 'Atelier Film Nghệ Thuật',
+        url: 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=2000&q=80',
+        thumb: 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=320&q=80'
+      },
+      {
+        id: 'minimal_linen',
+        name: 'Alabaster & Linen Tối Giản',
+        url: 'https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?auto=format&fit=crop&w=2000&q=80',
+        thumb: 'https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?auto=format&fit=crop&w=320&q=80'
+      },
+      {
+        id: 'monochrome_studio',
+        name: 'Noir Đen Trắng Cổ Điển',
+        url: 'https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&w=2000&q=80',
+        thumb: 'https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&w=320&q=80'
+      }
+    ];
+
+    let bgConfig = JSON.parse(localStorage.getItem('fu_studio_bg_config')) || {
+      url: BG_PRESETS[0].url,
+      blur: 36,
+      opacity: 45
+    };
+
+    const DEFAULT_GAS_URL = 'https://script.google.com/macros/s/AKfycbw7CjioeUF_h1Ow6pPEYe6rtuJQ0b2gKa689lY9WcPi2w_p-nJrsXugX0B2vJxcMC1s/exec';
+    let gasUrl = localStorage.getItem('fu_studio_gas_url') || DEFAULT_GAS_URL;
+    let priceCatalog = JSON.parse(localStorage.getItem('fu_studio_catalog_v3')) || DEFAULT_CATALOG;
+    let currentCategoryFilter = 'ALL';
+    let currentPaymentQuickFilter = '';
+    let currentViewMode = 'card';
+    let modalCart = [];
+
+    let orders = JSON.parse(localStorage.getItem('fu_studio_xuongin_v5')) || [
+      {
+        id: 1,
+        code: 'FU918',
+        name: 'BI & VIVIAN',
+        date: '2026-04-12',
+        deliveryDate: '2026-04-14',
+        isUrgent: false,
+        workshop: 'TPS',
+        payment: 'Đã thanh toán',
+        driveUrl: 'https://drive.google.com/drive/folders/demo-fu918',
+        items: [
+          { name: 'Album Photobook 30x30 (30 trang)', qty: 1, price: 544000 },
+          { name: 'Ảnh Cổng Tráng Gương 60x90', qty: 1, price: 295000 },
+          { name: 'Ảnh Lẻ Để Bàn 13x18 Ép Gỗ', qty: 5, price: 27540 }
+        ]
+      },
+      {
+        id: 2,
+        code: 'FU923',
+        name: 'LINH & TRUNG',
+        date: '2026-04-14',
+        deliveryDate: '2026-04-16',
+        isUrgent: false,
+        workshop: 'Xưởng Khung',
+        payment: 'Chưa thanh toán',
+        driveUrl: 'https://drive.google.com/drive/folders/demo-fu923',
+        items: [
+          { name: 'Ảnh Cổng Tráng Gương 60x90', qty: 2, price: 295000 },
+          { name: 'Hộp Album Gỗ / Da', qty: 1, price: 139500 }
+        ]
+      },
+      {
+        id: 3,
+        code: 'FU912',
+        name: 'BẢO KHUYÊN & MINH SANG',
+        date: '2026-04-15',
+        deliveryDate: '2026-04-17',
+        isUrgent: false,
+        workshop: 'TPS',
+        payment: 'Chưa thanh toán',
+        driveUrl: '',
+        items: [
+          { name: 'Ảnh Cổng Tráng Gương 60x90', qty: 1, price: 295000 },
+          { name: 'Ảnh Cổng Ép Gỗ 60x90', qty: 1, price: 220000 }
+        ]
+      },
+      {
+        id: 4,
+        code: 'FU927',
+        name: 'XUÂN NAM & TUYẾT THỦY',
+        date: '2026-04-21',
+        deliveryDate: '2026-04-22',
+        isUrgent: true,
+        workshop: 'Lab Sài Gòn',
+        payment: 'Chưa thanh toán',
+        driveUrl: '',
+        items: [
+          { name: 'Ảnh Lẻ Để Bàn 13x18 Ép Gỗ', qty: 10, price: 27540 }
+        ]
+      }
+    ];
+
+    // ================= BACKGROUND MANAGEMENT =================
+    function applyBackgroundConfig() {
+      const bgImg = document.getElementById('bgImage');
+      if (!bgImg) return;
+      bgImg.style.backgroundImage = `url('${bgConfig.url}')`;
+      bgImg.style.filter = `blur(${bgConfig.blur}px)`;
+      bgImg.style.opacity = (Number(bgConfig.opacity) || 45) / 100;
+    }
+
+    function saveBgConfigToStorage() {
+      localStorage.setItem('fu_studio_bg_config', JSON.stringify(bgConfig));
+    }
+
+    function openBgModal() {
+      renderBgPresetsGrid();
+      const customInput = document.getElementById('customBgUrlInput');
+      if (customInput) customInput.value = bgConfig.url;
+      const blurSlider = document.getElementById('blurSlider');
+      if (blurSlider) {
+        blurSlider.value = bgConfig.blur;
+        document.getElementById('blurValDisplay').innerText = bgConfig.blur + 'px';
+      }
+      const opacitySlider = document.getElementById('opacitySlider');
+      if (opacitySlider) {
+        opacitySlider.value = bgConfig.opacity;
+        document.getElementById('opacityValDisplay').innerText = bgConfig.opacity + '%';
+      }
+      document.getElementById('bgModal').classList.remove('hidden');
+    }
+
+    function closeBgModal() {
+      document.getElementById('bgModal').classList.add('hidden');
+    }
+
+    function renderBgPresetsGrid() {
+      const container = document.getElementById('bgPresetsGrid');
+      if (!container) return;
+      container.innerHTML = '';
+      BG_PRESETS.forEach(p => {
+        const isSelected = (bgConfig.url === p.url);
+        const card = document.createElement('div');
+        card.onclick = () => selectBgPreset(p.url);
+        card.className = `group relative rounded-xl overflow-hidden border cursor-pointer transition-all ${
+          isSelected ? 'border-zinc-950 ring-2 ring-zinc-950 shadow-md' : 'border-zinc-200 hover:border-zinc-400'
+        }`;
+        card.innerHTML = `
+          <div class="h-20 w-full bg-cover bg-center transition transform group-hover:scale-105" style="background-image: url('${p.thumb}');"></div>
+          <div class="p-2 bg-white flex items-center justify-between">
+            <span class="text-xs font-medium text-zinc-900 truncate">${p.name}</span>
+            ${isSelected ? '<i class="fa-solid fa-circle-check text-xs text-zinc-950 ml-1"></i>' : ''}
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function selectBgPreset(url) {
+      bgConfig.url = url;
+      applyBackgroundConfig();
+      saveBgConfigToStorage();
+      renderBgPresetsGrid();
+      const customInput = document.getElementById('customBgUrlInput');
+      if (customInput) customInput.value = url;
+      showToast('Đã áp dụng hình nền mẫu mới', 'info');
+    }
+
+    function applyCustomBgUrl() {
+      const url = document.getElementById('customBgUrlInput').value.trim();
+      if (!url) return alert('Vui lòng dán link ảnh hợp lệ!');
+      bgConfig.url = url;
+      applyBackgroundConfig();
+      saveBgConfigToStorage();
+      renderBgPresetsGrid();
+      showToast('Đã cập nhật link ảnh nền riêng của studio', 'success');
+    }
+
+    function updateBgBlur(val) {
+      bgConfig.blur = Number(val);
+      document.getElementById('blurValDisplay').innerText = val + 'px';
+      applyBackgroundConfig();
+      saveBgConfigToStorage();
+    }
+
+    function updateBgOpacity(val) {
+      bgConfig.opacity = Number(val);
+      document.getElementById('opacityValDisplay').innerText = val + '%';
+      applyBackgroundConfig();
+      saveBgConfigToStorage();
+    }
+
+    function resetDefaultBg() {
+      bgConfig = {
+        url: BG_PRESETS[0].url,
+        blur: 36,
+        opacity: 45
+      };
+      applyBackgroundConfig();
+      saveBgConfigToStorage();
+      openBgModal();
+      showToast('Đã khôi phục nền mờ mặc định', 'info');
+    }
+
+    // ================= TOAST & VIEW CONTROLS =================
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      const colors = {
+        success: 'bg-zinc-950 text-emerald-300 border-zinc-800',
+        error: 'bg-zinc-950 text-rose-300 border-zinc-800',
+        info: 'bg-zinc-950 text-zinc-200 border-zinc-800'
+      };
+      toast.className = `${colors[type] || colors.info} border px-4 py-2.5 rounded-lg text-xs font-medium shadow-2xl backdrop-blur-md flex items-center gap-2.5 transform transition-all duration-300 translate-y-3 opacity-0`;
+      toast.innerHTML = `<i class="fa-solid ${type === 'success' ? 'fa-check text-emerald-400' : type === 'error' ? 'fa-exclamation text-rose-400' : 'fa-circle-info text-zinc-400'} text-xs"></i> <span>${message}</span>`;
+      container.appendChild(toast);
+      
+      requestAnimationFrame(() => {
+        toast.classList.remove('translate-y-3', 'opacity-0');
+      });
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-2');
+        setTimeout(() => toast.remove(), 250);
+      }, 3500);
+    }
+
+    function saveToStorage() {
+      localStorage.setItem('fu_studio_xuongin_v5', JSON.stringify(orders));
+    }
+
+    function saveCatalogToStorage() {
+      localStorage.setItem('fu_studio_catalog_v3', JSON.stringify(priceCatalog));
+    }
+
+    function formatMoney(amount) {
+      return Number(amount || 0).toLocaleString('vi-VN') + ' đ';
+    }
+
+    // Định dạng ngày theo chuẩn Việt Nam Ngày/Tháng/Năm (DD/MM/YYYY)
+    function formatDateVN(dateStr) {
+      if (!dateStr) return '';
+      if (dateStr instanceof Date) {
+        const dd = String(dateStr.getDate()).padStart(2, '0');
+        const mm = String(dateStr.getMonth() + 1).padStart(2, '0');
+        const yyyy = dateStr.getFullYear();
+        return `${dd}/${mm}/${yyyy}`;
+      }
+      const clean = String(dateStr).trim().split('T')[0];
+      if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(clean)) return clean;
+      const parts = clean.split('-');
+      if (parts.length === 3) {
+        const yyyy = parts[0];
+        const mm = parts[1].padStart(2, '0');
+        const dd = parts[2].padStart(2, '0');
+        return `${dd}/${mm}/${yyyy}`;
+      }
+      return dateStr;
+    }
+
+    function switchView(mode) {
+      currentViewMode = mode;
+      const cardContainer = document.getElementById('cardViewContainer');
+      const tableContainer = document.getElementById('tableViewContainer');
+      const btnCard = document.getElementById('btnViewCard');
+      const btnTable = document.getElementById('btnViewTable');
+
+      if (mode === 'card') {
+        cardContainer.classList.remove('hidden');
+        tableContainer.classList.add('hidden');
+        btnCard.className = 'px-2.5 py-1.5 rounded-md text-xs font-medium transition flex items-center gap-1.5 bg-white text-zinc-900 shadow-xs cursor-pointer';
+        btnTable.className = 'px-2.5 py-1.5 rounded-md text-xs font-medium transition flex items-center gap-1.5 text-zinc-500 hover:text-zinc-900 cursor-pointer';
+      } else {
+        cardContainer.classList.add('hidden');
+        tableContainer.classList.remove('hidden');
+        btnTable.className = 'px-2.5 py-1.5 rounded-md text-xs font-medium transition flex items-center gap-1.5 bg-white text-zinc-900 shadow-xs cursor-pointer';
+        btnCard.className = 'px-2.5 py-1.5 rounded-md text-xs font-medium transition flex items-center gap-1.5 text-zinc-500 hover:text-zinc-900 cursor-pointer';
+      }
+      renderAll();
+    }
+
+    function setQuickPaymentFilter(pay) {
+      currentPaymentQuickFilter = pay;
+      document.querySelectorAll('.pay-pill').forEach(btn => {
+        if (btn.getAttribute('data-pay') === pay) {
+          btn.className = 'pay-pill bg-zinc-900 text-white text-xs font-medium px-3.5 py-1.5 rounded-md transition whitespace-nowrap flex items-center gap-2 cursor-pointer shadow-xs border border-zinc-900';
+        } else {
+          btn.className = 'pay-pill bg-white/80 hover:bg-white text-zinc-600 hover:text-zinc-900 text-xs font-medium px-3.5 py-1.5 rounded-md transition whitespace-nowrap flex items-center gap-1.5 cursor-pointer border border-zinc-200/80 shadow-2xs';
+        }
+      });
+      renderAll();
+    }
+
+    // ================= CLOUD SYNC & GOOGLE SHEETS =================
+    function updateCloudBadge() {
+      const btn = document.getElementById('btnCloudSync');
+      if (!btn) return;
+      if (gasUrl) {
+        btn.className = 'bg-emerald-50/90 hover:bg-emerald-100 text-emerald-900 border border-emerald-300/80 px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-2 transition cursor-pointer shadow-xs';
+        btn.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse"></span> <span class="hidden sm:inline">Google Sheet Sync</span><span class="sm:hidden">Online</span>`;
+      } else {
+        btn.className = 'bg-white/80 hover:bg-white text-zinc-700 border border-zinc-200/80 px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-2 transition cursor-pointer shadow-xs';
+        btn.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> <span>Nối Google Sheet</span>`;
+      }
+    }
+
+    function openCloudModal() {
+      document.getElementById('gasUrlInput').value = gasUrl;
+      document.getElementById('cloudModal').classList.remove('hidden');
+    }
+
+    function closeCloudModal() {
+      document.getElementById('cloudModal').classList.add('hidden');
+    }
+
+    async function testAndSaveGasUrl() {
+      const input = document.getElementById('gasUrlInput').value.trim();
+      if (!input) {
+        alert('Dán link Web App Apps Script vào ô trước nghen!');
+        return;
+      }
+      try {
+        showToast('Đang kiểm tra kết nối Google Sheet...', 'info');
+        const sep = input.includes('?') ? '&' : '?';
+        const res = await fetch(`${input}${sep}action=getOrders&_t=${Date.now()}`);
+        const data = await res.json();
+        if (data && data.status === 'success') {
+          gasUrl = input;
+          localStorage.setItem('fu_studio_gas_url', gasUrl);
+          updateCloudBadge();
+          if (data.settings && typeof data.settings === 'object') {
+            if (data.settings.fu_zalo_template_single) localStorage.setItem('fu_zalo_template_single', data.settings.fu_zalo_template_single);
+            if (data.settings.fu_zalo_template_batch) localStorage.setItem('fu_zalo_template_batch', data.settings.fu_zalo_template_batch);
+          }
+          if (Array.isArray(data.orders) && data.orders.length > 0) {
+            orders = data.orders;
+            saveToStorage();
+            updateWorkshopFilterOptions();
+            renderAll();
+            showToast(`Đã nối Sheet thành công! Tải về ${orders.length} đơn & mẫu tin Zalo.`, 'success');
+          } else {
+            showToast('Đã nối Sheet thành công! (Sheet hiện đang trống)', 'success');
+          }
+          closeCloudModal();
+        } else {
+          alert('Không thể nhận dạng dữ liệu từ Google Sheet. Hãy kiểm tra lại phần quyền triển khai đã chọn "Anyone" chưa nghen!');
+        }
+      } catch (err) {
+        alert('Lỗi kết nối tới link Apps Script: ' + err.message + '\nĐảm bảo đã triển khai loại Web App và chọn Who has access là "Anyone" nghen!');
+      }
+    }
+
+    function disconnectGas() {
+      if (confirm('Bạn có chắc muốn ngắt kết nối với Google Sheet trên máy này?')) {
+        gasUrl = '';
+        localStorage.removeItem('fu_studio_gas_url');
+        updateCloudBadge();
+        closeCloudModal();
+        showToast('Đã ngắt kết nối Google Sheet trên máy này.', 'info');
+      }
+    }
+
+    function copyGasScript() {
+      navigator.clipboard.writeText(GAS_SCRIPT_TEMPLATE).then(() => {
+        showToast('Đã sao chép mã Apps Script vào bộ nhớ tạm!', 'success');
+      }).catch(() => {
+        alert('Hãy sao chép mã trực tiếp từ file đính kèm nghen!');
+      });
+    }
+
+    async function syncFromCloud(showFeedback = false) {
+      if (!gasUrl) {
+        if (showFeedback) openCloudModal();
+        return;
+      }
+      const icon = document.getElementById('syncIcon');
+      if (icon) icon.classList.add('animate-spin-fast');
+
+      try {
+        const sep = gasUrl.includes('?') ? '&' : '?';
+        const res = await fetch(`${gasUrl}${sep}action=getOrders&_t=${Date.now()}`);
+        const data = await res.json();
+        if (data && data.status === 'success' && Array.isArray(data.orders)) {
+          if (data.settings && typeof data.settings === 'object') {
+            if (data.settings.fu_zalo_template_single) localStorage.setItem('fu_zalo_template_single', data.settings.fu_zalo_template_single);
+            if (data.settings.fu_zalo_template_batch) localStorage.setItem('fu_zalo_template_batch', data.settings.fu_zalo_template_batch);
+          }
+          if (data.orders.length > 0) {
+            orders = data.orders;
+            saveToStorage();
+            updateWorkshopFilterOptions();
+            renderAll();
+          }
+          if (showFeedback) showToast(`Đã đồng bộ mới nhất từ Google Sheet! (${orders.length} đơn & mẫu tin)`, 'success');
+        }
+      } catch (err) {
+        if (showFeedback) showToast('Lỗi khi tải dữ liệu từ Sheet: ' + err.message, 'error');
+      } finally {
+        if (icon) icon.classList.remove('animate-spin-fast');
+      }
+    }
+
+    async function sendCloudPost(payload) {
+      if (!gasUrl) return;
+      try {
+        await fetch(gasUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify(payload)
+        });
+      } catch (err) {
+        console.warn('Lỗi gửi cập nhật ngầm lên Cloud:', err);
+      }
+    }
+
+    async function pushAllOrdersToSheet() {
+      if (!gasUrl) {
+        alert('Cần lưu link Web App trước nghen!');
+        return;
+      }
+      if (orders.length === 0) {
+        alert('Hiện tại máy này chưa có đơn nào để đẩy lên!');
+        return;
+      }
+      showToast('Đang tải dữ liệu lên Google Sheet...', 'info');
+      try {
+        const res = await fetch(gasUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({
+            action: 'bulkSave',
+            orders: orders,
+            settings: {
+              fu_zalo_template_single: getSingleZaloTemplate(),
+              fu_zalo_template_batch: getBatchZaloTemplate()
+            }
+          })
+        });
+        const data = await res.json();
+        if (data && data.status === 'success') {
+          showToast(`Đã đẩy toàn bộ ${orders.length} đơn và mẫu tin lên Google Sheet thành công!`, 'success');
+          closeCloudModal();
+        } else {
+          showToast('Có lỗi khi đẩy dữ liệu lên Sheet.', 'error');
+        }
+      } catch(e) {
+        showToast('Lỗi: ' + e.message, 'error');
+      }
+    }
+
+    // ================= POS CATALOG & CART =================
+    function filterCatalog(cat) {
+      currentCategoryFilter = cat;
+      document.querySelectorAll('#categoryTabs .cat-tab').forEach(btn => {
+        if (btn.getAttribute('data-cat') === cat) {
+          btn.className = 'cat-tab bg-zinc-900 text-white text-xs px-2.5 py-1 rounded-md font-medium transition cursor-pointer border border-zinc-900';
+        } else {
+          btn.className = 'cat-tab bg-white text-zinc-600 text-xs px-2.5 py-1 rounded-md font-medium hover:bg-zinc-100 transition cursor-pointer border border-zinc-200';
+        }
+      });
+      renderQuickCatalogGrid();
+    }
+
+    function renderQuickCatalogGrid() {
+      const grid = document.getElementById('quickCatalogGrid');
+      if (!grid) return;
+      grid.innerHTML = '';
+
+      const list = currentCategoryFilter === 'ALL'
+        ? priceCatalog
+        : priceCatalog.filter(item => item.category === currentCategoryFilter);
+
+      list.forEach(item => {
+        const inCart = modalCart.find(c => !c.isCustom && c.name === item.name);
+        const qtyBadge = inCart
+          ? `<span class="absolute -top-1.5 -right-1.5 bg-zinc-950 text-zinc-100 text-xs font-mono-val font-bold w-5 h-5 flex items-center justify-center rounded-full border border-zinc-700 shadow-xs">${inCart.qty}</span>`
+          : '';
+
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.onclick = () => quickAddItem(item.name, item.price);
+        btn.className = `pos-btn relative text-left p-2.5 rounded-lg border transition-all flex flex-col justify-between min-h-[70px] cursor-pointer group ${
+          inCart
+            ? 'border-zinc-950 bg-zinc-50 ring-1 ring-zinc-950'
+            : 'border-zinc-200 bg-white hover:border-zinc-400 hover:shadow-xs'
+        }`;
+        btn.innerHTML = `
+          ${qtyBadge}
+          <div class="text-xs font-medium text-zinc-800 leading-snug pr-2">${item.name}</div>
+          <div class="flex items-center justify-between mt-2 pt-1.5 border-t border-zinc-100">
+            <span class="text-xs font-mono-val font-semibold text-zinc-900 tabular-nums">${formatMoney(item.price)}</span>
+            <span class="text-xs text-zinc-500 group-hover:text-zinc-900 font-medium transition">+ Thêm</span>
+          </div>
+        `;
+        grid.appendChild(btn);
+      });
+    }
+
+    function quickAddItem(name, price, qtyToAdd = 1) {
+      const existing = modalCart.find(c => !c.isCustom && c.name === name);
+      if (existing) {
+        existing.qty += qtyToAdd;
+      } else {
+        modalCart.push({
+          uid: 'item_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+          name: name,
+          qty: qtyToAdd,
+          price: Number(price) || 0,
+          isCustom: false
+        });
+      }
+      renderCart();
+      renderQuickCatalogGrid();
+    }
+
+    function addCustomRowToCart(name = '', qty = 1, price = 0) {
+      modalCart.push({
+        uid: 'custom_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+        name: name,
+        qty: qty,
+        price: price,
+        isCustom: true
+      });
+      renderCart();
+    }
+
+    function applyCombo(comboCode) {
+      modalCart = [];
+      if (comboCode === '2_cong_guong') {
+        quickAddItem("Ảnh Cổng Tráng Gương 60x90", 295000, 2);
+      } else if (comboCode === '1_guong_1_go') {
+        quickAddItem("Ảnh Cổng Tráng Gương 60x90", 295000, 1);
+        quickAddItem("Ảnh Cổng Ép Gỗ 60x90", 220000, 1);
+      } else if (comboCode === 'combo_tiec_cuoi') {
+        quickAddItem("Album Photobook 30x30 (30 trang)", 544000, 1);
+        quickAddItem("Ảnh Cổng Tráng Gương 60x90", 295000, 1);
+        quickAddItem("Ảnh Lẻ Để Bàn 13x18 Ép Gỗ", 27540, 5);
+      } else if (comboCode === 'combo_2_cong_5_ban') {
+        quickAddItem("Ảnh Cổng Tráng Gương 60x90", 295000, 2);
+        quickAddItem("Ảnh Lẻ Để Bàn 13x18 Ép Gỗ", 27540, 5);
+      } else if (comboCode === 'only_10_ban') {
+        quickAddItem("Ảnh Lẻ Để Bàn 13x18 Ép Gỗ", 27540, 10);
+      }
+      renderCart();
+      renderQuickCatalogGrid();
+    }
+
+    function clearCart() {
+      modalCart = [];
+      renderCart();
+      renderQuickCatalogGrid();
+    }
+
+    function changeCartQty(uid, delta) {
+      const idx = modalCart.findIndex(c => c.uid === uid);
+      if (idx === -1) return;
+      modalCart[idx].qty += delta;
+      if (modalCart[idx].qty <= 0) {
+        modalCart.splice(idx, 1);
+      }
+      renderCart();
+      renderQuickCatalogGrid();
+    }
+
+    function setCartQtyDirect(uid, val) {
+      const item = modalCart.find(c => c.uid === uid);
+      if (!item) return;
+      item.qty = Math.max(1, Number(val) || 1);
+      renderCartTotalOnly();
+      renderQuickCatalogGrid();
+    }
+
+    function updateCartField(uid, field, val) {
+      const item = modalCart.find(c => c.uid === uid);
+      if (!item) return;
+      if (field === 'price') {
+        item.price = Number(val) || 0;
+        renderCartTotalOnly();
+      } else {
+        item[field] = val;
+      }
+    }
+
+    function removeCartItem(uid) {
+      modalCart = modalCart.filter(c => c.uid !== uid);
+      renderCart();
+      renderQuickCatalogGrid();
+    }
+
+    function renderCartTotalOnly() {
+      let total = 0;
+      let totalItems = 0;
+      modalCart.forEach(c => {
+        const sub = c.qty * c.price;
+        total += sub;
+        totalItems += c.qty;
+        const subEl = document.getElementById('sub_' + c.uid);
+        if (subEl) subEl.innerText = formatMoney(sub);
+      });
+      document.getElementById('modalTotalPreview').innerText = formatMoney(total);
+      document.getElementById('cartCountBadge').innerText = `${modalCart.length} loại (${totalItems} cái)`;
+    }
+
+    function renderCart() {
+      const container = document.getElementById('cartItemsContainer');
+      if (!container) return;
+      container.innerHTML = '';
+
+      if (modalCart.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-10 text-zinc-400">
+            <div class="w-9 h-9 rounded-md bg-zinc-100 text-zinc-400 flex items-center justify-center mx-auto mb-2 border border-zinc-200">
+              <i class="fa-solid fa-layer-group text-xs"></i>
+            </div>
+            <p class="text-xs font-semibold text-zinc-700">Chưa có hạng mục in nào</p>
+            <p class="text-xs text-zinc-500 mt-0.5">Chạm chọn <b class="text-zinc-800">Combo mẫu</b> hoặc <b class="text-zinc-800">Món lẻ</b> ở cột trái</p>
+          </div>
+        `;
+        renderCartTotalOnly();
+        return;
+      }
+
+      modalCart.forEach(item => {
+        const sub = item.qty * item.price;
+        const div = document.createElement('div');
+        div.className = 'py-2.5 first:pt-0 last:pb-0 space-y-1.5';
+        div.innerHTML = `
+          <div class="flex items-center justify-between gap-2">
+            <div class="flex-1">
+              ${
+                item.isCustom
+                  ? `<input type="text" value="${item.name}" oninput="updateCartField('${item.uid}', 'name', this.value)" placeholder="Nhập tên sản phẩm in..." class="w-full text-xs font-medium text-zinc-900 border border-zinc-300 rounded px-2 py-1 outline-none bg-zinc-50 focus:bg-white focus:border-zinc-900">`
+                  : `<div class="text-xs font-medium text-zinc-900">${item.name}</div>`
+              }
+            </div>
+            <button type="button" onclick="removeCartItem('${item.uid}')" class="text-zinc-300 hover:text-rose-500 px-1 cursor-pointer transition">
+              <i class="fa-solid fa-xmark text-xs"></i>
+            </button>
+          </div>
+
+          <div class="flex items-center justify-between gap-2">
+            <div class="flex items-center gap-1">
+              <button type="button" onclick="changeCartQty('${item.uid}', -1)" class="w-5 h-5 rounded bg-zinc-100 hover:bg-zinc-200 text-zinc-700 font-semibold text-xs flex items-center justify-center cursor-pointer transition">-</button>
+              <input type="number" min="1" value="${item.qty}" oninput="setCartQtyDirect('${item.uid}', this.value)" class="w-9 text-center text-xs font-mono-val font-semibold border border-zinc-200 rounded py-0.5 outline-none">
+              <button type="button" onclick="changeCartQty('${item.uid}', 1)" class="w-5 h-5 rounded bg-zinc-900 hover:bg-zinc-800 text-white font-semibold text-xs flex items-center justify-center cursor-pointer transition">+</button>
+              <button type="button" onclick="changeCartQty('${item.uid}', 5)" class="px-1.5 h-5 rounded bg-zinc-100 hover:bg-zinc-200 text-zinc-700 font-mono-val font-semibold text-xs flex items-center justify-center cursor-pointer transition">+5</button>
+            </div>
+
+            <div class="flex items-center gap-1.5">
+              <span class="text-xs text-zinc-500">×</span>
+              <input type="number" step="500" value="${item.price}" oninput="updateCartField('${item.uid}', 'price', this.value)" class="w-20 text-right text-xs font-mono-val border border-zinc-200 rounded px-1.5 py-0.5 outline-none text-zinc-800 focus:border-zinc-900">
+              <span id="sub_${item.uid}" class="text-xs font-mono-val font-semibold text-zinc-950 min-w-[75px] text-right tabular-nums">${formatMoney(sub)}</span>
+            </div>
+          </div>
+        `;
+        container.appendChild(div);
+      });
+
+      renderCartTotalOnly();
+    }
+
+    function calculateDeliveryDate(baseDateStr, daysToAdd = 2) {
+      if (!baseDateStr) return '';
+      const parts = String(baseDateStr).split('T')[0].split('-');
+      if (parts.length === 3) {
+        const d = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+        d.setDate(d.getDate() + Number(daysToAdd));
+        const yyyy = d.getFullYear();
+        const mm = String(d.getMonth() + 1).padStart(2, '0');
+        const dd = String(d.getDate()).padStart(2, '0');
+        return `${yyyy}-${mm}-${dd}`;
+      }
+      return '';
+    }
+
+    function onPrintDateChange() {
+      const pDate = document.getElementById('printDate').value;
+      const isUrgent = document.getElementById('isUrgent').checked;
+      document.getElementById('deliveryDate').value = calculateDeliveryDate(pDate, isUrgent ? 1 : 2);
+    }
+
+    function setDeliveryPreset(days) {
+      const isUrgent = (days === 1);
+      document.getElementById('isUrgent').checked = isUrgent;
+      updateUrgentUI(isUrgent);
+      const pDate = document.getElementById('printDate').value || new Date().toISOString().split('T')[0];
+      document.getElementById('deliveryDate').value = calculateDeliveryDate(pDate, days);
+    }
+
+    function updateUrgentUI(isUrgent) {
+      const btnNormal = document.getElementById('btnDeliveryNormal');
+      const btnUrgent = document.getElementById('btnDeliveryUrgent');
+      if (btnNormal && btnUrgent) {
+        if (isUrgent) {
+          btnUrgent.className = 'px-2 py-0.5 rounded text-xs font-semibold bg-rose-600 text-white shadow-2xs cursor-pointer transition';
+          btnNormal.className = 'px-2 py-0.5 rounded text-xs font-medium bg-zinc-100 text-zinc-600 hover:text-zinc-900 cursor-pointer transition';
+        } else {
+          btnNormal.className = 'px-2 py-0.5 rounded text-xs font-semibold bg-zinc-900 text-white shadow-2xs cursor-pointer transition';
+          btnUrgent.className = 'px-2 py-0.5 rounded text-xs font-medium bg-zinc-100 text-zinc-600 hover:text-rose-700 hover:bg-rose-50 cursor-pointer transition';
+        }
+      }
+    }
+
+    function openModal(editId = null) {
+      const modal = document.getElementById('orderModal');
+      const form = document.getElementById('orderForm');
+      form.reset();
+      modalCart = [];
+      currentCategoryFilter = 'ALL';
+
+      if (editId) {
+        const order = orders.find(o => o.id === editId);
+        if (order) {
+          document.getElementById('modalTitle').innerText = 'Chỉnh Sửa Đơn In — ' + order.code;
+          document.getElementById('orderId').value = order.id;
+          document.getElementById('orderCode').value = order.code;
+          document.getElementById('clientName').value = order.name;
+          document.getElementById('printDate').value = order.date;
+          const isUrgent = !!order.isUrgent;
+          document.getElementById('isUrgent').checked = isUrgent;
+          document.getElementById('deliveryDate').value = order.deliveryDate || calculateDeliveryDate(order.date, isUrgent ? 1 : 2);
+          updateUrgentUI(isUrgent);
+          document.getElementById('workshopName').value = order.workshop || 'TPS';
+          document.getElementById('paymentStatus').value = order.payment;
+          document.getElementById('driveUrl').value = order.driveUrl || '';
+
+          (order.items || []).forEach(it => {
+            const inCatalog = priceCatalog.some(c => c.name === it.name);
+            modalCart.push({
+              uid: 'item_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+              name: it.name,
+              qty: Number(it.qty) || 1,
+              price: Number(it.price) || 0,
+              isCustom: !inCatalog
+            });
+          });
+        }
+      } else {
+        document.getElementById('modalTitle').innerText = 'Lên Đơn In Gửi Xưởng';
+        document.getElementById('orderId').value = '';
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('printDate').value = today;
+        document.getElementById('isUrgent').checked = false;
+        document.getElementById('deliveryDate').value = calculateDeliveryDate(today, 2);
+        updateUrgentUI(false);
+        document.getElementById('workshopName').value = 'TPS';
+        document.getElementById('paymentStatus').value = 'Chưa thanh toán';
+        document.getElementById('driveUrl').value = '';
+      }
+
+      filterCatalog('ALL');
+      renderCart();
+      modal.classList.remove('hidden');
+    }
+
+    function closeModal() {
+      document.getElementById('orderModal').classList.add('hidden');
+    }
+
+    function saveOrder(e) {
+      e.preventDefault();
+      if (modalCart.length === 0) {
+        alert('Chưa chọn sản phẩm in nào hết! Chạm chọn ít nhất 1 món bên trái nghen.');
+        return;
+      }
+
+      const id = document.getElementById('orderId').value;
+      const items = modalCart.map(c => ({
+        name: (c.name || '').trim() || 'Hạng mục in',
+        qty: Number(c.qty) || 1,
+        price: Number(c.price) || 0
+      }));
+
+      const printDateVal = document.getElementById('printDate').value;
+      const isUrgent = document.getElementById('isUrgent').checked;
+      const deliveryDateVal = document.getElementById('deliveryDate').value || calculateDeliveryDate(printDateVal, isUrgent ? 1 : 2);
+
+      const orderData = {
+        id: id ? Number(id) : Date.now(),
+        code: document.getElementById('orderCode').value.trim().toUpperCase(),
+        name: document.getElementById('clientName').value.trim(),
+        date: printDateVal,
+        deliveryDate: deliveryDateVal,
+        isUrgent: isUrgent,
+        workshop: document.getElementById('workshopName').value.trim() || 'TPS',
+        payment: document.getElementById('paymentStatus').value,
+        driveUrl: document.getElementById('driveUrl').value.trim(),
+        items: items
+      };
+
+      if (id) {
+        const idx = orders.findIndex(o => o.id === Number(id));
+        if (idx !== -1) orders[idx] = orderData;
+      } else {
+        orders.unshift(orderData);
+      }
+
+      saveToStorage();
+      updateWorkshopFilterOptions();
+      closeModal();
+      renderAll();
+
+      if (gasUrl) {
+        showToast('Đang lưu đồng bộ lên Google Sheet...', 'info');
+        sendCloudPost({ action: 'saveOrder', order: orderData }).then(() => {
+          showToast('Đã lưu đơn lên Google Sheet ✅', 'success');
+        });
+      }
+    }
+
+    function duplicateOrder(id) {
+      const source = orders.find(o => o.id === id);
+      if (!source) return;
+      openModal();
+      document.getElementById('modalTitle').innerText = 'Nhân Bản Đơn In (Từ ' + source.code + ')';
+      document.getElementById('orderCode').value = source.code + '_COPY';
+      document.getElementById('clientName').value = source.name;
+      document.getElementById('printDate').value = source.date;
+      document.getElementById('isUrgent').checked = !!source.isUrgent;
+      document.getElementById('deliveryDate').value = source.deliveryDate || calculateDeliveryDate(source.date, source.isUrgent ? 1 : 2);
+      updateUrgentUI(!!source.isUrgent);
+      document.getElementById('workshopName').value = source.workshop || 'TPS';
+      document.getElementById('paymentStatus').value = source.payment;
+      document.getElementById('driveUrl').value = source.driveUrl || '';
+      modalCart = (source.items || []).map(it => ({
+        uid: 'dup_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+        name: it.name,
+        qty: it.qty,
+        price: it.price,
+        isCustom: !priceCatalog.some(c => c.name === it.name)
+      }));
+      renderCart();
+      renderQuickCatalogGrid();
+    }
+
+    // ================= CATALOG MANAGEMENT =================
+    let currentCatalogManageFilter = 'ALL';
+
+    function openCatalogModal() {
+      currentCatalogManageFilter = 'ALL';
+      filterCatalogManage('ALL');
+      document.getElementById('catalogModal').classList.remove('hidden');
+    }
+
+    function closeCatalogModal() {
+      document.getElementById('catalogModal').classList.add('hidden');
+    }
+
+    function filterCatalogManage(category) {
+      currentCatalogManageFilter = category;
+      document.querySelectorAll('.cat-manage-pill').forEach(btn => {
+        btn.className = 'cat-manage-pill px-2.5 py-1 rounded text-xs font-medium text-zinc-600 hover:text-zinc-900 transition cursor-pointer';
+      });
+      const activeBtn = document.getElementById('catTabManage_' + category);
+      if (activeBtn) {
+        activeBtn.className = 'cat-manage-pill px-2.5 py-1 rounded text-xs font-semibold bg-zinc-950 text-white transition cursor-pointer shadow-2xs';
+      }
+      renderCatalogManageList();
+    }
+
+    function renderCatalogManageList() {
+      const container = document.getElementById('catalogManageList');
+      container.innerHTML = '';
+      const groupLabels = { ANH_CONG: 'Ảnh Cổng', ALBUM: 'Album & Hộp', ANH_LE: 'Ảnh Lẻ / Bàn' };
+
+      const itemsToRender = currentCatalogManageFilter === 'ALL'
+        ? priceCatalog
+        : priceCatalog.filter(it => it.category === currentCatalogManageFilter);
+
+      if (itemsToRender.length === 0) {
+        container.innerHTML = '<div class="p-8 text-center text-xs text-zinc-400">Chưa có sản phẩm nào trong nhóm này</div>';
+        return;
+      }
+
+      itemsToRender.forEach((item) => {
+        const originalIdx = priceCatalog.findIndex(p => p.id === item.id);
+        const div = document.createElement('div');
+        div.className = 'p-3 flex items-center justify-between gap-2 text-xs bg-white hover:bg-zinc-50';
+        div.innerHTML = `
+          <div class="flex-1">
+            <span class="font-medium text-zinc-900">${item.name}</span>
+            <span class="ml-2 text-xs font-mono-val font-semibold px-2 py-0.5 rounded bg-zinc-100 text-zinc-600 border border-zinc-200/80">${groupLabels[item.category] || 'Khác'}</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <input type="number" value="${item.price}" onchange="updateCatalogPrice(${originalIdx}, this.value)" class="w-24 text-right border border-zinc-200 rounded px-2 py-1 font-mono-val font-semibold text-zinc-950 focus:border-zinc-900 outline-none">
+            <button type="button" onclick="deleteCatalogItem(${originalIdx})" class="text-zinc-400 hover:text-rose-600 p-1 cursor-pointer transition" title="Xoá"><i class="fa-regular fa-trash-can"></i></button>
+          </div>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function addNewCatalogItem() {
+      const name = document.getElementById('newCatName').value.trim();
+      const category = document.getElementById('newCatGroup').value;
+      const price = Number(document.getElementById('newCatPrice').value) || 0;
+      if (!name) return alert('Nhập tên sản phẩm trước nghen!');
+      priceCatalog.push({ id: 'cat_' + Date.now(), name, price, category });
+      saveCatalogToStorage();
+      document.getElementById('newCatName').value = '';
+      document.getElementById('newCatPrice').value = '';
+      renderCatalogManageList();
+    }
+
+    function updateCatalogPrice(idx, newPrice) {
+      priceCatalog[idx].price = Number(newPrice) || 0;
+      saveCatalogToStorage();
+    }
+
+    function deleteCatalogItem(idx) {
+      priceCatalog.splice(idx, 1);
+      saveCatalogToStorage();
+      renderCatalogManageList();
+    }
+
+    function resetDefaultCatalog() {
+      if (confirm('Khôi phục lại bảng giá mẫu mặc định ban đầu?')) {
+        priceCatalog = [...DEFAULT_CATALOG];
+        saveCatalogToStorage();
+        renderCatalogManageList();
+      }
+    }
+
+    // ================= MAIN RENDER (CARDS & TABLE) =================
+    function deleteOrder(id) {
+      if (confirm('Bạn có chắc muốn xoá đơn in này không?')) {
+        orders = orders.filter(o => o.id !== id);
+        saveToStorage();
+        renderAll();
+
+        if (gasUrl) {
+          sendCloudPost({ action: 'deleteOrder', id: id });
+          showToast('Đã xóa đơn trên Sheet', 'info');
+        }
+      }
+    }
+
+    function togglePayment(id) {
+      const item = orders.find(o => o.id === id);
+      if (item) {
+        item.payment = item.payment === 'Đã thanh toán' ? 'Chưa thanh toán' : 'Đã thanh toán';
+        saveToStorage();
+        renderAll();
+
+        if (gasUrl) {
+          sendCloudPost({ action: 'togglePayment', id: id, payment: item.payment });
+          showToast(`Đã chuyển: ${item.code} ➔ ${item.payment}`, 'success');
+        }
+      }
+    }
+
+    function resetFilters() {
+      document.getElementById('searchInput').value = '';
+      document.getElementById('filterMonth').value = '';
+      const wEl = document.getElementById('filterWorkshop');
+      if (wEl) wEl.value = '';
+      setQuickPaymentFilter('');
+    }
+
+    // ================= ZALO MESSAGE TEMPLATES & COMPOSER =================
+    const DEFAULT_ZALO_SINGLE_TEMPLATE = `FU STUDIO - ĐƠN GỬI IN
+Mã: {MA_DON} | Dâu Rể: {DAU_RE}
+Xưởng: {XUONG} | Gửi: {NGAY} | Nhận: {NGAY_NHAN} {TINH_TRANG_GAP}
+{DANH_SACH_MON}
+Link file in: {LINK_DRIVE}
+Tổng tiền xưởng: {TONG_TIEN}
+
+Lưu ý: In chuẩn màu theo profile studio, kiểm tra kỹ bề mặt trước khi đóng gói nghen anh em!`;
+
+    const DEFAULT_ZALO_BATCH_TEMPLATE = `FU STUDIO - TỔNG HỢP ĐƠN GỬI XƯỞNG [{XUONG}]
+Thời gian: {NGAY_HIEN_TAI}
+Tổng số đơn: {SO_LUONG_DON} đơn | Tổng tiền xưởng: {TONG_TIEN_TOAN_BO}
+========================================
+{DANH_SACH_TAT_CA_DON}
+========================================
+Lưu ý: Anh em thợ kiểm tra kỹ danh sách và xác nhận giúp FU Studio trước khi cho chạy máy nghen!`;
+
+    let currentZaloOrderId = null; // null = chế độ tổng hợp nhiều đơn, number = đơn lẻ
+    let activeZaloConfigTab = 'single';
+
+    function getSingleZaloTemplate() {
+      return localStorage.getItem('fu_zalo_template_single') || DEFAULT_ZALO_SINGLE_TEMPLATE;
+    }
+
+    function getBatchZaloTemplate() {
+      return localStorage.getItem('fu_zalo_template_batch') || DEFAULT_ZALO_BATCH_TEMPLATE;
+    }
+
+    function buildSingleZaloMessage(o) {
+      const tpl = getSingleZaloTemplate();
+      const orderTotal = (o.items || []).reduce((sum, it) => sum + (it.qty * it.price), 0);
+      const itemsText = (o.items || []).map(it => `  - ${it.qty}x ${it.name}`).join('\n');
+      const driveText = o.driveUrl ? o.driveUrl : 'Đã gửi riêng qua Zalo/Drive';
+      const notesText = o.note ? o.note : 'Không có ghi chú thêm';
+      const deliveryDateStr = o.deliveryDate || calculateDeliveryDate(o.date, o.isUrgent ? 1 : 2);
+      const urgentTag = o.isUrgent ? '⚡ [IN GẤP - GIAO 1 NGÀY]' : '';
+
+      return tpl
+        .replace(/\{MA_DON\}/g, o.code || '')
+        .replace(/\{DAU_RE\}/g, o.name || '')
+        .replace(/\{XUONG\}/g, o.workshop || 'TPS')
+        .replace(/\{NGAY\}/g, formatDateVN(o.date))
+        .replace(/\{NGAY_NHAN\}/g, formatDateVN(deliveryDateStr))
+        .replace(/\{TINH_TRANG_GAP\}/g, urgentTag)
+        .replace(/\{DANH_SACH_MON\}/g, itemsText)
+        .replace(/\{LINK_DRIVE\}/g, driveText)
+        .replace(/\{TONG_TIEN\}/g, formatMoney(orderTotal))
+        .replace(/\{GHI_CHU\}/g, notesText);
+    }
+
+    function buildBatchZaloMessage(orderList, currentWorkshopFilter) {
+      const tpl = getBatchZaloTemplate();
+      const totalAmount = orderList.reduce((sum, o) => sum + (o.items || []).reduce((s, it) => s + (it.qty * it.price), 0), 0);
+      const workshopLabel = currentWorkshopFilter ? currentWorkshopFilter : 'TẤT CẢ XƯỞNG';
+      const todayStr = formatDateVN(new Date());
+
+      const allOrdersText = orderList.map((o, idx) => {
+        const oTotal = (o.items || []).reduce((s, it) => s + (it.qty * it.price), 0);
+        const items = (o.items || []).map(it => `   - ${it.qty}x ${it.name}`).join('\n');
+        const drive = o.driveUrl ? `\n   Link file: ${o.driveUrl}` : '';
+        const deliveryStr = o.deliveryDate ? ` | Nhận: ${formatDateVN(o.deliveryDate)}` : '';
+        const urgentTag = o.isUrgent ? ' ⚡ [IN GẤP]' : '';
+        return `${idx + 1}. [${o.code}] ${o.name} (${formatMoney(oTotal)} - ${o.workshop || 'TPS'})\n   - Gửi: ${formatDateVN(o.date)}${deliveryStr}${urgentTag}\n${items}${drive}`;
+      }).join('\n\n');
+
+      return tpl
+        .replace(/\{XUONG\}/g, workshopLabel)
+        .replace(/\{NGAY_HIEN_TAI\}/g, todayStr)
+        .replace(/\{SO_LUONG_DON\}/g, orderList.length)
+        .replace(/\{TONG_TIEN_TOAN_BO\}/g, formatMoney(totalAmount))
+        .replace(/\{DANH_SACH_TAT_CA_DON\}/g, allOrdersText);
+    }
+
+    function openZaloModal(id) {
+      const o = orders.find(item => item.id === id);
+      if (!o) return;
+      currentZaloOrderId = id;
+
+      const orderTotal = (o.items || []).reduce((sum, it) => sum + (it.qty * it.price), 0);
+
+      document.getElementById('zaloModalTitle').innerText = `Soạn Tin Nhắn Gửi Xưởng — ${o.code} (${o.name})`;
+      document.getElementById('zaloMetaCode').innerText = o.code;
+      document.getElementById('zaloMetaName').innerText = o.name;
+      document.getElementById('zaloMetaWorkshop').innerText = `Xưởng: ${o.workshop || 'TPS'}`;
+      document.getElementById('zaloMetaTotal').innerText = formatMoney(orderTotal);
+      document.getElementById('zaloMessageContent').value = buildSingleZaloMessage(o);
+
+      document.getElementById('zaloModal').classList.remove('hidden');
+    }
+
+    function openBatchZaloModal() {
+      const filtered = getFilteredOrders();
+      if (!filtered || filtered.length === 0) {
+        showToast('Không có đơn hàng nào trong bộ lọc hiện tại để tổng hợp!', 'error');
+        return;
+      }
+      currentZaloOrderId = null; // null biểu thị chế độ tổng hợp toàn bộ đơn
+
+      const workshopVal = document.getElementById('filterWorkshop') ? document.getElementById('filterWorkshop').value : '';
+      const totalAmount = filtered.reduce((sum, o) => sum + (o.items || []).reduce((s, it) => s + (it.qty * it.price), 0), 0);
+
+      document.getElementById('zaloModalTitle').innerText = `Tổng Hợp Toàn Bộ Đơn Gửi Xưởng (${filtered.length} đơn)`;
+      document.getElementById('zaloMetaCode').innerText = `TỔNG HỢP`;
+      document.getElementById('zaloMetaName').innerText = `${filtered.length} Đơn Hàng`;
+      document.getElementById('zaloMetaWorkshop').innerText = workshopVal ? `Xưởng: ${workshopVal}` : 'Tất cả xưởng';
+      document.getElementById('zaloMetaTotal').innerText = formatMoney(totalAmount);
+      
+      document.getElementById('zaloMessageContent').value = buildBatchZaloMessage(filtered, workshopVal);
+      document.getElementById('zaloModal').classList.remove('hidden');
+    }
+
+    function reloadCurrentZaloMessage() {
+      if (currentZaloOrderId !== null) {
+        const o = orders.find(item => item.id === currentZaloOrderId);
+        if (o) {
+          document.getElementById('zaloMessageContent').value = buildSingleZaloMessage(o);
+          showToast('Đã điền lại nội dung theo mẫu mặc định đơn lẻ! ✅', 'success');
+        }
+      } else {
+        const filtered = getFilteredOrders();
+        const workshopVal = document.getElementById('filterWorkshop') ? document.getElementById('filterWorkshop').value : '';
+        document.getElementById('zaloMessageContent').value = buildBatchZaloMessage(filtered, workshopVal);
+        showToast('Đã điền lại nội dung theo mẫu tổng hợp toàn bộ đơn! ✅', 'success');
+      }
+    }
+
+    function closeZaloModal() {
+      document.getElementById('zaloModal').classList.add('hidden');
+    }
+
+    function copyZaloMessageFromModal() {
+      const text = document.getElementById('zaloMessageContent').value;
+      navigator.clipboard.writeText(text).then(() => {
+        showToast('Đã sao chép tin nhắn Zalo gửi xưởng thành công! ✅', 'success');
+      }).catch(() => {
+        prompt('Sao chép nội dung tin nhắn gửi Zalo bên dưới:', text);
+      });
+    }
+
+    function copyZaloOrder(id) {
+      openZaloModal(id);
+    }
+
+    // ================= ZALO CONFIG MODAL CONTROLLERS =================
+    function openZaloConfigModal() {
+      document.getElementById('cfgZaloSingleTemplate').value = getSingleZaloTemplate();
+      document.getElementById('cfgZaloBatchTemplate').value = getBatchZaloTemplate();
+      switchZaloConfigTab(activeZaloConfigTab || 'single');
+      document.getElementById('zaloConfigModal').classList.remove('hidden');
+    }
+
+    function closeZaloConfigModal() {
+      document.getElementById('zaloConfigModal').classList.add('hidden');
+    }
+
+    function switchZaloConfigTab(tab) {
+      activeZaloConfigTab = tab;
+      const btnSingle = document.getElementById('tabBtnSingle');
+      const btnBatch = document.getElementById('tabBtnBatch');
+      const chipsSingle = document.getElementById('chipsSectionSingle');
+      const chipsBatch = document.getElementById('chipsSectionBatch');
+      const txtSingle = document.getElementById('cfgZaloSingleTemplate');
+      const txtBatch = document.getElementById('cfgZaloBatchTemplate');
+      const lbl = document.getElementById('configTextareaLabel');
+
+      if (tab === 'single') {
+        btnSingle.className = 'px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-zinc-950 text-white transition cursor-pointer shadow-xs';
+        btnBatch.className = 'px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-white text-zinc-600 hover:text-zinc-900 border border-zinc-200 transition cursor-pointer';
+        chipsSingle.classList.remove('hidden');
+        chipsBatch.classList.add('hidden');
+        txtSingle.classList.remove('hidden');
+        txtBatch.classList.add('hidden');
+        lbl.innerText = 'Nội dung mẫu mặc định (Đơn lẻ)';
+      } else {
+        btnSingle.className = 'px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-white text-zinc-600 hover:text-zinc-900 border border-zinc-200 transition cursor-pointer';
+        btnBatch.className = 'px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-zinc-950 text-white transition cursor-pointer shadow-xs';
+        chipsSingle.classList.add('hidden');
+        chipsBatch.classList.remove('hidden');
+        txtSingle.classList.add('hidden');
+        txtBatch.classList.remove('hidden');
+        lbl.innerText = 'Nội dung mẫu mặc định (Tổng hợp toàn bộ đơn)';
+      }
+    }
+
+    function insertTagToZaloConfig(tag) {
+      const textarea = activeZaloConfigTab === 'single' ? document.getElementById('cfgZaloSingleTemplate') : document.getElementById('cfgZaloBatchTemplate');
+      if (!textarea) return;
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+      const val = textarea.value;
+      textarea.value = val.substring(0, start) + tag + val.substring(end);
+      textarea.selectionStart = textarea.selectionEnd = start + tag.length;
+      textarea.focus();
+    }
+
+    function copyZaloConfigCode() {
+      const data = {
+        single: document.getElementById('cfgZaloSingleTemplate').value,
+        batch: document.getElementById('cfgZaloBatchTemplate').value
+      };
+      navigator.clipboard.writeText(JSON.stringify(data)).then(() => {
+        showToast('Đã sao chép mã cấu hình mẫu tin vào bộ nhớ tạm! ✅', 'success');
+      }).catch(() => {
+        prompt('Sao chép mã cấu hình bên dưới:', JSON.stringify(data));
+      });
+    }
+
+    function importZaloConfigCode() {
+      const code = prompt('Dán mã cấu hình mẫu tin nhắn bạn đã sao chép từ máy tính khác vào đây:');
+      if (!code) return;
+      try {
+        const data = JSON.parse(code);
+        if (data && (data.single || data.batch)) {
+          if (data.single) document.getElementById('cfgZaloSingleTemplate').value = data.single;
+          if (data.batch) document.getElementById('cfgZaloBatchTemplate').value = data.batch;
+          saveZaloConfig();
+          showToast('Đã nhận mã cấu hình mẫu tin từ máy khác thành công! ✅', 'success');
+        } else {
+          alert('Mã cấu hình không đúng định dạng!');
+        }
+      } catch(e) {
+        alert('Mã cấu hình không hợp lệ!');
+      }
+    }
+
+    function saveZaloConfig() {
+      const singleVal = document.getElementById('cfgZaloSingleTemplate').value;
+      const batchVal = document.getElementById('cfgZaloBatchTemplate').value;
+      localStorage.setItem('fu_zalo_template_single', singleVal);
+      localStorage.setItem('fu_zalo_template_batch', batchVal);
+
+      // Nếu có kết nối Google Sheet thì tự động gửi ngầm lưu lên sheet
+      if (gasUrl) {
+        sendCloudPost({
+          action: 'saveSettings',
+          settings: {
+            fu_zalo_template_single: singleVal,
+            fu_zalo_template_batch: batchVal
+          }
+        });
+      }
+
+      // Nếu đang mở popup zaloModal thì cập nhật lại nội dung ngay lập tức
+      const modal = document.getElementById('zaloModal');
+      if (modal && !modal.classList.contains('hidden')) {
+        reloadCurrentZaloMessage();
+      }
+
+      showToast(gasUrl ? 'Đã lưu mẫu tin và đồng bộ lên Google Sheet! ✅' : 'Đã lưu mẫu tin nhắn Zalo mặc định thành công! ✅', 'success');
+      closeZaloConfigModal();
+    }
+
+    function resetZaloConfigToDefault() {
+      if (confirm('Bạn có chắc muốn khôi phục lại mẫu tin nhắn gốc ban đầu của studio không?')) {
+        document.getElementById('cfgZaloSingleTemplate').value = DEFAULT_ZALO_SINGLE_TEMPLATE;
+        document.getElementById('cfgZaloBatchTemplate').value = DEFAULT_ZALO_BATCH_TEMPLATE;
+        localStorage.removeItem('fu_zalo_template_single');
+        localStorage.removeItem('fu_zalo_template_batch');
+        if (gasUrl) {
+          sendCloudPost({
+            action: 'saveSettings',
+            settings: {
+              fu_zalo_template_single: DEFAULT_ZALO_SINGLE_TEMPLATE,
+              fu_zalo_template_batch: DEFAULT_ZALO_BATCH_TEMPLATE
+            }
+          });
+        }
+        showToast('Đã khôi phục mẫu tin nhắn gốc thành công! ✅', 'info');
+      }
+    }
+
+    // Nút gạch nợ công nợ xưởng 1 chạm dạng pill cao cấp, thanh lịch, mượt mà
+    function getPaymentBadgeHtml(o) {
+      if (o.payment === 'Đã thanh toán') {
+        return `<button type="button" onclick="togglePayment(${o.id})" title="Chạm để chuyển lại trạng thái nợ xưởng" class="group inline-flex items-center gap-2 px-3 py-1.5 text-xs font-semibold rounded-full bg-emerald-500/15 text-emerald-800 border border-emerald-300 hover:bg-emerald-500/25 transition cursor-pointer shadow-2xs whitespace-nowrap">
+          <span class="w-2 h-2 rounded-full bg-emerald-600 shadow-xs"></span>
+          <span>Đã tất toán</span>
+        </button>`;
+      }
+      return `<button type="button" onclick="togglePayment(${o.id})" title="Chạm 1 lần để GẠCH NỢ (Đã tất toán)" class="group inline-flex items-center gap-2 px-3 py-1.5 text-xs font-semibold rounded-full bg-rose-500/15 text-rose-800 border border-rose-300 hover:bg-rose-500/25 transition cursor-pointer shadow-2xs whitespace-nowrap">
+        <span class="w-2 h-2 rounded-full bg-rose-600 animate-pulse shadow-xs"></span>
+        <span>Nợ xưởng</span>
+        <span class="text-xs text-rose-600 font-normal pl-1 border-l border-rose-300 group-hover:text-rose-950">Gạch nợ</span>
+      </button>`;
+    }
+
+    function getFilteredOrders() {
+      const search = (document.getElementById('searchInput') ? document.getElementById('searchInput').value : '').toLowerCase().trim();
+      const month = document.getElementById('filterMonth') ? document.getElementById('filterMonth').value : '';
+      const workshop = document.getElementById('filterWorkshop') ? document.getElementById('filterWorkshop').value : '';
+
+      return orders.filter(o => {
+        const matchSearch = o.code.toLowerCase().includes(search) || o.name.toLowerCase().includes(search);
+        let matchMonth = true;
+        if (month) {
+          const m = new Date(o.date).getMonth() + 1;
+          matchMonth = (m == month);
+        }
+        const matchPayment = !currentPaymentQuickFilter || o.payment === currentPaymentQuickFilter;
+        let matchWorkshop = true;
+        if (workshop) {
+          matchWorkshop = (o.workshop || 'TPS').toLowerCase() === workshop.toLowerCase();
+        }
+        return matchSearch && matchMonth && matchPayment && matchWorkshop;
+      });
+    }
+
+    function renderAll() {
+      const filtered = getFilteredOrders();
+
+      let totalCost = 0;
+      let debtAmount = 0;
+
+      filtered.forEach(o => {
+        const orderTotal = (o.items || []).reduce((sum, it) => sum + (it.qty * it.price), 0);
+        totalCost += orderTotal;
+        if (o.payment === 'Chưa thanh toán') debtAmount += orderTotal;
+      });
+
+      document.getElementById('stat-total-cost').innerText = formatMoney(totalCost);
+      document.getElementById('stat-total-orders').innerText = `${filtered.length} đơn hàng`;
+      document.getElementById('stat-debt').innerText = formatMoney(debtAmount);
+
+      const cardContainer = document.getElementById('cardViewContainer');
+      const tbody = document.getElementById('orderTableBody');
+      const empty = document.getElementById('emptyState');
+
+      cardContainer.innerHTML = '';
+      tbody.innerHTML = '';
+
+      if (filtered.length === 0) {
+        empty.classList.remove('hidden');
+        return;
+      }
+      empty.classList.add('hidden');
+
+      filtered.forEach(o => {
+        const orderTotal = (o.items || []).reduce((sum, it) => sum + (it.qty * it.price), 0);
+        const paymentBadge = getPaymentBadgeHtml(o);
+
+        const driveBtnHtml = o.driveUrl ? `
+          <a href="${o.driveUrl}" target="_blank" rel="noopener noreferrer" class="h-7 px-2 rounded-md bg-white/80 hover:bg-white text-zinc-700 hover:text-emerald-700 border border-zinc-200/90 flex items-center gap-1.5 text-xs font-medium transition shadow-2xs" title="Mở Google Drive file in">
+            <i class="fa-brands fa-google-drive text-emerald-600 text-xs"></i>
+            <span>Drive</span>
+          </a>
+        ` : '';
+
+        const zaloBtnHtml = `
+          <button type="button" onclick="openZaloModal(${o.id})" class="h-7 px-2 rounded-md bg-white/80 hover:bg-sky-50 text-zinc-700 hover:text-sky-700 border border-zinc-200/90 flex items-center gap-1.5 text-xs font-medium transition cursor-pointer shadow-2xs" title="Xem & soạn tin nhắn gửi Zalo cho xưởng">
+            <i class="fa-solid fa-paper-plane text-sky-600 text-xs"></i>
+            <span>Zalo</span>
+          </button>
+        `;
+
+        const deliveryHtml = o.deliveryDate ? (
+          o.isUrgent
+            ? `<span class="text-xs font-mono-val font-semibold px-2 py-0.5 rounded bg-rose-500/15 text-rose-800 border border-rose-300 flex items-center gap-1" title="Đơn in gấp (Giao trong 1 ngày: ${formatDateVN(o.deliveryDate)})"><i class="fa-solid fa-bolt text-rose-600 text-xs"></i> Gấp: ${formatDateVN(o.deliveryDate)}</span>`
+            : `<span class="text-xs font-mono-val text-zinc-600 px-1.5 py-0.5 rounded bg-white/80 border border-zinc-200" title="Ngày nhận hình dự kiến (+2 ngày)">Nhận: ${formatDateVN(o.deliveryDate)}</span>`
+        ) : '';
+
+        // 1. Render Studio Card (Architectural & Minimal Luxury Frosted Glass)
+        let cardItemsHtml = '';
+        (o.items || []).forEach(it => {
+          cardItemsHtml += `
+            <div class="flex items-center justify-between gap-2 py-1.5 border-b border-zinc-100/80 last:border-0 text-xs">
+              <div class="font-medium text-zinc-800 flex items-center gap-2">
+                <span class="px-1.5 py-0.5 rounded bg-zinc-100/90 text-zinc-800 font-mono-val font-semibold text-xs border border-zinc-200/80">${it.qty}×</span>
+                <span class="truncate max-w-[200px]">${it.name}</span>
+              </div>
+              <span class="font-mono-val font-medium text-zinc-700 whitespace-nowrap tabular-nums text-xs">${formatMoney(it.qty * it.price)}</span>
+            </div>
+          `;
+        });
+
+        const card = document.createElement('div');
+        card.className = 'studio-card rounded-xl flex flex-col justify-between overflow-hidden h-full';
+        card.innerHTML = `
+          <div>
+            <!-- Card Header -->
+            <div class="p-3.5 border-b border-zinc-200/60 bg-white/40 space-y-1.5">
+              <div class="flex items-center justify-between gap-2">
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  <span class="text-xs font-mono-val font-semibold px-2 py-0.5 rounded bg-zinc-950 text-zinc-100 tracking-wide">${o.code}</span>
+                  <span class="text-xs font-mono-val px-1.5 py-0.5 rounded bg-white/80 text-zinc-700 border border-zinc-200">${o.workshop}</span>
+                  <span class="text-xs font-mono-val text-zinc-500 whitespace-nowrap">Gửi: ${formatDateVN(o.date)}</span>
+                  ${deliveryHtml}
+                </div>
+                <div class="flex items-center gap-1 shrink-0">
+                  ${driveBtnHtml}
+                  ${zaloBtnHtml}
+                  <button type="button" onclick="openModal(${o.id})" class="w-6 h-6 rounded hover:bg-zinc-200/70 text-zinc-500 hover:text-zinc-900 flex items-center justify-center transition cursor-pointer" title="Chỉnh sửa"><i class="fa-solid fa-pen text-xs"></i></button>
+                  <button type="button" onclick="duplicateOrder(${o.id})" class="w-6 h-6 rounded hover:bg-zinc-200/70 text-zinc-500 hover:text-zinc-900 flex items-center justify-center transition cursor-pointer" title="Nhân bản"><i class="fa-regular fa-copy text-xs"></i></button>
+                  <button type="button" onclick="deleteOrder(${o.id})" class="w-6 h-6 rounded hover:bg-rose-50 text-zinc-300 hover:text-rose-600 flex items-center justify-center transition cursor-pointer" title="Xoá"><i class="fa-regular fa-trash-can text-xs"></i></button>
+                </div>
+              </div>
+              <h4 class="text-sm font-semibold text-zinc-950 tracking-tight">${o.name}</h4>
+            </div>
+
+            <!-- Card Body: Items -->
+            <div class="px-3.5 py-2">
+              ${cardItemsHtml}
+            </div>
+          </div>
+
+          <!-- Card Footer -->
+          <div class="px-3.5 py-2.5 bg-white/50 border-t border-zinc-200/60 flex items-center justify-between gap-2">
+            <div>
+              ${paymentBadge}
+            </div>
+            <div class="text-right">
+              <div class="text-xs font-mono-val font-medium text-zinc-500">Tổng Đơn</div>
+              <div class="text-sm font-mono-val font-semibold text-zinc-950 tabular-nums">${formatMoney(orderTotal)}</div>
+            </div>
+          </div>
+        `;
+        cardContainer.appendChild(card);
+
+        // 2. Render Table Row (Clean Editorial Lines, Monospaced Figures)
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-white/60 transition';
+        tr.innerHTML = `
+          <td class="py-3 px-4 align-top whitespace-nowrap">
+            <span class="text-xs font-mono-val font-semibold px-2 py-0.5 rounded bg-zinc-950 text-zinc-100">${o.code}</span>
+            <div class="text-xs font-semibold text-zinc-900 mt-1">${o.name}</div>
+          </td>
+          <td class="py-3 px-4 align-top text-xs font-mono-val whitespace-nowrap">
+            <div class="text-zinc-600">Gửi: ${formatDateVN(o.date)}</div>
+            ${o.deliveryDate ? `
+              <div class="mt-0.5 ${o.isUrgent ? 'text-rose-700 font-semibold flex items-center gap-1' : 'text-zinc-500'}">
+                ${o.isUrgent ? '<i class="fa-solid fa-bolt text-rose-600 text-xs"></i> Gấp: ' : 'Nhận: '}${formatDateVN(o.deliveryDate)}
+              </div>
+            ` : ''}
+            <div class="text-xs text-zinc-500 mt-0.5">Xưởng: ${o.workshop}</div>
+          </td>
+          <td class="py-3 px-4 align-top min-w-[260px]">
+            ${cardItemsHtml}
+          </td>
+          <td class="py-3 px-4 align-top text-right font-mono-val font-semibold text-zinc-950 whitespace-nowrap text-xs tabular-nums">
+            ${formatMoney(orderTotal)}
+          </td>
+          <td class="py-3 px-4 align-top text-center whitespace-nowrap">
+            <div class="inline-flex">${paymentBadge}</div>
+          </td>
+          <td class="py-3 px-4 align-top text-center whitespace-nowrap">
+            <div class="flex items-center justify-center gap-1">
+              ${driveBtnHtml}
+              ${zaloBtnHtml}
+              <button type="button" onclick="openModal(${o.id})" class="text-zinc-500 hover:text-zinc-900 p-1 cursor-pointer transition" title="Sửa"><i class="fa-solid fa-pen text-xs"></i></button>
+              <button type="button" onclick="duplicateOrder(${o.id})" class="text-zinc-500 hover:text-zinc-900 p-1 cursor-pointer transition" title="Nhân bản"><i class="fa-regular fa-copy text-xs"></i></button>
+              <button type="button" onclick="deleteOrder(${o.id})" class="text-zinc-300 hover:text-rose-600 p-1 cursor-pointer transition" title="Xóa"><i class="fa-regular fa-trash-can text-xs"></i></button>
+            </div>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function exportCSV() {
+      const rows = ['﻿Mã Đơn,Tên Khách,Ngày Gửi In,Ngày Nhận Hình,In Gấp,Hạng Mục In,Số Lượng,Đơn Giá,Thành Tiền,Công Nợ,Xưởng In,Link File In'];
+      orders.forEach(o => {
+        (o.items || []).forEach(it => {
+          rows.push(`"${o.code}","${o.name}","${formatDateVN(o.date)}","${formatDateVN(o.deliveryDate)}","${o.isUrgent ? 'GẤP' : 'Thường'}","${it.name}",${it.qty},${it.price},${it.qty * it.price},"${o.payment}","${o.workshop}","${o.driveUrl || ''}"`);
+        });
+      });
+      const csv = rows.join('\n');
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = `FU_STUDIO_PRINT_LAB_${new Date().toISOString().split('T')[0]}.csv`;
+      link.click();
+    }
+
+    function updateWorkshopFilterOptions() {
+      const sel = document.getElementById('filterWorkshop');
+      if (!sel) return;
+      const currentVal = sel.value;
+      const workshops = Array.from(new Set(orders.map(o => (o.workshop || 'TPS').trim()).filter(Boolean)));
+      if (!workshops.includes('TPS')) workshops.unshift('TPS');
+      sel.innerHTML = `<option value="">Tất cả xưởng</option>` + workshops.map(w => `<option value="${w}">${w}</option>`).join('');
+      if (workshops.includes(currentVal)) {
+        sel.value = currentVal;
+      }
+    }
+
+    // Khởi chạy ứng dụng ban đầu
+    updateWorkshopFilterOptions();
+    applyBackgroundConfig();
+    updateCloudBadge();
+    renderAll();
+    // Tự động kiểm tra và kéo dữ liệu mới nhất từ Sheet về nếu đã cấu hình
+    if (gasUrl) {
+      syncFromCloud();
+    }
+  </script>
+</body>
+</html>
