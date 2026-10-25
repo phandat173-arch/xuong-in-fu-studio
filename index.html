@@ -1106,12 +1106,23 @@ function saveOrUpdateOrder(sheet, order) {
   var values = sheet.getDataRange().getValues();
   var rowIndex = -1;
   var orderId = String(order.id);
+  var maxId = 0;
   for (var i = 1; i < values.length; i++) {
+    var rowIdNum = Number(values[i][0]);
+    if (!isNaN(rowIdNum) && rowIdNum > 0 && rowIdNum < 1000000000 && rowIdNum > maxId) {
+      maxId = rowIdNum;
+    }
     if (String(values[i][0]) === orderId) {
       rowIndex = i + 1;
       break;
     }
   }
+
+  // Tự động bảo vệ bộ đếm: Nếu đơn mới chưa có ID hoặc ID bị timestamp dài (> 1 tỷ) thì gán maxId + 1
+  if (rowIndex === -1 && (!order.id || Number(order.id) > 1000000000)) {
+    order.id = maxId + 1;
+  }
+
   var totalCost = 0;
   var itemsSummary = [];
   (order.items || []).forEach(function(it) {
@@ -1940,6 +1951,14 @@ function createJsonResponse(obj) {
       document.getElementById('orderModal').classList.add('hidden');
     }
 
+    function getNextOrderId() {
+      if (!orders || orders.length === 0) return 1;
+      const validIds = orders
+        .map(o => Number(o.id) || 0)
+        .filter(n => n > 0 && n < 1000000000);
+      return validIds.length > 0 ? Math.max(...validIds) + 1 : 1;
+    }
+
     function saveOrder(e) {
       e.preventDefault();
       if (modalCart.length === 0) {
@@ -1959,7 +1978,7 @@ function createJsonResponse(obj) {
       const deliveryDateVal = document.getElementById('deliveryDate').value || calculateDeliveryDate(printDateVal, isUrgent ? 1 : 2);
 
       const orderData = {
-        id: id ? Number(id) : Date.now(),
+        id: id ? Number(id) : getNextOrderId(),
         code: document.getElementById('orderCode').value.trim().toUpperCase(),
         name: document.getElementById('clientName').value.trim(),
         date: printDateVal,
