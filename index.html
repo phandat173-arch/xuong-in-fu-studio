@@ -290,12 +290,6 @@
           <span>Tổng hợp Zalo</span>
         </button>
 
-        <!-- Nút Cài Đặt Combo Chọn Nhanh -->
-        <button type="button" onclick="openComboManageModal()" class="text-xs font-medium px-2.5 py-1.5 rounded-md bg-white/80 hover:bg-white text-zinc-700 hover:text-zinc-950 border border-zinc-200/80 shadow-2xs transition flex items-center gap-1.5 cursor-pointer backdrop-blur-xs hover:border-zinc-400" title="Cài đặt các gói Combo chọn nhanh">
-          <i class="fa-solid fa-box-open text-amber-600 text-xs"></i>
-          <span>Gói Combo</span>
-        </button>
-
         <!-- Nút Cài Đặt Mẫu Tin Nhắn Mặc Định -->
         <button type="button" onclick="openZaloConfigModal()" class="text-xs font-medium px-2.5 py-1.5 rounded-md bg-white/80 hover:bg-white text-zinc-600 hover:text-zinc-900 border border-zinc-200/80 shadow-2xs transition flex items-center gap-1.5 cursor-pointer backdrop-blur-xs hover:border-zinc-400" title="Cài đặt mẫu tin nhắn Zalo mặc định">
           <i class="fa-solid fa-sliders text-zinc-500 text-xs"></i>
@@ -1266,6 +1260,9 @@ function createJsonResponse(obj) {
       { id: 'a2', name: "Album Photobook 25x25 (30 trang)", price: 416000, category: "ALBUM" },
       { id: 'a3', name: "Album Mở Phẳng 25x25", price: 223200, category: "ALBUM" },
       { id: 'a4', name: "Hộp Album Gỗ / Da", price: 139500, category: "ALBUM" },
+      { id: 'a5', name: "Tờ Lẻ Album Photobook 30x30", price: 32000, category: "ALBUM" },
+      { id: 'a6', name: "Tờ Lẻ Album Photobook 25x25", price: 24000, category: "ALBUM" },
+      { id: 'a7', name: "Tờ Lẻ Album Mở Phẳng 25x25", price: 18000, category: "ALBUM" },
       { id: 'l1', name: "Ảnh Lẻ Để Bàn 13x18 Ép Gỗ", price: 27540, category: "ANH_LE" },
       { id: 'l2', name: "Ảnh Lẻ Để Bàn 13x18 Tráng Gương", price: 38000, category: "ANH_LE" },
       { id: 'l3', name: "Ảnh Lẻ Để Bàn 15x21 Ép Gỗ", price: 35000, category: "ANH_LE" },
@@ -1316,6 +1313,13 @@ function createJsonResponse(obj) {
     const DEFAULT_GAS_URL = 'https://script.google.com/macros/s/AKfycbw7CjioeUF_h1Ow6pPEYe6rtuJQ0b2gKa689lY9WcPi2w_p-nJrsXugX0B2vJxcMC1s/exec';
     let gasUrl = localStorage.getItem('fu_studio_gas_url') || DEFAULT_GAS_URL;
     let priceCatalog = JSON.parse(localStorage.getItem('fu_studio_catalog_v3')) || DEFAULT_CATALOG;
+    // Tự động bổ sung các sản phẩm mẫu mới (như Tờ Lẻ Album) vào danh mục nếu chưa có
+    DEFAULT_CATALOG.forEach(item => {
+      if (!priceCatalog.some(p => p.name.trim().toLowerCase() === item.name.trim().toLowerCase())) {
+        priceCatalog.push(item);
+      }
+    });
+    localStorage.setItem('fu_studio_catalog_v3', JSON.stringify(priceCatalog));
 
     const DEFAULT_COMBOS = [
       {
