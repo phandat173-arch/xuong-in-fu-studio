@@ -290,6 +290,12 @@
           <span>Tổng hợp Zalo</span>
         </button>
 
+        <!-- Nút Cài Đặt Combo Chọn Nhanh -->
+        <button type="button" onclick="openComboManageModal()" class="text-xs font-medium px-2.5 py-1.5 rounded-md bg-white/80 hover:bg-white text-zinc-700 hover:text-zinc-950 border border-zinc-200/80 shadow-2xs transition flex items-center gap-1.5 cursor-pointer backdrop-blur-xs hover:border-zinc-400" title="Cài đặt các gói Combo chọn nhanh">
+          <i class="fa-solid fa-box-open text-amber-600 text-xs"></i>
+          <span>Gói Combo</span>
+        </button>
+
         <!-- Nút Cài Đặt Mẫu Tin Nhắn Mặc Định -->
         <button type="button" onclick="openZaloConfigModal()" class="text-xs font-medium px-2.5 py-1.5 rounded-md bg-white/80 hover:bg-white text-zinc-600 hover:text-zinc-900 border border-zinc-200/80 shadow-2xs transition flex items-center gap-1.5 cursor-pointer backdrop-blur-xs hover:border-zinc-400" title="Cài đặt mẫu tin nhắn Zalo mặc định">
           <i class="fa-solid fa-sliders text-zinc-500 text-xs"></i>
@@ -753,61 +759,23 @@
           <!-- LEFT COLUMN (7 cols): COMBOS & PRODUCT TILES -->
           <div class="lg:col-span-7 space-y-4">
             
-            <!-- Block 1: 1-Tap Combos -->
+            <!-- Block 1: 1-Tap Combos (Dynamic) -->
             <div class="bg-white p-4 rounded-lg border border-zinc-200 shadow-xs space-y-3">
               <div class="flex items-center justify-between border-b border-zinc-100 pb-2">
                 <div class="flex items-center gap-2">
                   <span class="w-5 h-5 rounded bg-zinc-100 text-zinc-700 flex items-center justify-center text-xs font-mono-val font-semibold">1</span>
                   <span class="text-xs font-semibold text-zinc-900">Combo chọn nhanh</span>
+                  <button type="button" onclick="openComboManageModal()" class="text-xs text-amber-800 hover:text-amber-950 bg-amber-50 hover:bg-amber-100 border border-amber-200/90 px-2 py-0.5 rounded-md flex items-center gap-1 cursor-pointer transition font-medium ml-1" title="Cài đặt và chỉnh sửa các gói combo theo bảng giá của bạn">
+                    <i class="fa-solid fa-sliders text-[10px]"></i> Sửa combo
+                  </button>
                 </div>
                 <button type="button" onclick="clearCart()" class="text-xs font-medium text-zinc-400 hover:text-rose-600 flex items-center gap-1 cursor-pointer transition">
                   <i class="fa-regular fa-trash-can text-xs"></i> Xoá giỏ
                 </button>
               </div>
 
-              <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                <button type="button" onclick="applyCombo('2_cong_guong')" class="pos-btn text-left p-2.5 rounded-lg border border-zinc-200 hover:border-zinc-900 bg-zinc-50/40 hover:bg-zinc-900 group cursor-pointer transition-all">
-                  <div class="flex items-center justify-between">
-                    <span class="text-xs font-semibold text-zinc-900 group-hover:text-white">2 Cổng Tráng Gương</span>
-                  </div>
-                  <div class="text-xs text-zinc-500 group-hover:text-zinc-300 mt-1">2 tấm 60x90 Tráng gương</div>
-                </button>
-
-                <button type="button" onclick="applyCombo('1_guong_1_go')" class="pos-btn text-left p-2.5 rounded-lg border border-zinc-200 hover:border-zinc-900 bg-zinc-50/40 hover:bg-zinc-900 group cursor-pointer transition-all">
-                  <div class="flex items-center justify-between">
-                    <span class="text-xs font-semibold text-zinc-900 group-hover:text-white">1 Gương + 1 Ép Gỗ</span>
-                  </div>
-                  <div class="text-xs text-zinc-500 group-hover:text-zinc-300 mt-1">1 Cổng gương + 1 Cổng gỗ</div>
-                </button>
-
-                <button type="button" onclick="applyCombo('combo_tiec_cuoi')" class="pos-btn text-left p-2.5 rounded-lg border border-zinc-200 hover:border-zinc-900 bg-zinc-50/40 hover:bg-zinc-900 group cursor-pointer transition-all">
-                  <div class="flex items-center justify-between">
-                    <span class="text-xs font-semibold text-zinc-900 group-hover:text-white">Trọn Gói Cưới Chuẩn</span>
-                  </div>
-                  <div class="text-xs text-zinc-500 group-hover:text-zinc-300 mt-1">1 AB 30x30 + 1 Cổng + 5 Bàn</div>
-                </button>
-
-                <button type="button" onclick="applyCombo('combo_2_cong_5_ban')" class="pos-btn text-left p-2.5 rounded-lg border border-zinc-200 hover:border-zinc-900 bg-zinc-50/40 hover:bg-zinc-900 group cursor-pointer transition-all">
-                  <div class="flex items-center justify-between">
-                    <span class="text-xs font-semibold text-zinc-900 group-hover:text-white">2 Cổng + 5 Ảnh Bàn</span>
-                  </div>
-                  <div class="text-xs text-zinc-500 group-hover:text-zinc-300 mt-1">Khách đổi AB lấy 2 cổng</div>
-                </button>
-
-                <button type="button" onclick="applyCombo('only_10_ban')" class="pos-btn text-left p-2.5 rounded-lg border border-zinc-200 hover:border-zinc-900 bg-zinc-50/40 hover:bg-zinc-900 group cursor-pointer transition-all">
-                  <div class="flex items-center justify-between">
-                    <span class="text-xs font-semibold text-zinc-900 group-hover:text-white">In Lẻ 10 Ảnh Bàn</span>
-                  </div>
-                  <div class="text-xs text-zinc-500 group-hover:text-zinc-300 mt-1">10 tấm 13x18 Ép gỗ</div>
-                </button>
-
-                <button type="button" onclick="addCustomRowToCart()" class="pos-btn text-left p-2.5 rounded-lg border border-dashed border-zinc-300 hover:border-zinc-900 bg-white hover:bg-zinc-50 group cursor-pointer transition-all">
-                  <div class="flex items-center justify-between">
-                    <span class="text-xs font-semibold text-zinc-700">+ Tự Gõ Món Lạ</span>
-                    <i class="fa-solid fa-pen-nib text-xs text-zinc-500"></i>
-                  </div>
-                  <div class="text-xs text-zinc-500 mt-1">Kích thước / yêu cầu riêng</div>
-                </button>
+              <div id="presetCombosGrid" class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                <!-- Rendered dynamically by JS -->
               </div>
             </div>
 
@@ -946,6 +914,106 @@
         <button type="button" onclick="resetDefaultCatalog()" class="text-xs font-medium text-rose-600 hover:underline cursor-pointer">Khôi phục mặc định</button>
         <button type="button" onclick="closeCatalogModal()" class="px-4 py-1.5 bg-zinc-900 text-white text-xs font-medium rounded-md cursor-pointer hover:bg-zinc-800 transition">Đóng lại</button>
       </div>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL QUẢN LÝ COMBO CHỌN NHANH ==================== -->
+  <div id="comboManageModal" class="fixed inset-0 bg-zinc-950/40 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white/95 backdrop-blur-2xl rounded-2xl shadow-2xl max-w-xl w-full max-h-[88vh] flex flex-col overflow-hidden border border-white/80">
+      
+      <!-- Modal Header -->
+      <div class="bg-zinc-950 text-zinc-100 px-6 py-4 flex justify-between items-center border-b border-zinc-800">
+        <div class="flex items-center gap-2.5">
+          <div class="w-7 h-7 rounded-md bg-amber-500/20 text-amber-400 flex items-center justify-center text-xs border border-amber-500/30">
+            <i class="fa-solid fa-box-open"></i>
+          </div>
+          <div>
+            <h3 class="font-semibold text-sm tracking-tight text-white">Cài Đặt Gói Combo Chọn Nhanh</h3>
+            <p class="text-xs text-zinc-400">Tùy biến các combo mẫu theo bảng giá xưởng thực tế của studio</p>
+          </div>
+        </div>
+        <button type="button" onclick="closeComboManageModal()" class="w-7 h-7 rounded-md hover:bg-zinc-800 text-zinc-400 hover:text-white flex items-center justify-center transition cursor-pointer">
+          <i class="fa-solid fa-xmark text-xs"></i>
+        </button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="p-5 overflow-y-auto space-y-4 flex-1 custom-scrollbar">
+        
+        <!-- Khung Tạo / Sửa Combo -->
+        <div class="bg-zinc-50 p-4 rounded-xl border border-zinc-200 space-y-3">
+          <div class="flex items-center justify-between">
+            <div class="text-xs font-semibold text-zinc-800 flex items-center gap-1.5">
+              <i class="fa-solid fa-wand-magic-sparkles text-amber-600 text-xs"></i>
+              <span id="comboFormTitle">Thêm gói combo mới</span>
+            </div>
+            <button type="button" id="btnCancelEditCombo" onclick="cancelEditCombo()" class="text-[11px] text-zinc-500 hover:text-zinc-800 underline cursor-pointer hidden">Hủy sửa</button>
+          </div>
+
+          <input type="hidden" id="editComboId" value="">
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <div>
+              <label class="block text-xs font-semibold text-zinc-600 mb-1">Tên combo *</label>
+              <input type="text" id="comboNameInput" placeholder="VD: Gói Tiệc Cưới VIP" class="w-full text-xs border border-zinc-200 rounded-md px-2.5 py-1.5 outline-none bg-white font-medium focus:border-zinc-900">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-zinc-600 mb-1">Mô tả ngắn (hiển thị dưới nút)</label>
+              <input type="text" id="comboDescInput" placeholder="VD: 1 Cổng gương + 1 AB + 5 Bàn" class="w-full text-xs border border-zinc-200 rounded-md px-2.5 py-1.5 outline-none bg-white font-medium focus:border-zinc-900">
+            </div>
+          </div>
+
+          <!-- Chọn món để cho vào combo -->
+          <div class="pt-2 border-t border-zinc-200/80">
+            <label class="block text-xs font-semibold text-zinc-700 mb-1.5">Các món in trong gói combo này:</label>
+            <div class="flex gap-2 items-end">
+              <div class="flex-1">
+                <select id="comboItemSelect" class="w-full text-xs border border-zinc-200 rounded-md px-2.5 py-1.5 bg-white outline-none font-medium focus:border-zinc-900 cursor-pointer">
+                  <!-- Generated from priceCatalog -->
+                </select>
+              </div>
+              <div class="w-20">
+                <input type="number" id="comboItemQty" min="1" value="1" placeholder="SL" class="w-full text-xs border border-zinc-200 rounded-md px-2 py-1.5 text-center bg-white font-mono-val outline-none focus:border-zinc-900">
+              </div>
+              <button type="button" onclick="addItemToComboDraft()" class="bg-zinc-800 hover:bg-zinc-950 text-white text-xs font-medium px-3 py-1.5 rounded-md cursor-pointer transition shadow-2xs whitespace-nowrap">
+                + Thêm món
+              </button>
+            </div>
+
+            <!-- Danh sách món đã thêm trong combo nháp -->
+            <div id="comboDraftItemsList" class="mt-2.5 space-y-1.5 min-h-[40px] bg-white p-2.5 rounded-lg border border-zinc-200/90 text-xs">
+              <!-- Rendered by JS -->
+            </div>
+          </div>
+
+          <div class="pt-1 flex justify-end">
+            <button type="button" onclick="saveComboDraft()" id="btnSaveComboDraft" class="bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-semibold px-4 py-2 rounded-lg cursor-pointer transition shadow-xs flex items-center gap-1.5">
+              <i class="fa-solid fa-check text-xs"></i>
+              <span>Lưu gói combo này</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Danh Sách Các Combo Hiện Có -->
+        <div class="space-y-2 pt-1">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold text-zinc-800">Danh sách các gói combo hiện tại (<span id="comboCountBadge">0</span>)</span>
+            <span class="text-[11px] text-zinc-400">Giá tự động nhảy theo bảng giá xưởng</span>
+          </div>
+
+          <div id="comboListContainer" class="space-y-2">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="p-4 bg-zinc-50 border-t border-zinc-200 flex justify-between items-center">
+        <button type="button" onclick="resetDefaultCombos()" class="text-xs font-medium text-rose-600 hover:underline cursor-pointer">Khôi phục combo mặc định</button>
+        <button type="button" onclick="closeComboManageModal()" class="px-4 py-1.5 bg-zinc-900 text-white text-xs font-medium rounded-md cursor-pointer hover:bg-zinc-800 transition">Đóng lại</button>
+      </div>
+
     </div>
   </div>
 
@@ -1248,6 +1316,56 @@ function createJsonResponse(obj) {
     const DEFAULT_GAS_URL = 'https://script.google.com/macros/s/AKfycbw7CjioeUF_h1Ow6pPEYe6rtuJQ0b2gKa689lY9WcPi2w_p-nJrsXugX0B2vJxcMC1s/exec';
     let gasUrl = localStorage.getItem('fu_studio_gas_url') || DEFAULT_GAS_URL;
     let priceCatalog = JSON.parse(localStorage.getItem('fu_studio_catalog_v3')) || DEFAULT_CATALOG;
+
+    const DEFAULT_COMBOS = [
+      {
+        id: 'cbo_1',
+        name: '2 Cổng Tráng Gương',
+        desc: '2 tấm 60x90 Tráng gương',
+        items: [
+          { name: 'Ảnh Cổng Tráng Gương 60x90', qty: 2 }
+        ]
+      },
+      {
+        id: 'cbo_2',
+        name: '1 Gương + 1 Ép Gỗ',
+        desc: '1 Cổng gương + 1 Cổng gỗ',
+        items: [
+          { name: 'Ảnh Cổng Tráng Gương 60x90', qty: 1 },
+          { name: 'Ảnh Cổng Ép Gỗ 60x90', qty: 1 }
+        ]
+      },
+      {
+        id: 'cbo_3',
+        name: 'Trọn Gói Cưới Chuẩn',
+        desc: '1 AB 30x30 + 1 Cổng + 5 Bàn',
+        items: [
+          { name: 'Album Photobook 30x30 (30 trang)', qty: 1 },
+          { name: 'Ảnh Cổng Tráng Gương 60x90', qty: 1 },
+          { name: 'Ảnh Lẻ Để Bàn 13x18 Ép Gỗ', qty: 5 }
+        ]
+      },
+      {
+        id: 'cbo_4',
+        name: '2 Cổng + 5 Ảnh Bàn',
+        desc: 'Khách đổi AB lấy 2 cổng',
+        items: [
+          { name: 'Ảnh Cổng Tráng Gương 60x90', qty: 2 },
+          { name: 'Ảnh Lẻ Để Bàn 13x18 Ép Gỗ', qty: 5 }
+        ]
+      },
+      {
+        id: 'cbo_5',
+        name: 'In Lẻ 10 Ảnh Bàn',
+        desc: '10 tấm 13x18 Ép gỗ',
+        items: [
+          { name: 'Ảnh Lẻ Để Bàn 13x18 Ép Gỗ', qty: 10 }
+        ]
+      }
+    ];
+
+    let presetCombos = JSON.parse(localStorage.getItem('fu_studio_combos_v1')) || DEFAULT_COMBOS;
+    let comboDraftItems = [];
     let currentCategoryFilter = 'ALL';
     let currentPaymentQuickFilter = '';
     let currentViewMode = 'card';
@@ -1467,6 +1585,7 @@ function createJsonResponse(obj) {
 
     function saveCatalogToStorage() {
       localStorage.setItem('fu_studio_catalog_v3', JSON.stringify(priceCatalog));
+      renderPresetCombosGrid();
     }
 
     function formatMoney(amount) {
@@ -1567,6 +1686,12 @@ function createJsonResponse(obj) {
           if (data.settings && typeof data.settings === 'object') {
             if (data.settings.fu_zalo_template_single) localStorage.setItem('fu_zalo_template_single', data.settings.fu_zalo_template_single);
             if (data.settings.fu_zalo_template_batch) localStorage.setItem('fu_zalo_template_batch', data.settings.fu_zalo_template_batch);
+            if (data.settings.fu_studio_combos_v1) {
+              try {
+                presetCombos = JSON.parse(data.settings.fu_studio_combos_v1);
+                localStorage.setItem('fu_studio_combos_v1', data.settings.fu_studio_combos_v1);
+              } catch(e) {}
+            }
           }
           if (Array.isArray(data.orders) && data.orders.length > 0) {
             orders = sanitizeOrders(data.orders);
@@ -1620,6 +1745,12 @@ function createJsonResponse(obj) {
           if (data.settings && typeof data.settings === 'object') {
             if (data.settings.fu_zalo_template_single) localStorage.setItem('fu_zalo_template_single', data.settings.fu_zalo_template_single);
             if (data.settings.fu_zalo_template_batch) localStorage.setItem('fu_zalo_template_batch', data.settings.fu_zalo_template_batch);
+            if (data.settings.fu_studio_combos_v1) {
+              try {
+                presetCombos = JSON.parse(data.settings.fu_studio_combos_v1);
+                localStorage.setItem('fu_studio_combos_v1', data.settings.fu_studio_combos_v1);
+              } catch(e) {}
+            }
           }
           if (data.orders.length > 0) {
             orders = sanitizeOrders(data.orders);
@@ -1762,25 +1893,300 @@ function createJsonResponse(obj) {
       renderCart();
     }
 
-    function applyCombo(comboCode) {
+    // ================= DYNAMIC PRESET COMBOS MANAGEMENT =================
+    function getCatalogItemPrice(itemName) {
+      if (!itemName) return 0;
+      const clean = String(itemName).trim().toLowerCase();
+      const found = priceCatalog.find(c => String(c.name).trim().toLowerCase() === clean);
+      return found ? (Number(found.price) || 0) : 0;
+    }
+
+    function calculateComboTotal(combo) {
+      let sum = 0;
+      (combo.items || []).forEach(it => {
+        sum += (Number(it.qty) || 1) * getCatalogItemPrice(it.name);
+      });
+      return sum;
+    }
+
+    function renderPresetCombosGrid() {
+      const grid = document.getElementById('presetCombosGrid');
+      if (!grid) return;
+      grid.innerHTML = '';
+
+      presetCombos.forEach(combo => {
+        const total = calculateComboTotal(combo);
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.onclick = () => applyCustomCombo(combo.id);
+        btn.className = 'pos-btn text-left p-2.5 rounded-lg border border-zinc-200 hover:border-zinc-900 bg-zinc-50/50 hover:bg-zinc-900 group cursor-pointer transition-all shadow-2xs';
+        btn.innerHTML = `
+          <div class="flex items-center justify-between gap-1">
+            <span class="text-xs font-semibold text-zinc-900 group-hover:text-white leading-tight">${combo.name}</span>
+            <span class="text-[10px] font-mono-val font-semibold text-zinc-500 group-hover:text-amber-300 shrink-0">${formatMoney(total)}</span>
+          </div>
+          <div class="text-[11px] text-zinc-500 group-hover:text-zinc-300 mt-1 line-clamp-1">${combo.desc || (combo.items || []).map(it => it.qty + 'x ' + it.name).join(', ')}</div>
+        `;
+        grid.appendChild(btn);
+      });
+
+      // Nút Tự Gõ Món Lạ
+      const customBtn = document.createElement('button');
+      customBtn.type = 'button';
+      customBtn.onclick = addCustomRowToCart;
+      customBtn.className = 'pos-btn text-left p-2.5 rounded-lg border border-dashed border-zinc-300 hover:border-zinc-900 bg-white hover:bg-zinc-50 group cursor-pointer transition-all';
+      customBtn.innerHTML = `
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-semibold text-zinc-700">+ Tự Gõ Món Lạ</span>
+          <i class="fa-solid fa-pen-nib text-xs text-zinc-400"></i>
+        </div>
+        <div class="text-[11px] text-zinc-500 mt-1">Kích thước / yêu cầu riêng</div>
+      `;
+      grid.appendChild(customBtn);
+    }
+
+    function applyCustomCombo(comboId) {
+      const combo = presetCombos.find(c => c.id === comboId);
+      if (!combo) return;
       modalCart = [];
-      if (comboCode === '2_cong_guong') {
-        quickAddItem("Ảnh Cổng Tráng Gương 60x90", 295000, 2);
-      } else if (comboCode === '1_guong_1_go') {
-        quickAddItem("Ảnh Cổng Tráng Gương 60x90", 295000, 1);
-        quickAddItem("Ảnh Cổng Ép Gỗ 60x90", 220000, 1);
-      } else if (comboCode === 'combo_tiec_cuoi') {
-        quickAddItem("Album Photobook 30x30 (30 trang)", 544000, 1);
-        quickAddItem("Ảnh Cổng Tráng Gương 60x90", 295000, 1);
-        quickAddItem("Ảnh Lẻ Để Bàn 13x18 Ép Gỗ", 27540, 5);
-      } else if (comboCode === 'combo_2_cong_5_ban') {
-        quickAddItem("Ảnh Cổng Tráng Gương 60x90", 295000, 2);
-        quickAddItem("Ảnh Lẻ Để Bàn 13x18 Ép Gỗ", 27540, 5);
-      } else if (comboCode === 'only_10_ban') {
-        quickAddItem("Ảnh Lẻ Để Bàn 13x18 Ép Gỗ", 27540, 10);
-      }
+      (combo.items || []).forEach(it => {
+        const price = getCatalogItemPrice(it.name);
+        quickAddItem(it.name, price, it.qty || 1);
+      });
       renderCart();
       renderQuickCatalogGrid();
+      showToast(`Đã chọn combo: ${combo.name}`, 'info');
+    }
+
+    function applyCombo(comboCode) {
+      // Backward compatibility fallback
+      const found = presetCombos.find(c => c.id === comboCode);
+      if (found) {
+        applyCustomCombo(found.id);
+      }
+    }
+
+    // Modal quản lý combo
+    function openComboManageModal() {
+      populateComboItemSelect();
+      cancelEditCombo();
+      renderComboList();
+      document.getElementById('comboManageModal').classList.remove('hidden');
+    }
+
+    function closeComboManageModal() {
+      document.getElementById('comboManageModal').classList.add('hidden');
+    }
+
+    function populateComboItemSelect() {
+      const sel = document.getElementById('comboItemSelect');
+      if (!sel) return;
+      sel.innerHTML = '';
+      priceCatalog.forEach(p => {
+        const opt = document.createElement('option');
+        opt.value = p.name;
+        opt.textContent = `${p.name} — ${formatMoney(p.price)}`;
+        sel.appendChild(opt);
+      });
+    }
+
+    function renderComboDraftItemsList() {
+      const container = document.getElementById('comboDraftItemsList');
+      if (!container) return;
+      if (comboDraftItems.length === 0) {
+        container.innerHTML = `<span class="text-zinc-400 italic">Chưa có món nào. Chọn sản phẩm ở trên và bấm "+ Thêm món".</span>`;
+        return;
+      }
+      container.innerHTML = '';
+      comboDraftItems.forEach((it, idx) => {
+        const unitPrice = getCatalogItemPrice(it.name);
+        const subtotal = unitPrice * it.qty;
+        const row = document.createElement('div');
+        row.className = 'flex items-center justify-between py-1 border-b border-zinc-100 last:border-b-0';
+        row.innerHTML = `
+          <div class="flex items-center gap-1.5 flex-1 min-w-0 pr-2">
+            <span class="font-mono-val font-semibold text-zinc-900 bg-zinc-100 px-1.5 py-0.5 rounded text-xs">${it.qty}x</span>
+            <span class="font-medium text-zinc-800 truncate">${it.name}</span>
+          </div>
+          <div class="flex items-center gap-2 shrink-0">
+            <span class="font-mono-val text-zinc-600">${formatMoney(subtotal)}</span>
+            <button type="button" onclick="removeItemFromComboDraft(${idx})" class="text-zinc-400 hover:text-rose-600 p-1 cursor-pointer transition" title="Xóa món này khỏi combo">
+              <i class="fa-solid fa-xmark text-xs"></i>
+            </button>
+          </div>
+        `;
+        container.appendChild(row);
+      });
+    }
+
+    function addItemToComboDraft() {
+      const sel = document.getElementById('comboItemSelect');
+      const qtyInput = document.getElementById('comboItemQty');
+      if (!sel || !sel.value) {
+        alert('Vui lòng chọn sản phẩm in!');
+        return;
+      }
+      const itemName = sel.value;
+      const qty = Math.max(1, parseInt(qtyInput.value) || 1);
+
+      const existing = comboDraftItems.find(it => it.name === itemName);
+      if (existing) {
+        existing.qty += qty;
+      } else {
+        comboDraftItems.push({ name: itemName, qty: qty });
+      }
+
+      qtyInput.value = 1;
+      renderComboDraftItemsList();
+    }
+
+    function removeItemFromComboDraft(idx) {
+      if (idx >= 0 && idx < comboDraftItems.length) {
+        comboDraftItems.splice(idx, 1);
+        renderComboDraftItemsList();
+      }
+    }
+
+    function saveComboDraft() {
+      const name = (document.getElementById('comboNameInput').value || '').trim();
+      const desc = (document.getElementById('comboDescInput').value || '').trim();
+      const editId = document.getElementById('editComboId').value;
+
+      if (!name) {
+        alert('Vui lòng nhập tên gói combo!');
+        document.getElementById('comboNameInput').focus();
+        return;
+      }
+      if (comboDraftItems.length === 0) {
+        alert('Gói combo phải có ít nhất 1 sản phẩm! Hãy chọn món và bấm "+ Thêm món".');
+        return;
+      }
+
+      if (editId) {
+        const idx = presetCombos.findIndex(c => c.id === editId);
+        if (idx !== -1) {
+          presetCombos[idx].name = name;
+          presetCombos[idx].desc = desc;
+          presetCombos[idx].items = JSON.parse(JSON.stringify(comboDraftItems));
+        }
+      } else {
+        presetCombos.push({
+          id: 'cbo_' + Date.now(),
+          name: name,
+          desc: desc,
+          items: JSON.parse(JSON.stringify(comboDraftItems))
+        });
+      }
+
+      localStorage.setItem('fu_studio_combos_v1', JSON.stringify(presetCombos));
+      if (gasUrl) {
+        sendCloudPost({ action: 'saveSettings', settings: { fu_studio_combos_v1: JSON.stringify(presetCombos) } });
+      }
+
+      renderPresetCombosGrid();
+      cancelEditCombo();
+      renderComboList();
+      showToast('Đã lưu gói combo thành công!', 'success');
+    }
+
+    function editCombo(comboId) {
+      const combo = presetCombos.find(c => c.id === comboId);
+      if (!combo) return;
+      document.getElementById('editComboId').value = combo.id;
+      document.getElementById('comboNameInput').value = combo.name;
+      document.getElementById('comboDescInput').value = combo.desc || '';
+      document.getElementById('comboFormTitle').innerText = 'Chỉnh sửa combo: ' + combo.name;
+      document.getElementById('btnCancelEditCombo').classList.remove('hidden');
+      document.getElementById('btnSaveComboDraft').innerHTML = `<i class="fa-solid fa-check text-xs"></i> <span>Cập nhật combo</span>`;
+      comboDraftItems = JSON.parse(JSON.stringify(combo.items || []));
+      renderComboDraftItemsList();
+    }
+
+    function cancelEditCombo() {
+      document.getElementById('editComboId').value = '';
+      document.getElementById('comboNameInput').value = '';
+      document.getElementById('comboDescInput').value = '';
+      document.getElementById('comboFormTitle').innerText = 'Thêm gói combo mới';
+      document.getElementById('btnCancelEditCombo').classList.add('hidden');
+      document.getElementById('btnSaveComboDraft').innerHTML = `<i class="fa-solid fa-check text-xs"></i> <span>Lưu gói combo này</span>`;
+      comboDraftItems = [];
+      renderComboDraftItemsList();
+    }
+
+    function deleteCombo(comboId) {
+      const combo = presetCombos.find(c => c.id === comboId);
+      if (!combo) return;
+      if (confirm(`Bạn có chắc muốn xóa combo "${combo.name}"?`)) {
+        presetCombos = presetCombos.filter(c => c.id !== comboId);
+        localStorage.setItem('fu_studio_combos_v1', JSON.stringify(presetCombos));
+        if (gasUrl) {
+          sendCloudPost({ action: 'saveSettings', settings: { fu_studio_combos_v1: JSON.stringify(presetCombos) } });
+        }
+        cancelEditCombo();
+        renderComboList();
+        renderPresetCombosGrid();
+        showToast('Đã xóa gói combo!', 'info');
+      }
+    }
+
+    function resetDefaultCombos() {
+      if (confirm('Khôi phục danh sách combo về 5 combo mặc định ban đầu của hệ thống?')) {
+        presetCombos = JSON.parse(JSON.stringify(DEFAULT_COMBOS));
+        localStorage.setItem('fu_studio_combos_v1', JSON.stringify(presetCombos));
+        if (gasUrl) {
+          sendCloudPost({ action: 'saveSettings', settings: { fu_studio_combos_v1: JSON.stringify(presetCombos) } });
+        }
+        cancelEditCombo();
+        renderComboList();
+        renderPresetCombosGrid();
+        showToast('Đã khôi phục 5 combo mặc định!', 'success');
+      }
+    }
+
+    function renderComboList() {
+      const container = document.getElementById('comboListContainer');
+      const badge = document.getElementById('comboCountBadge');
+      if (badge) badge.innerText = presetCombos.length;
+      if (!container) return;
+      if (presetCombos.length === 0) {
+        container.innerHTML = `<div class="text-xs text-zinc-400 p-4 text-center border border-dashed border-zinc-200 rounded-lg">Chưa có combo nào. Hãy tạo combo đầu tiên ở trên nghen!</div>`;
+        return;
+      }
+      container.innerHTML = '';
+      presetCombos.forEach(combo => {
+        const total = calculateComboTotal(combo);
+        const card = document.createElement('div');
+        card.className = 'bg-white p-3 rounded-lg border border-zinc-200 shadow-2xs hover:border-zinc-300 transition flex flex-col gap-2';
+        
+        const itemsChips = (combo.items || []).map(it => {
+          const uPrice = getCatalogItemPrice(it.name);
+          return `<span class="bg-zinc-100 text-zinc-800 px-2 py-0.5 rounded text-[11px] font-medium border border-zinc-200/60">${it.qty}x ${it.name} <span class="text-zinc-500 font-mono-val">(${formatMoney(uPrice)})</span></span>`;
+        }).join(' ');
+
+        card.innerHTML = `
+          <div class="flex items-start justify-between gap-2">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-semibold text-zinc-900">${combo.name}</span>
+                <span class="text-xs font-mono-val font-semibold text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200/80">${formatMoney(total)}</span>
+              </div>
+              <div class="text-[11px] text-zinc-500 mt-0.5">${combo.desc || 'Không có mô tả'}</div>
+            </div>
+            <div class="flex items-center gap-1 shrink-0">
+              <button type="button" onclick="editCombo('${combo.id}')" class="text-xs text-zinc-600 hover:text-zinc-900 px-2 py-1 rounded bg-zinc-100 hover:bg-zinc-200 cursor-pointer transition flex items-center gap-1 font-medium" title="Sửa combo này">
+                <i class="fa-solid fa-pen text-[10px]"></i> Sửa
+              </button>
+              <button type="button" onclick="deleteCombo('${combo.id}')" class="text-xs text-rose-600 hover:text-rose-800 px-2 py-1 rounded bg-rose-50 hover:bg-rose-100 cursor-pointer transition" title="Xóa combo này">
+                <i class="fa-regular fa-trash-can text-[10px]"></i>
+              </button>
+            </div>
+          </div>
+          <div class="flex flex-wrap gap-1.5 pt-1 border-t border-zinc-100">
+            ${itemsChips}
+          </div>
+        `;
+        container.appendChild(card);
+      });
     }
 
     function clearCart() {
@@ -1988,6 +2394,7 @@ function createJsonResponse(obj) {
 
       filterCatalog('ALL');
       renderCart();
+      renderPresetCombosGrid();
       modal.classList.remove('hidden');
     }
 
@@ -2700,6 +3107,7 @@ Lưu ý: Anh em thợ kiểm tra kỹ danh sách và xác nhận giúp FU Studio
     updateWorkshopFilterOptions();
     applyBackgroundConfig();
     updateCloudBadge();
+    renderPresetCombosGrid();
     renderAll();
     // Tự động kiểm tra và kéo dữ liệu mới nhất từ Sheet về nếu đã cấu hình
     if (gasUrl) {
