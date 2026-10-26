@@ -906,7 +906,12 @@
 
       <div class="p-4 bg-zinc-50 border-t border-zinc-200 flex justify-between items-center">
         <button type="button" onclick="resetDefaultCatalog()" class="text-xs font-medium text-rose-600 hover:underline cursor-pointer">Khôi phục mặc định</button>
-        <button type="button" onclick="closeCatalogModal()" class="px-4 py-1.5 bg-zinc-900 text-white text-xs font-medium rounded-md cursor-pointer hover:bg-zinc-800 transition">Đóng lại</button>
+        <div class="flex items-center gap-2">
+          <button type="button" onclick="closeCatalogModal()" class="px-3.5 py-1.5 bg-white hover:bg-zinc-100 text-zinc-700 text-xs font-medium rounded-md border border-zinc-300 transition cursor-pointer">Đóng</button>
+          <button type="button" onclick="saveAndCloseCatalogModal()" class="px-4 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-semibold rounded-md shadow-xs transition flex items-center gap-1.5 cursor-pointer">
+            <i class="fa-solid fa-check text-xs"></i> <span>Lưu Bảng Giá</span>
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -1312,14 +1317,24 @@ function createJsonResponse(obj) {
 
     const DEFAULT_GAS_URL = 'https://script.google.com/macros/s/AKfycbw7CjioeUF_h1Ow6pPEYe6rtuJQ0b2gKa689lY9WcPi2w_p-nJrsXugX0B2vJxcMC1s/exec';
     let gasUrl = localStorage.getItem('fu_studio_gas_url') || DEFAULT_GAS_URL;
-    let priceCatalog = JSON.parse(localStorage.getItem('fu_studio_catalog_v3')) || DEFAULT_CATALOG;
-    // Tự động bổ sung các sản phẩm mẫu mới (như Tờ Lẻ Album) vào danh mục nếu chưa có
-    DEFAULT_CATALOG.forEach(item => {
-      if (!priceCatalog.some(p => p.name.trim().toLowerCase() === item.name.trim().toLowerCase())) {
-        priceCatalog.push(item);
+    let priceCatalog = JSON.parse(localStorage.getItem('fu_studio_catalog_v3'));
+    if (!Array.isArray(priceCatalog) || priceCatalog.length === 0) {
+      priceCatalog = JSON.parse(JSON.stringify(DEFAULT_CATALOG));
+      localStorage.setItem('fu_studio_catalog_v3', JSON.stringify(priceCatalog));
+    } else {
+      // Chỉ nạp các món mặc định mới một lần duy nhất qua version tag để không ghi đè chỉnh sửa của người dùng
+      const CATALOG_VERSION = 'v3.2_to_le_album';
+      const lastVersion = localStorage.getItem('fu_catalog_version');
+      if (lastVersion !== CATALOG_VERSION) {
+        DEFAULT_CATALOG.forEach(item => {
+          if (!priceCatalog.some(p => p.name.trim().toLowerCase() === item.name.trim().toLowerCase())) {
+            priceCatalog.push(item);
+          }
+        });
+        localStorage.setItem('fu_studio_catalog_v3', JSON.stringify(priceCatalog));
+        localStorage.setItem('fu_catalog_version', CATALOG_VERSION);
       }
-    });
-    localStorage.setItem('fu_studio_catalog_v3', JSON.stringify(priceCatalog));
+    }
 
     const DEFAULT_COMBOS = [
       {
@@ -1587,9 +1602,19 @@ function createJsonResponse(obj) {
       localStorage.setItem('fu_studio_xuongin_v5', JSON.stringify(orders));
     }
 
-    function saveCatalogToStorage() {
+    function saveCatalogToStorage(showNotification = false) {
       localStorage.setItem('fu_studio_catalog_v3', JSON.stringify(priceCatalog));
       renderPresetCombosGrid();
+      renderQuickCatalogGrid();
+      if (gasUrl) {
+        sendCloudPost({
+          action: 'saveSettings',
+          settings: { fu_studio_catalog_v3: JSON.stringify(priceCatalog) }
+        });
+      }
+      if (showNotification) {
+        showToast('Đã lưu bảng giá xưởng thành công! ✅', 'success');
+      }
     }
 
     function formatMoney(amount) {
@@ -1696,6 +1721,17 @@ function createJsonResponse(obj) {
                 localStorage.setItem('fu_studio_combos_v1', data.settings.fu_studio_combos_v1);
               } catch(e) {}
             }
+            if (data.settings.fu_studio_catalog_v3) {
+              try {
+                const cloudCatalog = JSON.parse(data.settings.fu_studio_catalog_v3);
+                if (Array.isArray(cloudCatalog) && cloudCatalog.length > 0) {
+                  priceCatalog = cloudCatalog;
+                  localStorage.setItem('fu_studio_catalog_v3', JSON.stringify(priceCatalog));
+                  renderQuickCatalogGrid();
+                  renderPresetCombosGrid();
+                }
+              } catch(e) {}
+            }
           }
           if (Array.isArray(data.orders) && data.orders.length > 0) {
             orders = sanitizeOrders(data.orders);
@@ -1753,6 +1789,17 @@ function createJsonResponse(obj) {
               try {
                 presetCombos = JSON.parse(data.settings.fu_studio_combos_v1);
                 localStorage.setItem('fu_studio_combos_v1', data.settings.fu_studio_combos_v1);
+              } catch(e) {}
+            }
+            if (data.settings.fu_studio_catalog_v3) {
+              try {
+                const cloudCatalog = JSON.parse(data.settings.fu_studio_catalog_v3);
+                if (Array.isArray(cloudCatalog) && cloudCatalog.length > 0) {
+                  priceCatalog = cloudCatalog;
+                  localStorage.setItem('fu_studio_catalog_v3', JSON.stringify(priceCatalog));
+                  renderQuickCatalogGrid();
+                  renderPresetCombosGrid();
+                }
               } catch(e) {}
             }
           }
@@ -2538,17 +2585,19 @@ function createJsonResponse(obj) {
       }
 
       itemsToRender.forEach((item) => {
-        const originalIdx = priceCatalog.findIndex(p => p.id === item.id);
         const div = document.createElement('div');
-        div.className = 'p-3 flex items-center justify-between gap-2 text-xs bg-white hover:bg-zinc-50';
+        div.className = 'p-3 flex items-center justify-between gap-3 text-xs bg-white hover:bg-zinc-50/80 transition border-b border-zinc-100 last:border-b-0';
         div.innerHTML = `
-          <div class="flex-1">
-            <span class="font-medium text-zinc-900">${item.name}</span>
-            <span class="ml-2 text-xs font-mono-val font-semibold px-2 py-0.5 rounded bg-zinc-100 text-zinc-600 border border-zinc-200/80">${groupLabels[item.category] || 'Khác'}</span>
+          <div class="flex-1 min-w-0 flex items-center gap-2">
+            <span class="font-medium text-zinc-900 truncate" title="${item.name}">${item.name}</span>
+            <span class="text-[10px] font-mono-val font-semibold px-2 py-0.5 rounded bg-zinc-100 text-zinc-600 border border-zinc-200/80 shrink-0">${groupLabels[item.category] || 'Khác'}</span>
           </div>
-          <div class="flex items-center gap-2">
-            <input type="number" value="${item.price}" onchange="updateCatalogPrice(${originalIdx}, this.value)" class="w-24 text-right border border-zinc-200 rounded px-2 py-1 font-mono-val font-semibold text-zinc-950 focus:border-zinc-900 outline-none">
-            <button type="button" onclick="deleteCatalogItem(${originalIdx})" class="text-zinc-400 hover:text-rose-600 p-1 cursor-pointer transition" title="Xoá"><i class="fa-regular fa-trash-can"></i></button>
+          <div class="flex items-center gap-2 shrink-0">
+            <div class="relative flex items-center">
+              <input type="number" value="${item.price}" oninput="updateCatalogPriceById('${item.id}', this.value)" class="w-28 text-right border border-zinc-300 rounded px-2.5 py-1.5 font-mono-val font-semibold text-zinc-950 focus:border-zinc-900 focus:bg-white bg-zinc-50/50 outline-none transition">
+              <span class="ml-1.5 text-zinc-400 font-mono-val text-xs">đ</span>
+            </div>
+            <button type="button" onclick="deleteCatalogItemById('${item.id}')" class="text-zinc-400 hover:text-rose-600 p-1.5 cursor-pointer transition rounded hover:bg-rose-50" title="Xoá món này"><i class="fa-regular fa-trash-can text-xs"></i></button>
           </div>
         `;
         container.appendChild(div);
@@ -2561,27 +2610,39 @@ function createJsonResponse(obj) {
       const price = Number(document.getElementById('newCatPrice').value) || 0;
       if (!name) return alert('Nhập tên sản phẩm trước nghen!');
       priceCatalog.push({ id: 'cat_' + Date.now(), name, price, category });
-      saveCatalogToStorage();
+      saveCatalogToStorage(true);
       document.getElementById('newCatName').value = '';
       document.getElementById('newCatPrice').value = '';
       renderCatalogManageList();
     }
 
-    function updateCatalogPrice(idx, newPrice) {
-      priceCatalog[idx].price = Number(newPrice) || 0;
-      saveCatalogToStorage();
+    function updateCatalogPriceById(id, newPrice) {
+      const item = priceCatalog.find(p => p.id === id);
+      if (item) {
+        item.price = Number(newPrice) || 0;
+        saveCatalogToStorage(false);
+      }
     }
 
-    function deleteCatalogItem(idx) {
-      priceCatalog.splice(idx, 1);
-      saveCatalogToStorage();
-      renderCatalogManageList();
+    function deleteCatalogItemById(id) {
+      const item = priceCatalog.find(p => p.id === id);
+      if (!item) return;
+      if (confirm(`Bạn có chắc muốn xoá sản phẩm "${item.name}" khỏi bảng giá xưởng?`)) {
+        priceCatalog = priceCatalog.filter(p => p.id !== id);
+        saveCatalogToStorage(true);
+        renderCatalogManageList();
+      }
+    }
+
+    function saveAndCloseCatalogModal() {
+      saveCatalogToStorage(true);
+      closeCatalogModal();
     }
 
     function resetDefaultCatalog() {
       if (confirm('Khôi phục lại bảng giá mẫu mặc định ban đầu?')) {
-        priceCatalog = [...DEFAULT_CATALOG];
-        saveCatalogToStorage();
+        priceCatalog = JSON.parse(JSON.stringify(DEFAULT_CATALOG));
+        saveCatalogToStorage(true);
         renderCatalogManageList();
       }
     }
