@@ -361,6 +361,47 @@
 
   </main>
 
+  <!-- ==================== STUDIO CUSTOM DIALOG & CONFIRM MODAL (IN-APP) ==================== -->
+  <div id="studioConfirmModal" class="fixed inset-0 bg-zinc-950/70 backdrop-blur-md z-[100] hidden flex items-center justify-center p-4 transition-opacity duration-200 opacity-0 pointer-events-none">
+    <div id="studioConfirmCard" class="bg-zinc-950/95 border border-zinc-800/90 text-zinc-100 rounded-2xl shadow-2xl max-w-md w-full overflow-hidden transform scale-95 transition-all duration-200">
+      
+      <!-- Top Accent Bar -->
+      <div id="studioConfirmAccent" class="h-1 w-full bg-gradient-to-r from-rose-500 via-pink-400 to-rose-600"></div>
+
+      <div class="p-6">
+        <!-- Icon & Title -->
+        <div class="flex items-start gap-4">
+          <div id="studioConfirmIconContainer" class="w-12 h-12 rounded-xl flex items-center justify-center text-lg shrink-0 bg-rose-500/10 text-rose-400 border border-rose-500/20">
+            <i id="studioConfirmIcon" class="fa-solid fa-receipt"></i>
+          </div>
+          <div class="flex-1 min-w-0">
+            <h3 id="studioConfirmTitle" class="text-base font-semibold text-white tracking-tight leading-snug">
+              Xác nhận gạch nợ đơn hàng
+            </h3>
+            <p id="studioConfirmSubtitle" class="text-xs text-zinc-400 mt-1 leading-relaxed">
+              Bạn có chắc chắn muốn thực hiện thao tác này?
+            </p>
+          </div>
+        </div>
+
+        <!-- Custom Details Box (Order count, debt total, workshop name, etc.) -->
+        <div id="studioConfirmDetails" class="mt-4 empty:hidden"></div>
+
+        <!-- Action Buttons -->
+        <div class="mt-6 flex items-center justify-end gap-2.5">
+          <button id="studioConfirmBtnCancel" type="button" class="px-4 py-2.5 text-xs font-medium text-zinc-300 bg-zinc-900 hover:bg-zinc-800 border border-zinc-700/80 rounded-xl transition cursor-pointer">
+            Huỷ bỏ
+          </button>
+          <button id="studioConfirmBtnOk" type="button" class="px-5 py-2.5 text-xs font-medium text-white bg-rose-600 hover:bg-rose-500 rounded-xl shadow-lg shadow-rose-950/50 transition cursor-pointer flex items-center gap-1.5">
+            <i class="fa-solid fa-check text-[11px]"></i>
+            <span id="studioConfirmOkText">Xác nhận</span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
   <!-- ==================== MODAL ĐỔI NỀN MỜ NGHỆ THUẬT (BACKGROUND PRESETS) ==================== -->
   <div id="bgModal" class="fixed inset-0 bg-zinc-950/40 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white/95 backdrop-blur-2xl rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] flex flex-col overflow-hidden border border-white/80">
@@ -1570,7 +1611,7 @@ function createJsonResponse(obj) {
 
     function applyCustomBgUrl() {
       const url = document.getElementById('customBgUrlInput').value.trim();
-      if (!url) return alert('Vui lòng dán link ảnh hợp lệ!');
+      if (!url) return showToast('Vui lòng dán link ảnh hợp lệ!', 'error');
       bgConfig.url = url;
       applyBackgroundConfig();
       saveBgConfigToStorage();
@@ -1624,6 +1665,128 @@ function createJsonResponse(obj) {
         toast.classList.add('opacity-0', 'translate-y-2');
         setTimeout(() => toast.remove(), 250);
       }, 3500);
+    }
+
+    // ================= IN-APP STUDIO CONFIRM & ALERT MODAL =================
+    // Override native window.alert to display elegant in-app toast notification
+    window.alert = function(message) {
+      showToast(String(message), 'info');
+    };
+
+    function showStudioConfirm({
+      title = 'Xác nhận thao tác',
+      subtitle = '',
+      detailsHtml = '',
+      confirmText = 'Xác nhận',
+      cancelText = 'Huỷ bỏ',
+      type = 'danger', // 'danger' | 'payment' | 'info' | 'alert'
+      icon = ''
+    }) {
+      return new Promise((resolve) => {
+        const modal = document.getElementById('studioConfirmModal');
+        const card = document.getElementById('studioConfirmCard');
+        const accent = document.getElementById('studioConfirmAccent');
+        const iconContainer = document.getElementById('studioConfirmIconContainer');
+        const iconEl = document.getElementById('studioConfirmIcon');
+        const titleEl = document.getElementById('studioConfirmTitle');
+        const subtitleEl = document.getElementById('studioConfirmSubtitle');
+        const detailsEl = document.getElementById('studioConfirmDetails');
+        const btnCancel = document.getElementById('studioConfirmBtnCancel');
+        const btnOk = document.getElementById('studioConfirmBtnOk');
+        const okText = document.getElementById('studioConfirmOkText');
+
+        titleEl.textContent = title;
+        subtitleEl.textContent = subtitle;
+        subtitleEl.style.display = subtitle ? 'block' : 'none';
+
+        if (detailsHtml) {
+          detailsEl.innerHTML = detailsHtml;
+          detailsEl.style.display = 'block';
+        } else {
+          detailsEl.innerHTML = '';
+          detailsEl.style.display = 'none';
+        }
+
+        okText.textContent = confirmText;
+        btnCancel.textContent = cancelText;
+
+        // Custom styling by dialog type
+        if (type === 'alert') {
+          btnCancel.style.display = 'none';
+          accent.className = 'h-1 w-full bg-gradient-to-r from-blue-500 via-indigo-400 to-cyan-500';
+          iconContainer.className = 'w-12 h-12 rounded-xl flex items-center justify-center text-lg shrink-0 bg-blue-500/10 text-blue-400 border border-blue-500/20';
+          iconEl.className = icon || 'fa-solid fa-circle-info';
+          btnOk.className = 'px-5 py-2.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-500 rounded-xl transition cursor-pointer';
+        } else if (type === 'payment') {
+          btnCancel.style.display = 'block';
+          accent.className = 'h-1 w-full bg-gradient-to-r from-rose-500 via-pink-400 to-rose-600';
+          iconContainer.className = 'w-12 h-12 rounded-xl flex items-center justify-center text-lg shrink-0 bg-rose-500/10 text-rose-400 border border-rose-500/20';
+          iconEl.className = icon || 'fa-solid fa-receipt';
+          btnOk.className = 'px-5 py-2.5 text-xs font-medium text-white bg-rose-600 hover:bg-rose-500 rounded-xl shadow-lg shadow-rose-950/50 transition cursor-pointer flex items-center gap-1.5';
+        } else if (type === 'info') {
+          btnCancel.style.display = 'block';
+          accent.className = 'h-1 w-full bg-gradient-to-r from-zinc-700 via-zinc-400 to-zinc-700';
+          iconContainer.className = 'w-12 h-12 rounded-xl flex items-center justify-center text-lg shrink-0 bg-zinc-800 text-zinc-300 border border-zinc-700';
+          iconEl.className = icon || 'fa-solid fa-circle-question';
+          btnOk.className = 'px-5 py-2.5 text-xs font-medium text-zinc-950 bg-white hover:bg-zinc-200 rounded-xl transition cursor-pointer flex items-center gap-1.5';
+        } else { // default danger
+          btnCancel.style.display = 'block';
+          accent.className = 'h-1 w-full bg-gradient-to-r from-rose-500 via-red-500 to-rose-600';
+          iconContainer.className = 'w-12 h-12 rounded-xl flex items-center justify-center text-lg shrink-0 bg-rose-500/10 text-rose-400 border border-rose-500/20';
+          iconEl.className = icon || 'fa-solid fa-trash-can';
+          btnOk.className = 'px-5 py-2.5 text-xs font-medium text-white bg-rose-600 hover:bg-rose-500 rounded-xl shadow-lg shadow-rose-950/50 transition cursor-pointer flex items-center gap-1.5';
+        }
+
+        // Show modal with animation
+        modal.classList.remove('hidden', 'pointer-events-none');
+        requestAnimationFrame(() => {
+          modal.classList.remove('opacity-0');
+          modal.classList.add('opacity-100');
+          card.classList.remove('scale-95');
+          card.classList.add('scale-100');
+        });
+
+        let isCleaned = false;
+        function cleanup(result) {
+          if (isCleaned) return;
+          isCleaned = true;
+          modal.classList.add('opacity-0');
+          card.classList.remove('scale-100');
+          card.classList.add('scale-95');
+          setTimeout(() => {
+            modal.classList.add('hidden', 'pointer-events-none');
+            btnOk.removeEventListener('click', onOk);
+            btnCancel.removeEventListener('click', onCancel);
+            modal.removeEventListener('click', onBackdrop);
+            document.removeEventListener('keydown', onKeyDown);
+            resolve(result);
+          }, 150);
+        }
+
+        function onOk() { cleanup(true); }
+        function onCancel() { cleanup(false); }
+        function onBackdrop(e) { if (e.target === modal) cleanup(false); }
+        function onKeyDown(e) {
+          if (e.key === 'Escape') cleanup(false);
+          if (e.key === 'Enter') cleanup(true);
+        }
+
+        btnOk.addEventListener('click', onOk);
+        btnCancel.addEventListener('click', onCancel);
+        modal.addEventListener('click', onBackdrop);
+        document.addEventListener('keydown', onKeyDown);
+      });
+    }
+
+    function showStudioAlert({ title = 'Thông báo hệ thống', message = '', detailsHtml = '', buttonText = 'Đã hiểu', icon = 'fa-solid fa-circle-info' }) {
+      return showStudioConfirm({
+        title,
+        subtitle: message,
+        detailsHtml,
+        confirmText: buttonText,
+        type: 'alert',
+        icon
+      });
     }
 
     function saveToStorage() {
@@ -1736,7 +1899,7 @@ function createJsonResponse(obj) {
     async function testAndSaveGasUrl() {
       const input = document.getElementById('gasUrlInput').value.trim();
       if (!input) {
-        alert('Dán link Web App Apps Script vào ô trước nghen!');
+        showToast('Dán link Web App Apps Script vào ô trước nghen!', 'error');
         return;
       }
       try {
@@ -1780,28 +1943,35 @@ function createJsonResponse(obj) {
           }
           closeCloudModal();
         } else {
-          alert('Không thể nhận dạng dữ liệu từ Google Sheet. Hãy kiểm tra lại phần quyền triển khai đã chọn "Anyone" chưa nghen!');
+          showStudioAlert({ title: 'Lỗi nhận dạng dữ liệu', message: 'Không thể nhận dạng dữ liệu từ Google Sheet. Hãy kiểm tra lại quyền triển khai (Who has access) đã chọn "Anyone" chưa nghen!' });
         }
       } catch (err) {
-        alert('Lỗi kết nối tới link Apps Script: ' + err.message + '\nĐảm bảo đã triển khai loại Web App và chọn Who has access là "Anyone" nghen!');
+        showStudioAlert({ title: 'Lỗi kết nối Apps Script', message: 'Lỗi: ' + err.message + '. Đảm bảo đã triển khai loại Web App và chọn Who has access là "Anyone" nghen!' });
       }
     }
 
-    function disconnectGas() {
-      if (confirm('Bạn có chắc muốn ngắt kết nối với Google Sheet trên máy này?')) {
-        gasUrl = '';
-        localStorage.removeItem('fu_studio_gas_url');
-        updateCloudBadge();
-        closeCloudModal();
-        showToast('Đã ngắt kết nối Google Sheet trên máy này.', 'info');
-      }
+    async function disconnectGas() {
+      const confirmed = await showStudioConfirm({
+        title: 'Ngắt kết nối Google Sheet',
+        subtitle: 'Bạn có chắc muốn ngắt kết nối với Google Sheet trên máy này? Dữ liệu trên Google Sheet vẫn được giữ nguyên an toàn.',
+        confirmText: 'Ngắt kết nối',
+        cancelText: 'Huỷ bỏ',
+        type: 'danger',
+        icon: 'fa-solid fa-link-slash'
+      });
+      if (!confirmed) return;
+      gasUrl = '';
+      localStorage.removeItem('fu_studio_gas_url');
+      updateCloudBadge();
+      closeCloudModal();
+      showToast('Đã ngắt kết nối Google Sheet trên máy này.', 'info');
     }
 
     function copyGasScript() {
       navigator.clipboard.writeText(GAS_SCRIPT_TEMPLATE).then(() => {
         showToast('Đã sao chép mã Apps Script vào bộ nhớ tạm!', 'success');
       }).catch(() => {
-        alert('Hãy sao chép mã trực tiếp từ file đính kèm nghen!');
+        showToast('Hãy sao chép mã trực tiếp từ file đính kèm nghen!', 'info');
       });
     }
 
@@ -1871,11 +2041,11 @@ function createJsonResponse(obj) {
 
     async function pushAllOrdersToSheet() {
       if (!gasUrl) {
-        alert('Cần lưu link Web App trước nghen!');
+        showToast('Cần lưu link Web App trước nghen!', 'error');
         return;
       }
       if (orders.length === 0) {
-        alert('Hiện tại máy này chưa có đơn nào để đẩy lên!');
+        showToast('Hiện tại máy này chưa có đơn nào để đẩy lên!', 'info');
         return;
       }
       showToast('Đang tải dữ liệu lên Google Sheet...', 'info');
@@ -2110,7 +2280,7 @@ function createJsonResponse(obj) {
       const sel = document.getElementById('comboItemSelect');
       const qtyInput = document.getElementById('comboItemQty');
       if (!sel || !sel.value) {
-        alert('Vui lòng chọn sản phẩm in!');
+        showToast('Vui lòng chọn sản phẩm in!', 'error');
         return;
       }
       const itemName = sel.value;
@@ -2140,12 +2310,12 @@ function createJsonResponse(obj) {
       const editId = document.getElementById('editComboId').value;
 
       if (!name) {
-        alert('Vui lòng nhập tên gói combo!');
+        showToast('Vui lòng nhập tên gói combo!', 'error');
         document.getElementById('comboNameInput').focus();
         return;
       }
       if (comboDraftItems.length === 0) {
-        alert('Gói combo phải có ít nhất 1 sản phẩm! Hãy chọn món và bấm "+ Thêm món".');
+        showToast('Gói combo phải có ít nhất 1 sản phẩm! Hãy chọn món và bấm "+ Thêm món".', 'error');
         return;
       }
 
@@ -2200,34 +2370,47 @@ function createJsonResponse(obj) {
       renderComboDraftItemsList();
     }
 
-    function deleteCombo(comboId) {
+    async function deleteCombo(comboId) {
       const combo = presetCombos.find(c => c.id === comboId);
       if (!combo) return;
-      if (confirm(`Bạn có chắc muốn xóa combo "${combo.name}"?`)) {
-        presetCombos = presetCombos.filter(c => c.id !== comboId);
-        localStorage.setItem('fu_studio_combos_v1', JSON.stringify(presetCombos));
-        if (gasUrl) {
-          sendCloudPost({ action: 'saveSettings', settings: { fu_studio_combos_v1: JSON.stringify(presetCombos) } });
-        }
-        cancelEditCombo();
-        renderComboList();
-        renderPresetCombosGrid();
-        showToast('Đã xóa gói combo!', 'info');
+      const confirmed = await showStudioConfirm({
+        title: 'Xoá gói combo',
+        subtitle: `Bạn có chắc muốn xóa combo "${combo.name}" khỏi danh mục cấu hình?`,
+        confirmText: 'Xoá combo',
+        cancelText: 'Huỷ bỏ',
+        type: 'danger',
+        icon: 'fa-solid fa-trash-can'
+      });
+      if (!confirmed) return;
+      presetCombos = presetCombos.filter(c => c.id !== comboId);
+      localStorage.setItem('fu_studio_combos_v1', JSON.stringify(presetCombos));
+      if (gasUrl) {
+        sendCloudPost({ action: 'saveSettings', settings: { fu_studio_combos_v1: JSON.stringify(presetCombos) } });
       }
+      cancelEditCombo();
+      renderComboList();
+      renderPresetCombosGrid();
+      showToast('Đã xóa gói combo!', 'info');
     }
 
-    function resetDefaultCombos() {
-      if (confirm('Khôi phục danh sách combo về 5 combo mặc định ban đầu của hệ thống?')) {
-        presetCombos = JSON.parse(JSON.stringify(DEFAULT_COMBOS));
-        localStorage.setItem('fu_studio_combos_v1', JSON.stringify(presetCombos));
-        if (gasUrl) {
-          sendCloudPost({ action: 'saveSettings', settings: { fu_studio_combos_v1: JSON.stringify(presetCombos) } });
-        }
-        cancelEditCombo();
-        renderComboList();
-        renderPresetCombosGrid();
-        showToast('Đã khôi phục 5 combo mặc định!', 'success');
+    async function resetDefaultCombos() {
+      const confirmed = await showStudioConfirm({
+        title: 'Khôi phục combo mặc định',
+        subtitle: 'Khôi phục danh sách gói combo về 5 gói mặc định ban đầu của hệ thống?',
+        confirmText: 'Khôi phục',
+        cancelText: 'Huỷ bỏ',
+        type: 'info',
+        icon: 'fa-solid fa-rotate-left'
+      });
+      if (!confirmed) return;
+      presetCombos = JSON.parse(JSON.stringify(DEFAULT_COMBOS));
+      localStorage.setItem('fu_studio_combos_v1', JSON.stringify(presetCombos));
+      if (gasUrl) {
+        sendCloudPost({ action: 'saveSettings', settings: { fu_studio_combos_v1: JSON.stringify(presetCombos) } });
       }
+      renderComboManageList();
+      renderPresetComboPills();
+      showToast('Đã khôi phục 5 combo mặc định!', 'success');
     }
 
     function renderComboList() {
@@ -2500,7 +2683,7 @@ function createJsonResponse(obj) {
     function saveOrder(e) {
       e.preventDefault();
       if (modalCart.length === 0) {
-        alert('Chưa chọn sản phẩm in nào hết! Chạm chọn ít nhất 1 món bên trái nghen.');
+        showToast('Chưa chọn sản phẩm in nào hết! Chạm chọn ít nhất 1 món bên trái nghen.', 'error');
         return;
       }
 
@@ -2644,7 +2827,7 @@ function createJsonResponse(obj) {
       const name = document.getElementById('newCatName').value.trim();
       const category = document.getElementById('newCatGroup').value;
       const price = Number(document.getElementById('newCatPrice').value) || 0;
-      if (!name) return alert('Nhập tên sản phẩm trước nghen!');
+      if (!name) return showToast('Nhập tên sản phẩm trước nghen!', 'error');
       priceCatalog.push({ id: 'cat_' + Date.now(), name, price, category });
       saveCatalogToStorage(true);
       document.getElementById('newCatName').value = '';
@@ -2660,14 +2843,28 @@ function createJsonResponse(obj) {
       }
     }
 
-    function deleteCatalogItemById(id) {
+    async function deleteCatalogItemById(id) {
       const item = priceCatalog.find(p => p.id === id);
       if (!item) return;
-      if (confirm(`Bạn có chắc muốn xoá sản phẩm "${item.name}" khỏi bảng giá xưởng?`)) {
-        priceCatalog = priceCatalog.filter(p => p.id !== id);
-        saveCatalogToStorage(true);
-        renderCatalogManageList();
-      }
+      const confirmed = await showStudioConfirm({
+        title: 'Xoá sản phẩm khỏi bảng giá',
+        subtitle: `Bạn có chắc muốn xoá sản phẩm này khỏi bảng giá mẫu của xưởng?`,
+        detailsHtml: `
+          <div class="p-3 bg-zinc-900/90 border border-zinc-800 rounded-xl flex items-center justify-between text-xs">
+            <span class="text-zinc-400">Sản phẩm:</span>
+            <span class="font-medium text-white">${item.name}</span>
+          </div>
+        `,
+        confirmText: 'Xoá sản phẩm',
+        cancelText: 'Huỷ bỏ',
+        type: 'danger',
+        icon: 'fa-solid fa-trash-can'
+      });
+      if (!confirmed) return;
+      priceCatalog = priceCatalog.filter(p => p.id !== id);
+      saveCatalogToStorage(true);
+      renderCatalogManageList();
+      showToast(`Đã xoá "${item.name}" khỏi bảng giá`, 'info');
     }
 
     function saveAndCloseCatalogModal() {
@@ -2675,25 +2872,42 @@ function createJsonResponse(obj) {
       closeCatalogModal();
     }
 
-    function resetDefaultCatalog() {
-      if (confirm('Khôi phục lại bảng giá mẫu mặc định ban đầu?')) {
-        priceCatalog = JSON.parse(JSON.stringify(DEFAULT_CATALOG));
-        saveCatalogToStorage(true);
-        renderCatalogManageList();
-      }
+    async function resetDefaultCatalog() {
+      const confirmed = await showStudioConfirm({
+        title: 'Khôi phục bảng giá mặc định',
+        subtitle: 'Khôi phục lại toàn bộ bảng giá mẫu xưởng về dữ liệu chuẩn ban đầu?',
+        confirmText: 'Khôi phục',
+        cancelText: 'Huỷ bỏ',
+        type: 'info',
+        icon: 'fa-solid fa-rotate-left'
+      });
+      if (!confirmed) return;
+      priceCatalog = JSON.parse(JSON.stringify(DEFAULT_CATALOG));
+      saveCatalogToStorage(true);
+      renderCatalogManageList();
+      showToast('Đã khôi phục bảng giá mẫu chuẩn!', 'success');
     }
 
     // ================= MAIN RENDER (CARDS & TABLE) =================
-    function deleteOrder(id) {
-      if (confirm('Bạn có chắc muốn xoá đơn in này không?')) {
-        orders = orders.filter(o => o.id !== id);
-        saveToStorage();
-        renderAll();
+    async function deleteOrder(id) {
+      const order = orders.find(o => o.id === id);
+      const name = order ? (order.customer || order.code || 'đơn này') : 'đơn in này';
+      const confirmed = await showStudioConfirm({
+        title: 'Xác nhận xoá đơn in',
+        subtitle: `Bạn có chắc muốn xoá ${name}? Thao tác này sẽ xoá đơn khỏi danh sách và cập nhật lên Google Sheet.`,
+        confirmText: 'Xoá đơn',
+        cancelText: 'Huỷ bỏ',
+        type: 'danger',
+        icon: 'fa-solid fa-trash-can'
+      });
+      if (!confirmed) return;
+      orders = orders.filter(o => o.id !== id);
+      saveToStorage();
+      renderAll();
 
-        if (gasUrl) {
-          sendCloudPost({ action: 'deleteOrder', id: id });
-          showToast('Đã xóa đơn trên Sheet', 'info');
-        }
+      if (gasUrl) {
+        sendCloudPost({ action: 'deleteOrder', id: id });
+        showToast('Đã xóa đơn trên Sheet', 'info');
       }
     }
 
@@ -2938,10 +3152,10 @@ Lưu ý: Anh em thợ kiểm tra kỹ danh sách và xác nhận giúp FU Studio
           saveZaloConfig();
           showToast('Đã nhận mã cấu hình mẫu tin từ máy khác thành công! ✅', 'success');
         } else {
-          alert('Mã cấu hình không đúng định dạng!');
+          showToast('Mã cấu hình không đúng định dạng!', 'error');
         }
       } catch(e) {
-        alert('Mã cấu hình không hợp lệ!');
+        showToast('Mã cấu hình không hợp lệ!', 'error');
       }
     }
 
@@ -2972,23 +3186,30 @@ Lưu ý: Anh em thợ kiểm tra kỹ danh sách và xác nhận giúp FU Studio
       closeZaloConfigModal();
     }
 
-    function resetZaloConfigToDefault() {
-      if (confirm('Bạn có chắc muốn khôi phục lại mẫu tin nhắn gốc ban đầu của studio không?')) {
-        document.getElementById('cfgZaloSingleTemplate').value = DEFAULT_ZALO_SINGLE_TEMPLATE;
-        document.getElementById('cfgZaloBatchTemplate').value = DEFAULT_ZALO_BATCH_TEMPLATE;
-        localStorage.removeItem('fu_zalo_template_single');
-        localStorage.removeItem('fu_zalo_template_batch');
-        if (gasUrl) {
-          sendCloudPost({
-            action: 'saveSettings',
-            settings: {
-              fu_zalo_template_single: DEFAULT_ZALO_SINGLE_TEMPLATE,
-              fu_zalo_template_batch: DEFAULT_ZALO_BATCH_TEMPLATE
-            }
-          });
-        }
-        showToast('Đã khôi phục mẫu tin nhắn gốc thành công! ✅', 'info');
+    async function resetZaloConfigToDefault() {
+      const confirmed = await showStudioConfirm({
+        title: 'Khôi phục mẫu tin nhắn',
+        subtitle: 'Bạn có chắc muốn khôi phục lại mẫu tin nhắn gốc ban đầu của studio không?',
+        confirmText: 'Khôi phục',
+        cancelText: 'Huỷ bỏ',
+        type: 'info',
+        icon: 'fa-solid fa-rotate-left'
+      });
+      if (!confirmed) return;
+      document.getElementById('cfgZaloSingleTemplate').value = DEFAULT_ZALO_SINGLE_TEMPLATE;
+      document.getElementById('cfgZaloBatchTemplate').value = DEFAULT_ZALO_BATCH_TEMPLATE;
+      localStorage.removeItem('fu_zalo_template_single');
+      localStorage.removeItem('fu_zalo_template_batch');
+      if (gasUrl) {
+        sendCloudPost({
+          action: 'saveSettings',
+          settings: {
+            fu_zalo_template_single: DEFAULT_ZALO_SINGLE_TEMPLATE,
+            fu_zalo_template_batch: DEFAULT_ZALO_BATCH_TEMPLATE
+          }
+        });
       }
+      showToast('Đã khôi phục mẫu tin nhắn gốc thành công! ✅', 'info');
     }
 
     // Nút gạch nợ công nợ xưởng 1 chạm dạng pill cao cấp, thanh lịch, mượt mà
@@ -3249,7 +3470,7 @@ Lưu ý: Anh em thợ kiểm tra kỹ danh sách và xác nhận giúp FU Studio
       onOrderSelectionChange();
     }
 
-    function settleSelectedOrders() {
+    async function settleSelectedOrders() {
       const selected = document.querySelectorAll('.order-cb:checked');
       const ids = Array.from(selected).map(cb => Number(cb.getAttribute('data-id')));
       if (ids.length === 0) return;
@@ -3263,26 +3484,47 @@ Lưu ý: Anh em thợ kiểm tra kỹ danh sách và xác nhận giúp FU Studio
 
       const totalDebt = unpaidOrders.reduce((sum, o) => sum + (o.items || []).reduce((s, it) => s + (it.qty * it.price), 0), 0);
 
-      if (confirm(`Xác nhận GẠCH NỢ cho ${unpaidOrders.length} đơn đã chọn?\n\nTổng số tiền: ${formatMoney(totalDebt)}`)) {
-        unpaidOrders.forEach(o => {
-          o.payment = 'Đã thanh toán';
-        });
-        saveToStorage();
-        renderAll();
-        clearSelectedOrders();
+      const confirmed = await showStudioConfirm({
+        title: 'Xác nhận gạch nợ đơn đã chọn',
+        subtitle: 'Bạn có chắc chắn muốn gạch nợ cho các đơn hàng đã tích chọn?',
+        detailsHtml: `
+          <div class="p-3.5 bg-zinc-900/90 border border-zinc-800 rounded-xl space-y-2 text-xs">
+            <div class="flex items-center justify-between">
+              <span class="text-zinc-400">Số lượng đơn gạch nợ:</span>
+              <span class="font-semibold text-white">${unpaidOrders.length} đơn</span>
+            </div>
+            <div class="flex items-center justify-between border-t border-zinc-800/80 pt-2">
+              <span class="text-zinc-400">Tổng công nợ thanh toán:</span>
+              <span class="font-mono font-bold text-rose-400 text-sm">${formatMoney(totalDebt)}</span>
+            </div>
+          </div>
+        `,
+        confirmText: 'Xác nhận gạch nợ',
+        cancelText: 'Huỷ bỏ',
+        type: 'payment',
+        icon: 'fa-solid fa-receipt'
+      });
 
-        if (gasUrl) {
-          showToast('Đang cập nhật gạch nợ lên Google Sheet...', 'info');
-          sendCloudPost({ action: 'bulkSave', orders: unpaidOrders }).then(() => {
-            showToast(`Đã gạch nợ thành công ${unpaidOrders.length} đơn (${formatMoney(totalDebt)})! ✅`, 'success');
-          });
-        } else {
+      if (!confirmed) return;
+
+      unpaidOrders.forEach(o => {
+        o.payment = 'Đã thanh toán';
+      });
+      saveToStorage();
+      renderAll();
+      clearSelectedOrders();
+
+      if (gasUrl) {
+        showToast('Đang cập nhật gạch nợ lên Google Sheet...', 'info');
+        sendCloudPost({ action: 'bulkSave', orders: unpaidOrders }).then(() => {
           showToast(`Đã gạch nợ thành công ${unpaidOrders.length} đơn (${formatMoney(totalDebt)})! ✅`, 'success');
-        }
+        });
+      } else {
+        showToast(`Đã gạch nợ thành công ${unpaidOrders.length} đơn (${formatMoney(totalDebt)})! ✅`, 'success');
       }
     }
 
-    function batchSettleDebt() {
+    async function batchSettleDebt() {
       const filtered = getFilteredOrders();
       const unpaidOrders = filtered.filter(o => o.payment !== 'Đã thanh toán');
 
@@ -3304,22 +3546,47 @@ Lưu ý: Anh em thợ kiểm tra kỹ danh sách và xác nhận giúp FU Studio
         scopeText = `tất cả các xưởng trong Tháng ${monthFilter}`;
       }
 
-      if (confirm(`🎉 XÁC NHẬN QUYẾT TOÁN CÔNG NỢ XƯỞNG:\n\n• Đối tượng: ${scopeText}\n• Số lượng đơn: ${unpaidOrders.length} đơn\n• Tổng số tiền thanh toán: ${formatMoney(totalDebt)}\n\nBấm OK để tự động gạch nợ toàn bộ ${unpaidOrders.length} đơn này ngay lập tức!`)) {
-        unpaidOrders.forEach(o => {
-          o.payment = 'Đã thanh toán';
-        });
-        saveToStorage();
-        renderAll();
-        clearSelectedOrders();
+      const confirmed = await showStudioConfirm({
+        title: 'Quyết toán công nợ xưởng cuối tháng',
+        subtitle: 'Hệ thống sẽ tự động gạch nợ tất cả các đơn hàng nợ thuộc phạm vi lọc hiện tại:',
+        detailsHtml: `
+          <div class="p-4 bg-zinc-900/90 border border-zinc-800 rounded-xl space-y-2.5 text-xs">
+            <div class="flex items-center justify-between">
+              <span class="text-zinc-400">Phạm vi quyết toán:</span>
+              <span class="font-medium text-white">${scopeText}</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-zinc-400">Số lượng đơn nợ:</span>
+              <span class="font-semibold text-rose-400">${unpaidOrders.length} đơn</span>
+            </div>
+            <div class="flex items-center justify-between border-t border-zinc-800/80 pt-2">
+              <span class="text-zinc-400">Tổng tiền thanh toán xưởng:</span>
+              <span class="font-mono font-bold text-emerald-400 text-sm">${formatMoney(totalDebt)}</span>
+            </div>
+          </div>
+        `,
+        confirmText: 'Đồng ý quyết toán toàn bộ',
+        cancelText: 'Huỷ bỏ',
+        type: 'payment',
+        icon: 'fa-solid fa-credit-card'
+      });
 
-        if (gasUrl) {
-          showToast('Đang đồng bộ quyết toán lên Google Sheet...', 'info');
-          sendCloudPost({ action: 'bulkSave', orders: unpaidOrders }).then(() => {
-            showToast(`🎉 Quyết toán hoàn tất ${unpaidOrders.length} đơn (${formatMoney(totalDebt)})! ✅`, 'success');
-          });
-        } else {
+      if (!confirmed) return;
+
+      unpaidOrders.forEach(o => {
+        o.payment = 'Đã thanh toán';
+      });
+      saveToStorage();
+      renderAll();
+      clearSelectedOrders();
+
+      if (gasUrl) {
+        showToast('Đang đồng bộ quyết toán lên Google Sheet...', 'info');
+        sendCloudPost({ action: 'bulkSave', orders: unpaidOrders }).then(() => {
           showToast(`🎉 Quyết toán hoàn tất ${unpaidOrders.length} đơn (${formatMoney(totalDebt)})! ✅`, 'success');
-        }
+        });
+      } else {
+        showToast(`🎉 Quyết toán hoàn tất ${unpaidOrders.length} đơn (${formatMoney(totalDebt)})! ✅`, 'success');
       }
     }
 
