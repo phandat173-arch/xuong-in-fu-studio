@@ -220,12 +220,19 @@
           <span class="text-xs text-rose-700 font-semibold flex items-center gap-1.5">
             <span class="w-1.5 h-1.5 rounded-full bg-rose-600"></span> Công nợ xưởng chưa tất toán
           </span>
+          <span id="stat-debt-count-badge" class="text-xs font-mono-val font-semibold px-2 py-0.5 rounded bg-rose-100 text-rose-800 border border-rose-200 hidden">0 đơn nợ</span>
         </div>
         <div class="mt-2">
           <div class="text-3xl font-light tracking-tight text-rose-700 tabular-nums font-mono-val" id="stat-debt">0 đ</div>
-          <div class="text-xs text-zinc-600 mt-2 flex items-center gap-1.5">
-            <i class="fa-solid fa-arrow-pointer text-xs text-zinc-400"></i>
-            <span>Chạm nhãn công nợ trên từng đơn để gạch nợ 1 lần duy nhất</span>
+          <div class="flex flex-wrap items-center justify-between gap-2 mt-2 pt-2 border-t border-rose-100/80">
+            <div class="text-xs text-zinc-600 flex items-center gap-1.5">
+              <i class="fa-solid fa-arrow-pointer text-xs text-zinc-400"></i>
+              <span>Chạm nhãn để gạch nợ từng đơn lẻ</span>
+            </div>
+            <button type="button" onclick="batchSettleDebt()" id="btnBatchSettleDebt" class="px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold shadow-xs transition flex items-center gap-1.5 cursor-pointer hidden" title="Gạch nợ toàn bộ các đơn đang hiển thị mà không cần bấm từng đơn">
+              <i class="fa-solid fa-receipt text-xs"></i>
+              <span id="btnBatchSettleDebtLabel">Quyết toán & Gạch nợ toàn bộ</span>
+            </button>
           </div>
         </div>
       </div>
@@ -309,6 +316,7 @@
         <table class="w-full text-left text-sm text-zinc-700">
           <thead class="bg-white/40 text-xs font-mono-val font-medium text-zinc-600 border-b border-zinc-200/70">
             <tr>
+              <th class="py-3 px-3 w-8 text-center"><input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAllOrders(this.checked)" class="rounded border-zinc-300 text-zinc-950 focus:ring-0 cursor-pointer" title="Chọn tất cả để gạch nợ"></th>
               <th class="py-3 px-4">Hợp đồng / Dâu rể</th>
               <th class="py-3 px-4">Ngày gửi</th>
               <th class="py-3 px-4">Chi tiết sản phẩm in</th>
@@ -329,6 +337,26 @@
       </div>
       <h3 class="text-sm font-semibold text-zinc-800">Chưa có đơn in nào khớp với bộ lọc</h3>
       <p class="text-xs text-zinc-400 mt-1">Đổi từ khoá tìm kiếm hoặc bấm "Lên Đơn Mới" ở góc trên.</p>
+    </div>
+
+    <!-- Floating Batch Actions Bar (Khi chọn checkbox các đơn) -->
+    <div id="floatingBatchBar" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 hidden">
+      <div class="glass-panel bg-zinc-950/95 text-white px-5 py-3 rounded-2xl shadow-2xl border border-white/20 flex items-center gap-4 backdrop-blur-xl animate-fade-in">
+        <div class="flex items-center gap-2">
+          <span class="w-6 h-6 rounded-full bg-rose-600 text-white flex items-center justify-center text-xs font-mono-val font-bold" id="batchSelectedCount">0</span>
+          <span class="text-xs text-zinc-300">đã chọn • Nợ: <b id="batchSelectedDebt" class="text-rose-400 font-mono-val">0 đ</b></span>
+        </div>
+        <div class="h-4 w-px bg-zinc-700"></div>
+        <div class="flex items-center gap-2">
+          <button type="button" onclick="settleSelectedOrders()" class="px-3.5 py-1.5 bg-rose-600 hover:bg-rose-500 text-white text-xs font-semibold rounded-lg transition shadow-xs flex items-center gap-1.5 cursor-pointer">
+            <i class="fa-solid fa-check text-xs"></i>
+            <span>Gạch nợ đơn đã chọn</span>
+          </button>
+          <button type="button" onclick="clearSelectedOrders()" class="px-2.5 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs font-medium rounded-lg transition cursor-pointer">
+            Bỏ chọn
+          </button>
+        </div>
+      </div>
     </div>
 
   </main>
@@ -1624,22 +1652,30 @@ function createJsonResponse(obj) {
     // Định dạng ngày theo chuẩn Việt Nam Ngày/Tháng/Năm (DD/MM/YYYY)
     function formatDateVN(dateStr) {
       if (!dateStr) return '';
-      if (dateStr instanceof Date) {
+      if (dateStr instanceof Date && !isNaN(dateStr.getTime())) {
         const dd = String(dateStr.getDate()).padStart(2, '0');
         const mm = String(dateStr.getMonth() + 1).padStart(2, '0');
         const yyyy = dateStr.getFullYear();
         return `${dd}/${mm}/${yyyy}`;
       }
-      const clean = String(dateStr).trim().split('T')[0];
-      if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(clean)) return clean;
+      const str = String(dateStr).trim();
+      if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(str)) return str;
+      const clean = str.split('T')[0];
       const parts = clean.split('-');
-      if (parts.length === 3) {
+      if (parts.length === 3 && parts[0].length === 4) {
         const yyyy = parts[0];
         const mm = parts[1].padStart(2, '0');
         const dd = parts[2].padStart(2, '0');
         return `${dd}/${mm}/${yyyy}`;
       }
-      return dateStr;
+      const parsed = new Date(str);
+      if (!isNaN(parsed.getTime())) {
+        const dd = String(parsed.getDate()).padStart(2, '0');
+        const mm = String(parsed.getMonth() + 1).padStart(2, '0');
+        const yyyy = parsed.getFullYear();
+        return `${dd}/${mm}/${yyyy}`;
+      }
+      return str;
     }
 
     function switchView(mode) {
@@ -2958,15 +2994,14 @@ Lưu ý: Anh em thợ kiểm tra kỹ danh sách và xác nhận giúp FU Studio
     // Nút gạch nợ công nợ xưởng 1 chạm dạng pill cao cấp, thanh lịch, mượt mà
     function getPaymentBadgeHtml(o) {
       if (o.payment === 'Đã thanh toán') {
-        return `<button type="button" onclick="togglePayment(${o.id})" title="Chạm để chuyển lại trạng thái nợ xưởng" class="group inline-flex items-center gap-2 px-3 py-1.5 text-xs font-semibold rounded-full bg-emerald-500/15 text-emerald-800 border border-emerald-300 hover:bg-emerald-500/25 transition cursor-pointer shadow-2xs whitespace-nowrap">
-          <span class="w-2 h-2 rounded-full bg-emerald-600 shadow-xs"></span>
-          <span>Đã tất toán</span>
+        return `<button type="button" onclick="togglePayment(${o.id})" title="Chạm nếu muốn hoàn tác về nợ xưởng" class="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 hover:bg-emerald-100 transition cursor-pointer shadow-2xs whitespace-nowrap">
+          <i class="fa-solid fa-check text-[10px] text-emerald-600"></i>
+          <span>Đã thanh toán</span>
         </button>`;
       }
-      return `<button type="button" onclick="togglePayment(${o.id})" title="Chạm 1 lần để GẠCH NỢ (Đã tất toán)" class="group inline-flex items-center gap-2 px-3 py-1.5 text-xs font-semibold rounded-full bg-rose-500/15 text-rose-800 border border-rose-300 hover:bg-rose-500/25 transition cursor-pointer shadow-2xs whitespace-nowrap">
-        <span class="w-2 h-2 rounded-full bg-rose-600 animate-pulse shadow-xs"></span>
-        <span>Nợ xưởng</span>
-        <span class="text-xs text-rose-600 font-normal pl-1 border-l border-rose-300 group-hover:text-rose-950">Gạch nợ</span>
+      return `<button type="button" onclick="togglePayment(${o.id})" title="Chạm 1 lần để gạch nợ đơn này" class="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold rounded-full bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100 hover:border-rose-300 transition cursor-pointer shadow-2xs whitespace-nowrap">
+        <span class="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse"></span>
+        <span>Chưa thanh toán</span>
       </button>`;
     }
 
@@ -3003,9 +3038,38 @@ Lưu ý: Anh em thợ kiểm tra kỹ danh sách và xác nhận giúp FU Studio
         if (o.payment === 'Chưa thanh toán') debtAmount += orderTotal;
       });
 
+      const unpaidOrders = filtered.filter(o => o.payment !== 'Đã thanh toán');
+      const unpaidCount = unpaidOrders.length;
+
       document.getElementById('stat-total-cost').innerText = formatMoney(totalCost);
       document.getElementById('stat-total-orders').innerText = `${filtered.length} đơn hàng`;
       document.getElementById('stat-debt').innerText = formatMoney(debtAmount);
+
+      const btnSettle = document.getElementById('btnBatchSettleDebt');
+      const badgeDebtCount = document.getElementById('stat-debt-count-badge');
+      if (btnSettle) {
+        if (debtAmount > 0) {
+          btnSettle.classList.remove('hidden');
+          const workshopFilter = document.getElementById('filterWorkshop') ? document.getElementById('filterWorkshop').value : '';
+          const monthFilter = document.getElementById('filterMonth') ? document.getElementById('filterMonth').value : '';
+          let label = `Quyết toán tất cả (${unpaidCount} đơn)`;
+          if (workshopFilter) label = `Quyết toán ${workshopFilter} (${unpaidCount} đơn)`;
+          else if (monthFilter) label = `Quyết toán Th.${monthFilter} (${unpaidCount} đơn)`;
+          document.getElementById('btnBatchSettleDebtLabel').innerText = label;
+          if (badgeDebtCount) {
+            badgeDebtCount.classList.remove('hidden');
+            badgeDebtCount.className = 'text-xs font-mono-val font-semibold px-2 py-0.5 rounded bg-rose-100 text-rose-800 border border-rose-200';
+            badgeDebtCount.innerText = `${unpaidCount} đơn nợ`;
+          }
+        } else {
+          btnSettle.classList.add('hidden');
+          if (badgeDebtCount) {
+            badgeDebtCount.classList.remove('hidden');
+            badgeDebtCount.className = 'text-xs font-mono-val font-semibold px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 border border-emerald-200';
+            badgeDebtCount.innerText = 'Sạch nợ';
+          }
+        }
+      }
 
       const cardContainer = document.getElementById('cardViewContainer');
       const tbody = document.getElementById('orderTableBody');
@@ -3066,6 +3130,7 @@ Lưu ý: Anh em thợ kiểm tra kỹ danh sách và xác nhận giúp FU Studio
             <div class="p-3.5 border-b border-zinc-200/60 bg-white/40 space-y-1.5">
               <div class="flex items-center justify-between gap-2">
                 <div class="flex items-center gap-1.5 flex-wrap">
+                  <input type="checkbox" class="order-cb rounded border-zinc-300 text-zinc-900 focus:ring-0 cursor-pointer mr-0.5" data-id="${o.id}" data-debt="${o.payment !== 'Đã thanh toán' ? orderTotal : 0}" onchange="onOrderSelectionChange()" title="Chọn đơn này để quyết toán hàng loạt">
                   <span class="text-xs font-mono-val font-semibold px-2 py-0.5 rounded bg-zinc-950 text-zinc-100 tracking-wide">${o.code}</span>
                   <span class="text-xs font-mono-val px-1.5 py-0.5 rounded bg-white/80 text-zinc-700 border border-zinc-200">${o.workshop}</span>
                   <span class="text-xs font-mono-val text-zinc-500 whitespace-nowrap">Gửi: ${formatDateVN(o.date)}</span>
@@ -3075,7 +3140,6 @@ Lưu ý: Anh em thợ kiểm tra kỹ danh sách và xác nhận giúp FU Studio
                   ${driveBtnHtml}
                   ${zaloBtnHtml}
                   <button type="button" onclick="openModal(${o.id})" class="w-6 h-6 rounded hover:bg-zinc-200/70 text-zinc-500 hover:text-zinc-900 flex items-center justify-center transition cursor-pointer" title="Chỉnh sửa"><i class="fa-solid fa-pen text-xs"></i></button>
-                  <button type="button" onclick="duplicateOrder(${o.id})" class="w-6 h-6 rounded hover:bg-zinc-200/70 text-zinc-500 hover:text-zinc-900 flex items-center justify-center transition cursor-pointer" title="Nhân bản"><i class="fa-regular fa-copy text-xs"></i></button>
                   <button type="button" onclick="deleteOrder(${o.id})" class="w-6 h-6 rounded hover:bg-rose-50 text-zinc-300 hover:text-rose-600 flex items-center justify-center transition cursor-pointer" title="Xoá"><i class="fa-regular fa-trash-can text-xs"></i></button>
                 </div>
               </div>
@@ -3105,6 +3169,9 @@ Lưu ý: Anh em thợ kiểm tra kỹ danh sách và xác nhận giúp FU Studio
         const tr = document.createElement('tr');
         tr.className = 'hover:bg-white/60 transition';
         tr.innerHTML = `
+          <td class="py-3 px-3 align-top text-center">
+            <input type="checkbox" class="order-cb rounded border-zinc-300 text-zinc-900 focus:ring-0 cursor-pointer" data-id="${o.id}" data-debt="${o.payment !== 'Đã thanh toán' ? orderTotal : 0}" onchange="onOrderSelectionChange()" title="Chọn đơn này">
+          </td>
           <td class="py-3 px-4 align-top whitespace-nowrap">
             <span class="text-xs font-mono-val font-semibold px-2 py-0.5 rounded bg-zinc-950 text-zinc-100">${o.code}</span>
             <div class="text-xs font-semibold text-zinc-900 mt-1">${o.name}</div>
@@ -3132,13 +3199,128 @@ Lưu ý: Anh em thợ kiểm tra kỹ danh sách và xác nhận giúp FU Studio
               ${driveBtnHtml}
               ${zaloBtnHtml}
               <button type="button" onclick="openModal(${o.id})" class="text-zinc-500 hover:text-zinc-900 p-1 cursor-pointer transition" title="Sửa"><i class="fa-solid fa-pen text-xs"></i></button>
-              <button type="button" onclick="duplicateOrder(${o.id})" class="text-zinc-500 hover:text-zinc-900 p-1 cursor-pointer transition" title="Nhân bản"><i class="fa-regular fa-copy text-xs"></i></button>
               <button type="button" onclick="deleteOrder(${o.id})" class="text-zinc-300 hover:text-rose-600 p-1 cursor-pointer transition" title="Xóa"><i class="fa-regular fa-trash-can text-xs"></i></button>
             </div>
           </td>
         `;
         tbody.appendChild(tr);
       });
+      onOrderSelectionChange();
+    }
+
+    // ================= BATCH DEBT SETTLEMENT & SELECTION =================
+    function onOrderSelectionChange() {
+      const selected = document.querySelectorAll('.order-cb:checked');
+      const count = selected.length;
+      const bar = document.getElementById('floatingBatchBar');
+      const selectAll = document.getElementById('selectAllCheckbox');
+      const allCbs = document.querySelectorAll('.order-cb');
+
+      if (selectAll && allCbs.length > 0) {
+        selectAll.checked = (selected.length === allCbs.length);
+      }
+
+      if (count > 0) {
+        let totalDebt = 0;
+        selected.forEach(cb => {
+          totalDebt += Number(cb.getAttribute('data-debt')) || 0;
+        });
+        document.getElementById('batchSelectedCount').innerText = count;
+        document.getElementById('batchSelectedDebt').innerText = formatMoney(totalDebt);
+        if (bar) bar.classList.remove('hidden');
+      } else {
+        if (bar) bar.classList.add('hidden');
+      }
+    }
+
+    function toggleSelectAllOrders(checked) {
+      document.querySelectorAll('.order-cb').forEach(cb => {
+        cb.checked = checked;
+      });
+      onOrderSelectionChange();
+    }
+
+    function clearSelectedOrders() {
+      document.querySelectorAll('.order-cb').forEach(cb => {
+        cb.checked = false;
+      });
+      const selectAll = document.getElementById('selectAllCheckbox');
+      if (selectAll) selectAll.checked = false;
+      onOrderSelectionChange();
+    }
+
+    function settleSelectedOrders() {
+      const selected = document.querySelectorAll('.order-cb:checked');
+      const ids = Array.from(selected).map(cb => Number(cb.getAttribute('data-id')));
+      if (ids.length === 0) return;
+
+      const unpaidOrders = orders.filter(o => ids.includes(o.id) && o.payment !== 'Đã thanh toán');
+      if (unpaidOrders.length === 0) {
+        showToast('Các đơn bạn chọn đều đã được thanh toán từ trước rồi!', 'info');
+        clearSelectedOrders();
+        return;
+      }
+
+      const totalDebt = unpaidOrders.reduce((sum, o) => sum + (o.items || []).reduce((s, it) => s + (it.qty * it.price), 0), 0);
+
+      if (confirm(`Xác nhận GẠCH NỢ cho ${unpaidOrders.length} đơn đã chọn?\n\nTổng số tiền: ${formatMoney(totalDebt)}`)) {
+        unpaidOrders.forEach(o => {
+          o.payment = 'Đã thanh toán';
+        });
+        saveToStorage();
+        renderAll();
+        clearSelectedOrders();
+
+        if (gasUrl) {
+          showToast('Đang cập nhật gạch nợ lên Google Sheet...', 'info');
+          sendCloudPost({ action: 'bulkSave', orders: unpaidOrders }).then(() => {
+            showToast(`Đã gạch nợ thành công ${unpaidOrders.length} đơn (${formatMoney(totalDebt)})! ✅`, 'success');
+          });
+        } else {
+          showToast(`Đã gạch nợ thành công ${unpaidOrders.length} đơn (${formatMoney(totalDebt)})! ✅`, 'success');
+        }
+      }
+    }
+
+    function batchSettleDebt() {
+      const filtered = getFilteredOrders();
+      const unpaidOrders = filtered.filter(o => o.payment !== 'Đã thanh toán');
+
+      if (unpaidOrders.length === 0) {
+        showToast('Hiện tại không có đơn nào còn nợ xưởng!', 'info');
+        return;
+      }
+
+      const totalDebt = unpaidOrders.reduce((sum, o) => sum + (o.items || []).reduce((s, it) => s + (it.qty * it.price), 0), 0);
+      const workshopFilter = document.getElementById('filterWorkshop') ? document.getElementById('filterWorkshop').value : '';
+      const monthFilter = document.getElementById('filterMonth') ? document.getElementById('filterMonth').value : '';
+
+      let scopeText = 'toàn bộ các đơn đang hiển thị';
+      if (workshopFilter && monthFilter) {
+        scopeText = `xưởng "${workshopFilter}" trong Tháng ${monthFilter}`;
+      } else if (workshopFilter) {
+        scopeText = `xưởng "${workshopFilter}"`;
+      } else if (monthFilter) {
+        scopeText = `tất cả các xưởng trong Tháng ${monthFilter}`;
+      }
+
+      if (confirm(`🎉 XÁC NHẬN QUYẾT TOÁN CÔNG NỢ XƯỞNG:\n\n• Đối tượng: ${scopeText}\n• Số lượng đơn: ${unpaidOrders.length} đơn\n• Tổng số tiền thanh toán: ${formatMoney(totalDebt)}\n\nBấm OK để tự động gạch nợ toàn bộ ${unpaidOrders.length} đơn này ngay lập tức!`)) {
+        unpaidOrders.forEach(o => {
+          o.payment = 'Đã thanh toán';
+        });
+        saveToStorage();
+        renderAll();
+        clearSelectedOrders();
+
+        if (gasUrl) {
+          showToast('Đang đồng bộ quyết toán lên Google Sheet...', 'info');
+          sendCloudPost({ action: 'bulkSave', orders: unpaidOrders }).then(() => {
+            showToast(`🎉 Quyết toán hoàn tất ${unpaidOrders.length} đơn (${formatMoney(totalDebt)})! ✅`, 'success');
+          });
+        } else {
+          showToast(`🎉 Quyết toán hoàn tất ${unpaidOrders.length} đơn (${formatMoney(totalDebt)})! ✅`, 'success');
+        }
+      }
     }
 
     function exportCSV() {
