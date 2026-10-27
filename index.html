@@ -150,9 +150,14 @@
             <i class="fa-solid fa-camera-retro text-sm"></i>
           </div>
           <div class="min-w-0">
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-2 flex-wrap">
               <h1 class="text-base font-brand font-bold tracking-wider text-zinc-950 uppercase truncate">FU STUDIO</h1>
               <span class="text-[11px] sm:text-xs font-mono-val font-semibold px-2 py-0.5 rounded bg-white/70 text-zinc-700 border border-zinc-200/80 shadow-2xs shrink-0">v7.0 Glass</span>
+              <!-- Offline Status Badge (Tự động xuất hiện khi mất kết nối mạng) -->
+              <span id="offlineIndicatorBadge" class="hidden text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-amber-100/90 text-amber-900 border border-amber-300 shadow-2xs flex items-center gap-1.5 shrink-0 animate-pulse" title="Mất kết nối mạng - Đang xem dữ liệu lưu offline trong máy">
+                <span class="w-1.5 h-1.5 rounded-full bg-amber-600"></span>
+                <span>Đang xem dữ liệu offline</span>
+              </span>
             </div>
             <p class="text-[11px] sm:text-xs text-zinc-500 font-medium truncate">Hệ thống quản lý in ấn & đối soát công nợ xưởng</p>
           </div>
@@ -184,8 +189,8 @@
           <span>Đổi Nền Mờ</span>
         </button>
 
-        <!-- Google Sheet Cloud Sync Button -->
-        <button type="button" id="btnCloudSync" onclick="openCloudModal()" class="shrink-0 min-h-[38px] sm:min-h-0 bg-white/80 hover:bg-white text-zinc-700 border border-zinc-200/80 px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-2 transition cursor-pointer shadow-xs whitespace-nowrap">
+        <!-- Google Sheet Cloud Sync Button (Mô hình Offline-First) -->
+        <button type="button" id="btnCloudSync" onclick="handleCloudSyncButtonClick()" class="shrink-0 min-h-[38px] sm:min-h-0 bg-white/80 hover:bg-white text-zinc-700 border border-zinc-200/80 px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-2 transition cursor-pointer shadow-xs whitespace-nowrap" title="Bấm để đồng bộ dữ liệu với Google Sheet">
           <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
           <span>Nối Google Sheet</span>
         </button>
@@ -198,6 +203,12 @@
         <!-- Catalog / Price Settings -->
         <button type="button" onclick="openCatalogModal()" class="shrink-0 min-h-[38px] sm:min-h-0 bg-white/80 hover:bg-white text-zinc-700 px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5 border border-zinc-200/80 shadow-xs transition cursor-pointer whitespace-nowrap">
           <i class="fa-solid fa-sliders text-zinc-500 text-xs"></i> <span>Bảng Giá Mẫu</span>
+        </button>
+
+        <!-- Admin Role Lock/Unlock Button (Bảo vệ Bảng Giá Mẫu) -->
+        <button type="button" id="btnAdminLock" onclick="handleAdminButtonClick()" class="shrink-0 min-h-[38px] sm:min-h-0 bg-white/80 hover:bg-white text-zinc-700 border border-zinc-200/80 px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5 transition cursor-pointer shadow-xs whitespace-nowrap" title="Bấm để mở khoá quyền Quản trị viên (Admin)">
+          <i id="adminLockIcon" class="fa-solid fa-lock text-zinc-500 text-xs"></i>
+          <span id="adminLockLabel">Chế độ Admin</span>
         </button>
 
         <!-- Export CSV Button -->
@@ -947,14 +958,17 @@
     </div>
   </div>
 
-  <!-- ==================== MODAL QUẢN LÝ BẢNG GIÁ MẪU ==================== -->
+  <!-- ==================== MODAL QUẢN LÝ BẢNG GIÁ MẪU (HỖ TRỢ PHÂN QUYỀN ADMIN) ==================== -->
   <div id="catalogModal" class="fixed inset-0 bg-zinc-950/40 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white/95 backdrop-blur-2xl rounded-2xl shadow-2xl max-w-xl w-full max-h-[85vh] flex flex-col overflow-hidden border border-white/80">
       
       <div class="bg-zinc-950 text-zinc-100 px-6 py-4 flex justify-between items-center border-b border-zinc-800">
         <div>
-          <h3 class="font-semibold text-sm tracking-tight text-white">Cấu Hình Bảng Giá Xưởng Mẫu</h3>
-          <p class="text-xs text-zinc-400">Thêm sản phẩm mới hoặc điều chỉnh đơn giá gia công mặc định</p>
+          <div class="flex items-center gap-2">
+            <h3 class="font-semibold text-sm tracking-tight text-white">Bảng Giá Xưởng Mẫu</h3>
+            <span id="catalogAdminBadge" class="text-[10px] font-mono-val font-semibold px-2 py-0.5 rounded bg-zinc-800 text-zinc-300 border border-zinc-700">Chỉ xem</span>
+          </div>
+          <p id="catalogModalSubtitle" class="text-xs text-zinc-400">Xem đơn giá gia công mẫu của xưởng in</p>
         </div>
         <button type="button" onclick="closeCatalogModal()" class="w-7 h-7 rounded-md hover:bg-zinc-800 text-zinc-400 hover:text-white flex items-center justify-center transition cursor-pointer">
           <i class="fa-solid fa-xmark text-xs"></i>
@@ -962,8 +976,19 @@
       </div>
 
       <div class="p-5 overflow-y-auto space-y-4 flex-1 custom-scrollbar">
-        <!-- Khung Thêm Sản Phẩm Mới Vào Bảng Giá -->
-        <div class="bg-zinc-50 p-3.5 rounded-xl border border-zinc-200">
+        <!-- Banner thông báo khi ở chế độ Chỉ xem (Non-Admin) -->
+        <div id="catalogAdminLockBanner" class="p-3.5 bg-amber-50/90 border border-amber-200/90 rounded-xl flex items-center justify-between gap-3 text-xs text-amber-900 shadow-2xs">
+          <div class="flex items-center gap-2 min-w-0">
+            <i class="fa-solid fa-lock text-amber-600 text-sm shrink-0"></i>
+            <span class="truncate">Bảng giá đang ở chế độ <b>Chỉ xem (Read-only)</b>.</span>
+          </div>
+          <button type="button" onclick="openAdminPinModal('catalog')" class="shrink-0 px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white rounded-lg font-semibold text-xs transition cursor-pointer shadow-2xs flex items-center gap-1.5">
+            <i class="fa-solid fa-key text-[10px]"></i> <span>Mở khoá Admin</span>
+          </button>
+        </div>
+
+        <!-- Khung Thêm Sản Phẩm Mới Vào Bảng Giá (Chỉ Admin) -->
+        <div id="catalogAddNewSection" class="hidden bg-zinc-50 p-3.5 rounded-xl border border-zinc-200">
           <div class="text-xs font-semibold text-zinc-700 mb-2 flex items-center gap-1.5">
             <i class="fa-solid fa-plus-circle text-zinc-500 text-xs"></i>
             <span>Thêm sản phẩm mới vào bảng giá</span>
@@ -1008,15 +1033,115 @@
         <div id="catalogManageList" class="divide-y divide-zinc-100 border border-zinc-200 rounded-lg overflow-hidden"></div>
       </div>
 
-      <div class="p-4 bg-zinc-50 border-t border-zinc-200 flex justify-between items-center">
-        <button type="button" onclick="resetDefaultCatalog()" class="text-xs font-medium text-rose-600 hover:underline cursor-pointer">Khôi phục mặc định</button>
+      <div class="p-4 bg-zinc-50 border-t border-zinc-200 flex justify-between items-center flex-wrap gap-2">
+        <div id="catalogAdminButtons" class="hidden flex items-center gap-3">
+          <button type="button" onclick="resetDefaultCatalog()" class="text-xs font-medium text-rose-600 hover:underline cursor-pointer">Khôi phục mặc định</button>
+          <button type="button" onclick="openChangePinModal()" class="text-xs font-medium text-zinc-600 hover:text-zinc-900 underline cursor-pointer">Đổi mã PIN Admin</button>
+        </div>
+        <div id="catalogNonAdminLeft" class="text-xs text-zinc-400 italic">
+          <span>Chế độ an toàn: Không thể sửa giá</span>
+        </div>
         <div class="flex items-center gap-2">
+          <button type="button" id="btnCatalogUnlock" onclick="openAdminPinModal('catalog')" class="px-3 py-1.5 bg-zinc-100 hover:bg-zinc-200 text-zinc-800 text-xs font-semibold rounded-md transition cursor-pointer flex items-center gap-1.5 border border-zinc-200">
+            <i class="fa-solid fa-lock-open text-xs text-zinc-600"></i> <span>Mở khoá sửa</span>
+          </button>
           <button type="button" onclick="closeCatalogModal()" class="px-3.5 py-1.5 bg-white hover:bg-zinc-100 text-zinc-700 text-xs font-medium rounded-md border border-zinc-300 transition cursor-pointer">Đóng</button>
-          <button type="button" onclick="saveAndCloseCatalogModal()" class="px-4 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-semibold rounded-md shadow-xs transition flex items-center gap-1.5 cursor-pointer">
+          <button type="button" id="btnCatalogSave" onclick="saveAndCloseCatalogModal()" class="hidden px-4 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-semibold rounded-md shadow-xs transition flex items-center gap-1.5 cursor-pointer">
             <i class="fa-solid fa-check text-xs"></i> <span>Lưu Bảng Giá</span>
           </button>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL NHẬP MÃ PIN XÁC THỰC ADMIN ==================== -->
+  <div id="adminPinModal" class="fixed inset-0 bg-zinc-950/50 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white/95 backdrop-blur-2xl rounded-2xl shadow-2xl max-w-sm w-full overflow-hidden border border-white/80 animate-in fade-in zoom-in-95 duration-150">
+      <div class="bg-zinc-950 text-white px-5 py-4 flex items-center justify-between border-b border-zinc-800">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-lg bg-zinc-800 flex items-center justify-center text-amber-400 border border-zinc-700">
+            <i class="fa-solid fa-shield-halved text-sm"></i>
+          </div>
+          <div>
+            <h4 class="font-bold text-sm tracking-tight text-white">Xác Thực Quyền Admin</h4>
+            <p class="text-[11px] text-zinc-400">Nhập mã PIN để chỉnh sửa bảng giá</p>
+          </div>
+        </div>
+        <button type="button" onclick="closeAdminPinModal()" class="w-7 h-7 rounded-md hover:bg-zinc-800 text-zinc-400 hover:text-white flex items-center justify-center transition cursor-pointer">
+          <i class="fa-solid fa-xmark text-xs"></i>
+        </button>
+      </div>
+
+      <form onsubmit="handleAdminPinSubmit(event)" class="p-5 space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-zinc-700 mb-1.5">Mã PIN Quản Trị Viên (4-6 số)</label>
+          <div class="relative">
+            <input type="password" id="adminPinInput" inputmode="numeric" maxlength="6" placeholder="••••" autocomplete="current-password" autofocus class="w-full text-center tracking-[0.4em] text-lg font-mono-val font-bold px-3 py-2.5 bg-zinc-50 border border-zinc-300 rounded-xl focus:bg-white focus:border-zinc-950 focus:ring-1 focus:ring-zinc-950 outline-none transition">
+            <button type="button" onclick="togglePinVisibility('adminPinInput', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-700 p-1 cursor-pointer">
+              <i class="fa-regular fa-eye text-xs"></i>
+            </button>
+          </div>
+          <p id="adminPinError" class="hidden text-xs text-rose-600 font-medium mt-1.5 flex items-center gap-1">
+            <i class="fa-solid fa-circle-exclamation text-xs"></i>
+            <span id="adminPinErrorText">Mã PIN không chính xác!</span>
+          </p>
+          <p class="text-[11px] text-zinc-400 mt-1 italic text-center">Mã PIN mặc định ban đầu: 1234</p>
+        </div>
+
+        <div class="flex items-center gap-2 pt-1">
+          <button type="button" onclick="closeAdminPinModal()" class="flex-1 py-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-700 text-xs font-medium rounded-lg transition cursor-pointer">
+            Huỷ
+          </button>
+          <button type="submit" class="flex-1 py-2 bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-semibold rounded-lg shadow-xs transition flex items-center justify-center gap-1.5 cursor-pointer">
+            <i class="fa-solid fa-lock-open text-xs"></i>
+            <span>Mở khoá</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL ĐỔI MÃ PIN ADMIN ==================== -->
+  <div id="adminChangePinModal" class="fixed inset-0 bg-zinc-950/50 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white/95 backdrop-blur-2xl rounded-2xl shadow-2xl max-w-sm w-full overflow-hidden border border-white/80">
+      <div class="bg-zinc-950 text-white px-5 py-4 flex items-center justify-between border-b border-zinc-800">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-lg bg-zinc-800 flex items-center justify-center text-amber-400 border border-zinc-700">
+            <i class="fa-solid fa-key text-sm"></i>
+          </div>
+          <div>
+            <h4 class="font-bold text-sm tracking-tight text-white">Đổi Mã PIN Admin</h4>
+            <p class="text-[11px] text-zinc-400">Thiết lập mã PIN bảo vệ mới</p>
+          </div>
+        </div>
+        <button type="button" onclick="closeChangePinModal()" class="w-7 h-7 rounded-md hover:bg-zinc-800 text-zinc-400 hover:text-white flex items-center justify-center transition cursor-pointer">
+          <i class="fa-solid fa-xmark text-xs"></i>
+        </button>
+      </div>
+
+      <form onsubmit="handleChangePinSubmit(event)" class="p-5 space-y-3.5 text-xs">
+        <div>
+          <label class="block font-semibold text-zinc-700 mb-1">Mã PIN hiện tại *</label>
+          <input type="password" id="oldPinInput" inputmode="numeric" maxlength="6" placeholder="Mã PIN cũ" class="w-full px-3 py-2 bg-zinc-50 border border-zinc-300 rounded-lg focus:bg-white focus:border-zinc-950 outline-none font-mono-val">
+        </div>
+        <div>
+          <label class="block font-semibold text-zinc-700 mb-1">Mã PIN mới (4-6 số) *</label>
+          <input type="password" id="newPinInput" inputmode="numeric" maxlength="6" placeholder="Mã PIN mới" class="w-full px-3 py-2 bg-zinc-50 border border-zinc-300 rounded-lg focus:bg-white focus:border-zinc-950 outline-none font-mono-val">
+        </div>
+        <div>
+          <label class="block font-semibold text-zinc-700 mb-1">Xác nhận mã PIN mới *</label>
+          <input type="password" id="confirmNewPinInput" inputmode="numeric" maxlength="6" placeholder="Nhập lại mã PIN mới" class="w-full px-3 py-2 bg-zinc-50 border border-zinc-300 rounded-lg focus:bg-white focus:border-zinc-950 outline-none font-mono-val">
+        </div>
+        <p id="changePinError" class="hidden text-rose-600 font-medium"></p>
+        <div class="flex items-center gap-2 pt-2">
+          <button type="button" onclick="closeChangePinModal()" class="flex-1 py-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-700 font-medium rounded-lg transition cursor-pointer">
+            Huỷ
+          </button>
+          <button type="submit" class="flex-1 py-2 bg-zinc-950 hover:bg-zinc-800 text-white font-semibold rounded-lg shadow-xs transition cursor-pointer">
+            Lưu PIN Mới
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 
@@ -1413,30 +1538,110 @@ function createJsonResponse(obj) {
       }
     ];
 
-    let bgConfig = JSON.parse(localStorage.getItem('fu_studio_bg_config')) || {
+    // ================= OFFLINE-FIRST STORAGE ENGINE & STORAGE OPTIMIZER =================
+    const STORAGE_KEYS = {
+      ORDERS: 'fu_studio_xuongin_v5',
+      CATALOG: 'fu_studio_catalog_v3',
+      COMBOS: 'fu_studio_combos_v1',
+      BG_CONFIG: 'fu_studio_bg_config',
+      GAS_URL: 'fu_studio_gas_url',
+      CATALOG_VER: 'fu_catalog_version',
+      ZALO_SINGLE: 'fu_zalo_template_single',
+      ZALO_BATCH: 'fu_zalo_template_batch',
+      SYNC_META: 'fu_studio_sync_meta_v1',
+      PENDING_QUEUE: 'fu_pending_sync_queue_v1'
+    };
+
+    // Hàm dọn dẹp các cache cũ và rác trong LocalStorage để giải phóng dung lượng bộ nhớ
+    function cleanupLegacyStorage() {
+      try {
+        const legacyPrefixes = [
+          'fu_studio_xuongin_v1', 'fu_studio_xuongin_v2', 'fu_studio_xuongin_v3', 'fu_studio_xuongin_v4',
+          'fu_studio_catalog_v1', 'fu_studio_catalog_v2', 'fu_temp_', 'fu_tmp_'
+        ];
+        const keysToRemove = [];
+        for (let i = 0; i < localStorage.length; i++) {
+          const k = localStorage.key(i);
+          if (k && legacyPrefixes.some(p => k.startsWith(p))) {
+            keysToRemove.push(k);
+          }
+        }
+        keysToRemove.forEach(k => {
+          try { localStorage.removeItem(k); } catch(e) {}
+        });
+      } catch (err) {}
+    }
+
+    // Hàm ghi an toàn vào LocalStorage, xử lý vượt hạn mức dung lượng trình duyệt
+    function safeSetStorage(key, value) {
+      const serialized = typeof value === 'string' ? value : JSON.stringify(value);
+      try {
+        localStorage.setItem(key, serialized);
+        return true;
+      } catch (err) {
+        const isQuota = err && (
+          err.name === 'QuotaExceededError' ||
+          err.name === 'NS_ERROR_DOM_QUOTA_REACHED' ||
+          err.code === 22 ||
+          err.code === 1014
+        );
+        if (isQuota) {
+          console.warn('[StorageEngine] Vượt hạn mức LocalStorage! Bắt đầu dọn dẹp cache cũ...', err);
+          cleanupLegacyStorage();
+          try {
+            localStorage.setItem(key, serialized);
+            return true;
+          } catch (retryErr) {
+            console.error('[StorageEngine] Vẫn vượt hạn mức sau khi dọn dẹp:', retryErr);
+            showToast('Bộ nhớ trình duyệt gần đầy! Dữ liệu đang được lưu tạm trên phiên hiện tại.', 'warning');
+            return false;
+          }
+        }
+        console.error(`[StorageEngine] Lỗi khi ghi vào key "${key}":`, err);
+        return false;
+      }
+    }
+
+    // Hàm đọc an toàn từ LocalStorage, chống crash trang nếu JSON hỏng
+    function safeGetJSON(key, fallbackValue) {
+      try {
+        const raw = localStorage.getItem(key);
+        if (!raw) return fallbackValue;
+        const parsed = JSON.parse(raw);
+        return (parsed !== null && parsed !== undefined) ? parsed : fallbackValue;
+      } catch (err) {
+        console.warn(`[StorageEngine] Lỗi đọc JSON từ key "${key}", trả về giá trị mặc định:`, err);
+        return fallbackValue;
+      }
+    }
+
+    // Khởi chạy dọn dẹp nhẹ ban đầu
+    cleanupLegacyStorage();
+
+    let bgConfig = safeGetJSON(STORAGE_KEYS.BG_CONFIG, null) || {
       url: BG_PRESETS[0].url,
       blur: 36,
       opacity: 45
     };
 
     const DEFAULT_GAS_URL = 'https://script.google.com/macros/s/AKfycbw7CjioeUF_h1Ow6pPEYe6rtuJQ0b2gKa689lY9WcPi2w_p-nJrsXugX0B2vJxcMC1s/exec';
-    let gasUrl = localStorage.getItem('fu_studio_gas_url') || DEFAULT_GAS_URL;
-    let priceCatalog = JSON.parse(localStorage.getItem('fu_studio_catalog_v3'));
+    let gasUrl = localStorage.getItem(STORAGE_KEYS.GAS_URL) || DEFAULT_GAS_URL;
+    let priceCatalog = safeGetJSON(STORAGE_KEYS.CATALOG, null);
     if (!Array.isArray(priceCatalog) || priceCatalog.length === 0) {
       priceCatalog = JSON.parse(JSON.stringify(DEFAULT_CATALOG));
-      localStorage.setItem('fu_studio_catalog_v3', JSON.stringify(priceCatalog));
+      safeSetStorage(STORAGE_KEYS.CATALOG, priceCatalog);
     } else {
       // Chỉ nạp các món mặc định mới một lần duy nhất qua version tag để không ghi đè chỉnh sửa của người dùng
       const CATALOG_VERSION = 'v3.2_to_le_album';
-      const lastVersion = localStorage.getItem('fu_catalog_version');
+      const lastVersion = localStorage.getItem(STORAGE_KEYS.CATALOG_VER);
       if (lastVersion !== CATALOG_VERSION) {
         DEFAULT_CATALOG.forEach(item => {
           if (!priceCatalog.some(p => p.name.trim().toLowerCase() === item.name.trim().toLowerCase())) {
             priceCatalog.push(item);
           }
         });
-        localStorage.setItem('fu_studio_catalog_v3', JSON.stringify(priceCatalog));
-        localStorage.setItem('fu_catalog_version', CATALOG_VERSION);
+        safeSetStorage(STORAGE_KEYS.CATALOG, priceCatalog);
+        safeSetStorage(STORAGE_KEYS.CATALOG_VER, CATALOG_VERSION);
       }
     }
 
@@ -1487,7 +1692,7 @@ function createJsonResponse(obj) {
       }
     ];
 
-    let presetCombos = JSON.parse(localStorage.getItem('fu_studio_combos_v1')) || DEFAULT_COMBOS;
+    let presetCombos = safeGetJSON(STORAGE_KEYS.COMBOS, DEFAULT_COMBOS);
     let comboDraftItems = [];
     let currentCategoryFilter = 'ALL';
     let currentPaymentQuickFilter = '';
@@ -1540,7 +1745,7 @@ function createJsonResponse(obj) {
       });
     }
 
-    let rawStoredOrders = JSON.parse(localStorage.getItem('fu_studio_xuongin_v5')) || [
+    const DEFAULT_SAMPLE_ORDERS = [
       {
         id: 1,
         code: 'FU918',
@@ -1603,6 +1808,8 @@ function createJsonResponse(obj) {
       }
     ];
 
+    // Nạp dữ liệu Offline-First: Ưu tiên lấy từ LocalStorage ra ngay lập tức
+    let rawStoredOrders = safeGetJSON(STORAGE_KEYS.ORDERS, null) || DEFAULT_SAMPLE_ORDERS;
     let orders = sanitizeOrders(rawStoredOrders);
 
     // ================= BACKGROUND MANAGEMENT =================
@@ -1615,7 +1822,7 @@ function createJsonResponse(obj) {
     }
 
     function saveBgConfigToStorage() {
-      localStorage.setItem('fu_studio_bg_config', JSON.stringify(bgConfig));
+      safeSetStorage(STORAGE_KEYS.BG_CONFIG, bgConfig);
     }
 
     function openBgModal() {
@@ -1852,14 +2059,15 @@ function createJsonResponse(obj) {
     }
 
     function saveToStorage() {
-      localStorage.setItem('fu_studio_xuongin_v5', JSON.stringify(orders));
+      const optimized = optimizeOrdersForStorage(orders);
+      safeSetStorage(STORAGE_KEYS.ORDERS, optimized);
     }
 
     function saveCatalogToStorage(showNotification = false) {
-      localStorage.setItem('fu_studio_catalog_v3', JSON.stringify(priceCatalog));
+      safeSetStorage(STORAGE_KEYS.CATALOG, priceCatalog);
       renderPresetCombosGrid();
       renderQuickCatalogGrid();
-      if (gasUrl) {
+      if (gasUrl && navigator.onLine) {
         sendCloudPost({
           action: 'saveSettings',
           settings: { fu_studio_catalog_v3: JSON.stringify(priceCatalog) }
@@ -1921,16 +2129,143 @@ function createJsonResponse(obj) {
       renderAll();
     }
 
+    // ================= OFFLINE SYNC QUEUE & HELPERS =================
+    function enqueuePendingAction(payload) {
+      try {
+        const queue = safeGetJSON(STORAGE_KEYS.PENDING_QUEUE, []);
+        queue.push({
+          time: Date.now(),
+          payload
+        });
+        safeSetStorage(STORAGE_KEYS.PENDING_QUEUE, queue);
+      } catch (e) {
+        console.warn('[SyncQueue] Lỗi xếp hàng đợi đồng bộ offline:', e);
+      }
+    }
+
+    async function flushPendingSyncQueue() {
+      if (!gasUrl || !navigator.onLine) return;
+      const queue = safeGetJSON(STORAGE_KEYS.PENDING_QUEUE, []);
+      if (!Array.isArray(queue) || queue.length === 0) return;
+
+      for (const item of queue) {
+        try {
+          await fetch(gasUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify(item.payload)
+          });
+        } catch (err) {}
+      }
+      safeSetStorage(STORAGE_KEYS.PENDING_QUEUE, []);
+    }
+
+    // Lưu toàn bộ cache đơn hàng, bảng giá, combos và cài đặt từ Google Sheet vào LocalStorage
+    function cacheCloudData(data) {
+      let hasNewChanges = false;
+
+      // 1. Lưu cache Cài đặt (Zalo templates, Combos, Catalog)
+      if (data.settings && typeof data.settings === 'object') {
+        if (data.settings.fu_zalo_template_single) {
+          safeSetStorage(STORAGE_KEYS.ZALO_SINGLE, data.settings.fu_zalo_template_single);
+        }
+        if (data.settings.fu_zalo_template_batch) {
+          safeSetStorage(STORAGE_KEYS.ZALO_BATCH, data.settings.fu_zalo_template_batch);
+        }
+        if (data.settings.fu_studio_combos_v1) {
+          try {
+            const cloudCombos = JSON.parse(data.settings.fu_studio_combos_v1);
+            if (Array.isArray(cloudCombos) && cloudCombos.length > 0) {
+              presetCombos = cloudCombos;
+              safeSetStorage(STORAGE_KEYS.COMBOS, presetCombos);
+              renderPresetCombosGrid();
+            }
+          } catch(e) {}
+        }
+        if (data.settings.fu_studio_catalog_v3) {
+          try {
+            const cloudCatalog = JSON.parse(data.settings.fu_studio_catalog_v3);
+            if (Array.isArray(cloudCatalog) && cloudCatalog.length > 0) {
+              priceCatalog = cloudCatalog;
+              safeSetStorage(STORAGE_KEYS.CATALOG, priceCatalog);
+              renderQuickCatalogGrid();
+              renderPresetCombosGrid();
+            }
+          } catch(e) {}
+        }
+      }
+
+      // 2. Lưu cache Đơn hàng vào LocalStorage
+      if (Array.isArray(data.orders)) {
+        const sanitized = sanitizeOrders(data.orders);
+        if (JSON.stringify(sanitized) !== JSON.stringify(orders)) {
+          hasNewChanges = true;
+          orders = sanitized;
+          saveToStorage();
+          updateWorkshopFilterOptions();
+          renderAll();
+        }
+      }
+
+      // 3. Ghi nhận thời điểm đồng bộ thành công vào metadata
+      const syncMeta = {
+        lastSyncTime: Date.now(),
+        ordersCount: orders.length,
+        catalogCount: priceCatalog.length,
+        status: 'synced'
+      };
+      safeSetStorage(STORAGE_KEYS.SYNC_META, syncMeta);
+      updateCloudBadge();
+
+      return { hasNewChanges };
+    }
+
     // ================= CLOUD SYNC & GOOGLE SHEETS =================
     function updateCloudBadge() {
       const btn = document.getElementById('btnCloudSync');
+      const offlineBadge = document.getElementById('offlineIndicatorBadge');
+
+      if (!navigator.onLine) {
+        if (offlineBadge) offlineBadge.classList.remove('hidden');
+        if (btn) {
+          btn.className = 'shrink-0 min-h-[38px] sm:min-h-0 bg-amber-50/90 hover:bg-amber-100 text-amber-900 border border-amber-300/90 px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-2 transition cursor-pointer shadow-xs whitespace-nowrap';
+          btn.innerHTML = `<span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span> <span>Đang xem offline</span>`;
+          btn.title = 'Mất kết nối mạng - Đang xem dữ liệu lưu offline trong máy';
+        }
+        return;
+      }
+
+      if (offlineBadge) offlineBadge.classList.add('hidden');
+
       if (!btn) return;
       if (gasUrl) {
+        const meta = safeGetJSON(STORAGE_KEYS.SYNC_META, null);
+        let timeLabel = '';
+        if (meta && meta.lastSyncTime) {
+          const d = new Date(meta.lastSyncTime);
+          const hh = String(d.getHours()).padStart(2, '0');
+          const mm = String(d.getMinutes()).padStart(2, '0');
+          timeLabel = ` lúc ${hh}:${mm}`;
+        }
         btn.className = 'shrink-0 min-h-[38px] sm:min-h-0 bg-emerald-50/90 hover:bg-emerald-100 text-emerald-900 border border-emerald-300/80 px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-2 transition cursor-pointer shadow-xs whitespace-nowrap';
         btn.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse"></span> <span>Google Sheet Sync</span>`;
+        btn.title = `Đã kết nối Google Sheet (Đồng bộ gần nhất${timeLabel || ' hôm nay'})`;
       } else {
         btn.className = 'shrink-0 min-h-[38px] sm:min-h-0 bg-white/80 hover:bg-white text-zinc-700 border border-zinc-200/80 px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-2 transition cursor-pointer shadow-xs whitespace-nowrap';
         btn.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> <span>Nối Google Sheet</span>`;
+        btn.title = 'Chưa nối Google Sheet - Dữ liệu đang được lưu cục bộ trên máy này';
+      }
+    }
+
+    function handleCloudSyncButtonClick() {
+      if (!navigator.onLine) {
+        showToast('Đang ở chế độ offline (mất mạng). Dữ liệu được lưu trữ an toàn trong máy! 📡', 'info');
+        return;
+      }
+      if (!gasUrl) {
+        openCloudModal();
+      } else {
+        syncFromCloud(true);
       }
     }
 
@@ -1949,6 +2284,10 @@ function createJsonResponse(obj) {
         showToast('Dán link Web App Apps Script vào ô trước nghen!', 'error');
         return;
       }
+      if (!navigator.onLine) {
+        showToast('Không có kết nối mạng! Vui lòng kết nối internet để kiểm tra link nghen.', 'warning');
+        return;
+      }
       try {
         showToast('Đang kiểm tra kết nối Google Sheet...', 'info');
         const sep = input.includes('?') ? '&' : '?';
@@ -1956,38 +2295,9 @@ function createJsonResponse(obj) {
         const data = await res.json();
         if (data && data.status === 'success') {
           gasUrl = input;
-          localStorage.setItem('fu_studio_gas_url', gasUrl);
-          updateCloudBadge();
-          if (data.settings && typeof data.settings === 'object') {
-            if (data.settings.fu_zalo_template_single) localStorage.setItem('fu_zalo_template_single', data.settings.fu_zalo_template_single);
-            if (data.settings.fu_zalo_template_batch) localStorage.setItem('fu_zalo_template_batch', data.settings.fu_zalo_template_batch);
-            if (data.settings.fu_studio_combos_v1) {
-              try {
-                presetCombos = JSON.parse(data.settings.fu_studio_combos_v1);
-                localStorage.setItem('fu_studio_combos_v1', data.settings.fu_studio_combos_v1);
-              } catch(e) {}
-            }
-            if (data.settings.fu_studio_catalog_v3) {
-              try {
-                const cloudCatalog = JSON.parse(data.settings.fu_studio_catalog_v3);
-                if (Array.isArray(cloudCatalog) && cloudCatalog.length > 0) {
-                  priceCatalog = cloudCatalog;
-                  localStorage.setItem('fu_studio_catalog_v3', JSON.stringify(priceCatalog));
-                  renderQuickCatalogGrid();
-                  renderPresetCombosGrid();
-                }
-              } catch(e) {}
-            }
-          }
-          if (Array.isArray(data.orders) && data.orders.length > 0) {
-            orders = sanitizeOrders(data.orders);
-            saveToStorage();
-            updateWorkshopFilterOptions();
-            renderAll();
-            showToast(`Đã nối Sheet thành công! Tải về ${orders.length} đơn & mẫu tin Zalo.`, 'success');
-          } else {
-            showToast('Đã nối Sheet thành công! (Sheet hiện đang trống)', 'success');
-          }
+          safeSetStorage(STORAGE_KEYS.GAS_URL, gasUrl);
+          cacheCloudData(data);
+          showToast(`Đã nối Sheet thành công! Tải về ${orders.length} đơn & bảng giá vào cache máy.`, 'success');
           closeCloudModal();
         } else {
           showStudioAlert({ title: 'Lỗi nhận dạng dữ liệu', message: 'Không thể nhận dạng dữ liệu từ Google Sheet. Hãy kiểm tra lại quyền triển khai (Who has access) đã chọn "Anyone" chưa nghen!' });
@@ -2000,7 +2310,7 @@ function createJsonResponse(obj) {
     async function disconnectGas() {
       const confirmed = await showStudioConfirm({
         title: 'Ngắt kết nối Google Sheet',
-        subtitle: 'Bạn có chắc muốn ngắt kết nối với Google Sheet trên máy này? Dữ liệu trên Google Sheet vẫn được giữ nguyên an toàn.',
+        subtitle: 'Bạn có chắc muốn ngắt kết nối với Google Sheet trên máy này? Dữ liệu trên Google Sheet và cache trong máy vẫn được giữ nguyên an toàn.',
         confirmText: 'Ngắt kết nối',
         cancelText: 'Huỷ bỏ',
         type: 'danger',
@@ -2008,7 +2318,7 @@ function createJsonResponse(obj) {
       });
       if (!confirmed) return;
       gasUrl = '';
-      localStorage.removeItem('fu_studio_gas_url');
+      localStorage.removeItem(STORAGE_KEYS.GAS_URL);
       updateCloudBadge();
       closeCloudModal();
       showToast('Đã ngắt kết nối Google Sheet trên máy này.', 'info');
@@ -2022,50 +2332,50 @@ function createJsonResponse(obj) {
       });
     }
 
-    async function syncFromCloud(showFeedback = false) {
+    async function syncFromCloud(showFeedback = false, isBackground = false) {
       if (!gasUrl) {
         if (showFeedback) openCloudModal();
         return;
       }
+
+      if (!navigator.onLine) {
+        if (showFeedback) {
+          showToast('Đang ở chế độ offline (mất kết nối mạng). Hệ thống đang hiển thị dữ liệu lưu trong máy! 📡', 'warning');
+        }
+        updateCloudBadge();
+        return;
+      }
+
       const icon = document.getElementById('syncIcon');
       if (icon) icon.classList.add('animate-spin-fast');
 
       try {
         const sep = gasUrl.includes('?') ? '&' : '?';
         const res = await fetch(`${gasUrl}${sep}action=getOrders&_t=${Date.now()}`);
+        if (!res.ok) throw new Error(`Mã lỗi HTTP: ${res.status}`);
         const data = await res.json();
-        if (data && data.status === 'success' && Array.isArray(data.orders)) {
-          if (data.settings && typeof data.settings === 'object') {
-            if (data.settings.fu_zalo_template_single) localStorage.setItem('fu_zalo_template_single', data.settings.fu_zalo_template_single);
-            if (data.settings.fu_zalo_template_batch) localStorage.setItem('fu_zalo_template_batch', data.settings.fu_zalo_template_batch);
-            if (data.settings.fu_studio_combos_v1) {
-              try {
-                presetCombos = JSON.parse(data.settings.fu_studio_combos_v1);
-                localStorage.setItem('fu_studio_combos_v1', data.settings.fu_studio_combos_v1);
-              } catch(e) {}
-            }
-            if (data.settings.fu_studio_catalog_v3) {
-              try {
-                const cloudCatalog = JSON.parse(data.settings.fu_studio_catalog_v3);
-                if (Array.isArray(cloudCatalog) && cloudCatalog.length > 0) {
-                  priceCatalog = cloudCatalog;
-                  localStorage.setItem('fu_studio_catalog_v3', JSON.stringify(priceCatalog));
-                  renderQuickCatalogGrid();
-                  renderPresetCombosGrid();
-                }
-              } catch(e) {}
-            }
+        if (data && data.status === 'success') {
+          // Tự động lưu toàn bộ cache đơn hàng và bảng giá vào LocalStorage theo mô hình Offline-First
+          const result = cacheCloudData(data);
+          if (showFeedback) {
+            showToast(`Đã đồng bộ mới nhất từ Google Sheet! (${orders.length} đơn & bảng giá) ✅`, 'success');
+          } else if (isBackground && result.hasNewChanges) {
+            showToast('Đã tự động cập nhật dữ liệu mới nhất từ Google Sheet! ☁️', 'info');
           }
-          if (data.orders.length > 0) {
-            orders = sanitizeOrders(data.orders);
-            saveToStorage();
-            updateWorkshopFilterOptions();
-            renderAll();
+        } else {
+          if (showFeedback) {
+            showStudioAlert({
+              title: 'Lỗi nhận dạng dữ liệu',
+              message: 'Không nhận được dữ liệu hợp lệ từ Google Sheet Apps Script.'
+            });
           }
-          if (showFeedback) showToast(`Đã đồng bộ mới nhất từ Google Sheet! (${orders.length} đơn & mẫu tin)`, 'success');
         }
       } catch (err) {
-        if (showFeedback) showToast('Lỗi khi tải dữ liệu từ Sheet: ' + err.message, 'error');
+        console.warn('[SyncFromCloud] Lỗi tải dữ liệu:', err);
+        if (showFeedback) {
+          showToast('Không thể kết nối Google Sheet: ' + err.message + '. Đang xem dữ liệu offline.', 'error');
+        }
+        updateCloudBadge();
       } finally {
         if (icon) icon.classList.remove('animate-spin-fast');
       }
@@ -2073,6 +2383,10 @@ function createJsonResponse(obj) {
 
     async function sendCloudPost(payload) {
       if (!gasUrl) return null;
+      if (!navigator.onLine) {
+        enqueuePendingAction(payload);
+        return null;
+      }
       try {
         const res = await fetch(gasUrl, {
           method: 'POST',
@@ -2081,7 +2395,7 @@ function createJsonResponse(obj) {
         });
         return await res.json();
       } catch (err) {
-        console.warn('Lỗi gửi cập nhật ngầm lên Cloud:', err);
+        enqueuePendingAction(payload);
         return null;
       }
     }
@@ -2089,6 +2403,10 @@ function createJsonResponse(obj) {
     async function pushAllOrdersToSheet() {
       if (!gasUrl) {
         showToast('Cần lưu link Web App trước nghen!', 'error');
+        return;
+      }
+      if (!navigator.onLine) {
+        showToast('Không có kết nối mạng! Không thể đẩy lên Google Sheet lúc này.', 'warning');
         return;
       }
       if (orders.length === 0) {
@@ -2382,7 +2700,7 @@ function createJsonResponse(obj) {
         });
       }
 
-      localStorage.setItem('fu_studio_combos_v1', JSON.stringify(presetCombos));
+      safeSetStorage(STORAGE_KEYS.COMBOS, presetCombos);
       if (gasUrl) {
         sendCloudPost({ action: 'saveSettings', settings: { fu_studio_combos_v1: JSON.stringify(presetCombos) } });
       }
@@ -2430,7 +2748,7 @@ function createJsonResponse(obj) {
       });
       if (!confirmed) return;
       presetCombos = presetCombos.filter(c => c.id !== comboId);
-      localStorage.setItem('fu_studio_combos_v1', JSON.stringify(presetCombos));
+      safeSetStorage(STORAGE_KEYS.COMBOS, presetCombos);
       if (gasUrl) {
         sendCloudPost({ action: 'saveSettings', settings: { fu_studio_combos_v1: JSON.stringify(presetCombos) } });
       }
@@ -2451,7 +2769,7 @@ function createJsonResponse(obj) {
       });
       if (!confirmed) return;
       presetCombos = JSON.parse(JSON.stringify(DEFAULT_COMBOS));
-      localStorage.setItem('fu_studio_combos_v1', JSON.stringify(presetCombos));
+      safeSetStorage(STORAGE_KEYS.COMBOS, presetCombos);
       if (gasUrl) {
         sendCloudPost({ action: 'saveSettings', settings: { fu_studio_combos_v1: JSON.stringify(presetCombos) } });
       }
@@ -2811,12 +3129,370 @@ function createJsonResponse(obj) {
       renderQuickCatalogGrid();
     }
 
+    // ================= ADMIN ROLE & PIN AUTHENTICATION =================
+    // Mặc định người xem thông thường chỉ được xem (Read-only).
+    // SessionStorage tự động xoá khi đóng tab trình duyệt để đảm bảo an toàn tuyệt đối.
+    let isAdmin = sessionStorage.getItem('fu_studio_is_admin') === 'true';
+
+    // Mã PIN băm SHA-256 mặc định là "1234":
+    // 03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4
+    const DEFAULT_ADMIN_PIN_HASH = '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4';
+
+    // Thuật toán chuẩn SHA-256 thuần JS (hoạt động bền bỉ trên mọi trình duyệt/WebView kể cả offline)
+    function jsSha256(ascii) {
+      function rightRotate(value, amount) {
+        return (value >>> amount) | (value << (32 - amount));
+      }
+      var mathPow = Math.pow;
+      var maxWord = mathPow(2, 32);
+      var lengthProperty = 'length';
+      var i, j;
+      var result = '';
+      var words = [];
+      var asciiBitLength = ascii[lengthProperty] * 8;
+      var hash = jsSha256.h = jsSha256.h || [];
+      var k = jsSha256.k = jsSha256.k || [];
+      var primeCounter = k[lengthProperty];
+      var isComposite = {};
+      for (var candidate = 2; primeCounter < 64; candidate++) {
+        if (!isComposite[candidate]) {
+          for (i = 0; i < 313; i += candidate) {
+            isComposite[i] = candidate;
+          }
+          hash[primeCounter] = (mathPow(candidate, .5) * maxWord) | 0;
+          k[primeCounter++] = (mathPow(candidate, 1/3) * maxWord) | 0;
+        }
+      }
+      ascii += '\x80';
+      while (ascii[lengthProperty] % 64 - 56) ascii += '\x00';
+      for (i = 0; i < ascii[lengthProperty]; i++) {
+        j = ascii.charCodeAt(i);
+        if (j >> 8) return;
+        words[i >> 2] |= j << ((3 - i) % 4) * 8;
+      }
+      words[words[lengthProperty]] = ((asciiBitLength / maxWord) | 0);
+      words[words[lengthProperty]] = (asciiBitLength) | 0;
+      for (j = 0; j < words[lengthProperty];) {
+        var w = words.slice(j, j += 16);
+        var oldHash = hash;
+        hash = hash.slice(0, 8);
+        for (i = 0; i < 64; i++) {
+          var w15 = w[i - 15], w2 = w[i - 2];
+          var a = hash[0], e = hash[4];
+          var temp1 = hash[7]
+            + (rightRotate(e, 6) ^ rightRotate(e, 11) ^ rightRotate(e, 25))
+            + ((e & hash[5]) ^ ((~e) & hash[6]))
+            + k[i]
+            + (w[i] = (i < 16) ? w[i] : (
+                w[i - 16]
+                + (rightRotate(w15, 7) ^ rightRotate(w15, 18) ^ (w15 >>> 3))
+                + w[i - 7]
+                + (rightRotate(w2, 17) ^ rightRotate(w2, 19) ^ (w2 >>> 10))
+              ) | 0
+            );
+          var temp2 = (rightRotate(a, 2) ^ rightRotate(a, 13) ^ rightRotate(a, 22))
+            + ((a & hash[1]) ^ (a & hash[2]) ^ (hash[1] & hash[2]));
+          hash = [(temp1 + temp2) | 0].concat(hash);
+          hash[4] = (hash[4] + temp1) | 0;
+        }
+        for (i = 0; i < 8; i++) {
+          hash[i] = (hash[i] + oldHash[i]) | 0;
+        }
+      }
+      for (i = 0; i < 8; i++) {
+        for (j = 3; j + 1; j--) {
+          var b = (hash[i] >> (j * 8)) & 255;
+          result += ((b < 16) ? 0 : '') + b.toString(16);
+        }
+      }
+      return result;
+    }
+
+    // Hàm băm SHA-256 bất đồng bộ ưu tiên Web Crypto API bản địa
+    async function sha256Hex(str) {
+      const trimmed = String(str || '').trim();
+      if (window.crypto && window.crypto.subtle && window.crypto.subtle.digest) {
+        try {
+          const enc = new TextEncoder().encode(trimmed);
+          const buf = await window.crypto.subtle.digest('SHA-256', enc);
+          return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+        } catch (e) {}
+      }
+      return jsSha256(trimmed);
+    }
+
+    function getAdminPinHash() {
+      return localStorage.getItem('fu_studio_admin_pin_hash') || DEFAULT_ADMIN_PIN_HASH;
+    }
+
+    function setAdminPinHash(newHash) {
+      localStorage.setItem('fu_studio_admin_pin_hash', newHash);
+      if (gasUrl && navigator.onLine) {
+        sendCloudPost({
+          action: 'saveSettings',
+          settings: { fu_studio_admin_pin_hash: newHash }
+        });
+      }
+    }
+
+    function togglePinVisibility(inputId, btnEl) {
+      const input = document.getElementById(inputId);
+      if (!input) return;
+      const isPassword = input.type === 'password';
+      input.type = isPassword ? 'text' : 'password';
+      const icon = btnEl.querySelector('i');
+      if (icon) {
+        icon.className = isPassword ? 'fa-regular fa-eye-slash text-xs' : 'fa-regular fa-eye text-xs';
+      }
+    }
+
+    function updateAdminUI() {
+      // 1. Cập nhật nút Admin trên thanh công cụ Header
+      const btnLock = document.getElementById('btnAdminLock');
+      if (btnLock) {
+        if (isAdmin) {
+          btnLock.className = 'shrink-0 min-h-[38px] sm:min-h-0 bg-emerald-50/90 hover:bg-emerald-100 text-emerald-900 border border-emerald-300/80 px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer shadow-xs whitespace-nowrap';
+          btnLock.innerHTML = `<i class="fa-solid fa-shield-halved text-emerald-600 text-xs"></i> <span>Admin (Mở)</span>`;
+          btnLock.title = 'Bạn đang ở chế độ Quản trị viên (Bấm để khoá hoặc đổi mã PIN)';
+        } else {
+          btnLock.className = 'shrink-0 min-h-[38px] sm:min-h-0 bg-white/80 hover:bg-white text-zinc-700 border border-zinc-200/80 px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5 transition cursor-pointer shadow-xs whitespace-nowrap';
+          btnLock.innerHTML = `<i class="fa-solid fa-lock text-zinc-500 text-xs"></i> <span>Chế độ Admin</span>`;
+          btnLock.title = 'Bấm để mở khoá quyền Quản trị viên (Admin)';
+        }
+      }
+
+      // 2. Cập nhật trạng thái trong Modal Bảng Giá Mẫu
+      const badge = document.getElementById('catalogAdminBadge');
+      const subtitle = document.getElementById('catalogModalSubtitle');
+      const banner = document.getElementById('catalogAdminLockBanner');
+      const addSection = document.getElementById('catalogAddNewSection');
+      const adminBtns = document.getElementById('catalogAdminButtons');
+      const nonAdminLeft = document.getElementById('catalogNonAdminLeft');
+      const btnUnlock = document.getElementById('btnCatalogUnlock');
+      const btnSave = document.getElementById('btnCatalogSave');
+
+      if (badge) {
+        badge.className = isAdmin
+          ? 'text-[10px] font-mono-val font-semibold px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800'
+          : 'text-[10px] font-mono-val font-semibold px-2 py-0.5 rounded bg-zinc-800 text-zinc-300 border border-zinc-700';
+        badge.innerText = isAdmin ? 'Admin 🔓' : 'Chỉ xem 🔒';
+      }
+
+      if (subtitle) {
+        subtitle.innerText = isAdmin
+          ? 'Chỉnh sửa đơn giá gia công và cấu hình sản phẩm mẫu'
+          : 'Xem đơn giá gia công mẫu của xưởng in (Chỉ đọc)';
+      }
+
+      if (banner) {
+        if (isAdmin) banner.classList.add('hidden');
+        else banner.classList.remove('hidden');
+      }
+
+      if (addSection) {
+        if (isAdmin) addSection.classList.remove('hidden');
+        else addSection.classList.add('hidden');
+      }
+
+      if (adminBtns) {
+        if (isAdmin) adminBtns.classList.remove('hidden');
+        else adminBtns.classList.add('hidden');
+      }
+
+      if (nonAdminLeft) {
+        if (isAdmin) nonAdminLeft.classList.add('hidden');
+        else nonAdminLeft.classList.remove('hidden');
+      }
+
+      if (btnUnlock) {
+        if (isAdmin) btnUnlock.classList.add('hidden');
+        else btnUnlock.classList.remove('hidden');
+      }
+
+      if (btnSave) {
+        if (isAdmin) btnSave.classList.remove('hidden');
+        else btnSave.classList.add('hidden');
+      }
+
+      // Cập nhật lại danh sách bảng giá
+      renderCatalogManageList();
+    }
+
+    function openAdminPinModal(source = '') {
+      const modal = document.getElementById('adminPinModal');
+      const input = document.getElementById('adminPinInput');
+      const err = document.getElementById('adminPinError');
+      if (err) err.classList.add('hidden');
+      if (input) input.value = '';
+      if (modal) modal.classList.remove('hidden');
+      setTimeout(() => {
+        if (input) input.focus();
+      }, 50);
+    }
+
+    function closeAdminPinModal() {
+      const modal = document.getElementById('adminPinModal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    async function handleAdminPinSubmit(e) {
+      if (e) e.preventDefault();
+      const input = document.getElementById('adminPinInput');
+      const err = document.getElementById('adminPinError');
+      const errText = document.getElementById('adminPinErrorText');
+      const pin = (input ? input.value : '').trim();
+
+      if (!pin) {
+        if (errText) errText.innerText = 'Vui lòng nhập mã PIN!';
+        if (err) err.classList.remove('hidden');
+        return;
+      }
+
+      const enteredHash = await sha256Hex(pin);
+      const targetHash = getAdminPinHash();
+
+      if (enteredHash === targetHash) {
+        isAdmin = true;
+        sessionStorage.setItem('fu_studio_is_admin', 'true');
+        closeAdminPinModal();
+        updateAdminUI();
+        showToast('Đã mở khoá quyền Quản trị viên (Admin) thành công! 🔓', 'success');
+      } else {
+        if (errText) errText.innerText = 'Mã PIN không chính xác! Vui lòng thử lại.';
+        if (err) err.classList.remove('hidden');
+        if (input) {
+          input.value = '';
+          input.focus();
+          input.classList.add('ring-2', 'ring-rose-500');
+          setTimeout(() => input.classList.remove('ring-2', 'ring-rose-500'), 1000);
+        }
+        showToast('Sai mã PIN Quản trị viên! ⚠️', 'error');
+      }
+    }
+
+    function handleAdminButtonClick() {
+      if (!isAdmin) {
+        openAdminPinModal('toolbar');
+      } else {
+        handleAdminMenuClick();
+      }
+    }
+
+    async function handleAdminMenuClick() {
+      window.__adminAction = null;
+      const confirmed = await showStudioConfirm({
+        title: 'Tuỳ chọn Quản trị viên (Admin)',
+        subtitle: 'Bạn đang ở chế độ Quản trị viên được phép sửa bảng giá. Hãy chọn thao tác mong muốn:',
+        detailsHtml: `
+          <div class="space-y-2 text-xs">
+            <button type="button" onclick="window.__adminAction = 'changePin'; closeStudioConfirmModal(true);" class="w-full text-left p-3 rounded-xl border border-zinc-200 hover:bg-zinc-100 transition flex items-center justify-between cursor-pointer">
+              <div class="flex items-center gap-2.5">
+                <div class="w-7 h-7 rounded-md bg-amber-500/15 text-amber-700 flex items-center justify-center">
+                  <i class="fa-solid fa-key text-xs"></i>
+                </div>
+                <div>
+                  <div class="font-semibold text-zinc-950">Đổi mã PIN Admin</div>
+                  <div class="text-[11px] text-zinc-500">Cập nhật mã bảo vệ mới</div>
+                </div>
+              </div>
+              <i class="fa-solid fa-chevron-right text-zinc-400 text-xs"></i>
+            </button>
+            <button type="button" onclick="window.__adminAction = 'lock'; closeStudioConfirmModal(true);" class="w-full text-left p-3 rounded-xl border border-rose-200 hover:bg-rose-50 transition flex items-center justify-between text-rose-700 cursor-pointer">
+              <div class="flex items-center gap-2.5">
+                <div class="w-7 h-7 rounded-md bg-rose-500/15 text-rose-700 flex items-center justify-center">
+                  <i class="fa-solid fa-lock text-xs"></i>
+                </div>
+                <div>
+                  <div class="font-semibold text-rose-950">Khoá quyền Admin (Đăng xuất)</div>
+                  <div class="text-[11px] text-rose-600/80">Chuyển về chế độ chỉ xem</div>
+                </div>
+              </div>
+              <i class="fa-solid fa-chevron-right text-rose-400 text-xs"></i>
+            </button>
+          </div>
+        `,
+        confirmText: 'Đóng',
+        type: 'info',
+        icon: 'fa-solid fa-shield-halved'
+      });
+
+      if (window.__adminAction === 'changePin') {
+        window.__adminAction = null;
+        openChangePinModal();
+      } else if (window.__adminAction === 'lock') {
+        window.__adminAction = null;
+        lockAdmin();
+      }
+    }
+
+    function lockAdmin() {
+      isAdmin = false;
+      sessionStorage.removeItem('fu_studio_is_admin');
+      updateAdminUI();
+      showToast('Đã khoá quyền Quản trị viên (Chuyển sang chế độ chỉ xem)! 🔒', 'info');
+    }
+
+    function openChangePinModal() {
+      const modal = document.getElementById('adminChangePinModal');
+      const oldPin = document.getElementById('oldPinInput');
+      const newPin = document.getElementById('newPinInput');
+      const confirmPin = document.getElementById('confirmNewPinInput');
+      const err = document.getElementById('changePinError');
+
+      if (oldPin) oldPin.value = '';
+      if (newPin) newPin.value = '';
+      if (confirmPin) confirmPin.value = '';
+      if (err) err.classList.add('hidden');
+      if (modal) modal.classList.remove('hidden');
+      setTimeout(() => {
+        if (oldPin) oldPin.focus();
+      }, 50);
+    }
+
+    function closeChangePinModal() {
+      const modal = document.getElementById('adminChangePinModal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    async function handleChangePinSubmit(e) {
+      if (e) e.preventDefault();
+      const oldPin = (document.getElementById('oldPinInput') ? document.getElementById('oldPinInput').value : '').trim();
+      const newPin = (document.getElementById('newPinInput') ? document.getElementById('newPinInput').value : '').trim();
+      const confirmPin = (document.getElementById('confirmNewPinInput') ? document.getElementById('confirmNewPinInput').value : '').trim();
+      const err = document.getElementById('changePinError');
+
+      const showError = (msg) => {
+        if (err) {
+          err.innerText = msg;
+          err.classList.remove('hidden');
+        }
+      };
+
+      if (!oldPin) return showError('Vui lòng nhập mã PIN hiện tại!');
+      if (!newPin) return showError('Vui lòng nhập mã PIN mới!');
+      if (newPin.length < 4 || newPin.length > 6) return showError('Mã PIN mới phải từ 4 đến 6 chữ số!');
+      if (newPin !== confirmPin) return showError('Xác nhận mã PIN mới không khớp!');
+
+      const oldHash = await sha256Hex(oldPin);
+      const currentTargetHash = getAdminPinHash();
+
+      if (oldHash !== currentTargetHash) {
+        return showError('Mã PIN hiện tại không chính xác!');
+      }
+
+      const newHash = await sha256Hex(newPin);
+      setAdminPinHash(newHash);
+      closeChangePinModal();
+      showToast('Đã đổi mã PIN Quản trị viên mới thành công! 🔐', 'success');
+    }
+
     // ================= CATALOG MANAGEMENT =================
     let currentCatalogManageFilter = 'ALL';
 
     function openCatalogModal() {
       currentCatalogManageFilter = 'ALL';
       filterCatalogManage('ALL');
+      updateAdminUI();
       document.getElementById('catalogModal').classList.remove('hidden');
     }
 
@@ -2838,6 +3514,7 @@ function createJsonResponse(obj) {
 
     function renderCatalogManageList() {
       const container = document.getElementById('catalogManageList');
+      if (!container) return;
       container.innerHTML = '';
       const groupLabels = { ANH_CONG: 'Ảnh Cổng', ALBUM: 'Album & Hộp', ANH_LE: 'Ảnh Lẻ / Bàn' };
 
@@ -2853,17 +3530,31 @@ function createJsonResponse(obj) {
       itemsToRender.forEach((item) => {
         const div = document.createElement('div');
         div.className = 'p-3 flex items-center justify-between gap-3 text-xs bg-white hover:bg-zinc-50/80 transition border-b border-zinc-100 last:border-b-0';
+        
+        let actionsHtml = '';
+        if (isAdmin) {
+          actionsHtml = `
+            <div class="relative flex items-center">
+              <input type="number" value="${item.price}" oninput="updateCatalogPriceById('${item.id}', this.value)" class="w-28 text-right border border-zinc-300 rounded px-2.5 py-1.5 font-mono-val font-semibold text-zinc-950 focus:border-zinc-900 focus:bg-white bg-zinc-50/50 outline-none transition">
+              <span class="ml-1.5 text-zinc-400 font-mono-val text-xs">đ</span>
+            </div>
+            <button type="button" onclick="deleteCatalogItemById('${item.id}')" class="text-zinc-400 hover:text-rose-600 p-1.5 cursor-pointer transition rounded hover:bg-rose-50" title="Xoá món này"><i class="fa-regular fa-trash-can text-xs"></i></button>
+          `;
+        } else {
+          actionsHtml = `
+            <div class="text-right">
+              <span class="font-mono-val font-bold text-zinc-950 text-xs px-2.5 py-1 rounded bg-zinc-100/90 border border-zinc-200/90 tabular-nums">${formatMoney(item.price)}</span>
+            </div>
+          `;
+        }
+
         div.innerHTML = `
           <div class="flex-1 min-w-0 flex items-center gap-2">
             <span class="font-medium text-zinc-900 truncate" title="${item.name}">${item.name}</span>
             <span class="text-[10px] font-mono-val font-semibold px-2 py-0.5 rounded bg-zinc-100 text-zinc-600 border border-zinc-200/80 shrink-0">${groupLabels[item.category] || 'Khác'}</span>
           </div>
           <div class="flex items-center gap-2 shrink-0">
-            <div class="relative flex items-center">
-              <input type="number" value="${item.price}" oninput="updateCatalogPriceById('${item.id}', this.value)" class="w-28 text-right border border-zinc-300 rounded px-2.5 py-1.5 font-mono-val font-semibold text-zinc-950 focus:border-zinc-900 focus:bg-white bg-zinc-50/50 outline-none transition">
-              <span class="ml-1.5 text-zinc-400 font-mono-val text-xs">đ</span>
-            </div>
-            <button type="button" onclick="deleteCatalogItemById('${item.id}')" class="text-zinc-400 hover:text-rose-600 p-1.5 cursor-pointer transition rounded hover:bg-rose-50" title="Xoá món này"><i class="fa-regular fa-trash-can text-xs"></i></button>
+            ${actionsHtml}
           </div>
         `;
         container.appendChild(div);
@@ -2871,6 +3562,11 @@ function createJsonResponse(obj) {
     }
 
     function addNewCatalogItem() {
+      if (!isAdmin) {
+        showToast('Cần mở khoá quyền Admin để thêm sản phẩm mới!', 'warning');
+        openAdminPinModal('catalog');
+        return;
+      }
       const name = document.getElementById('newCatName').value.trim();
       const category = document.getElementById('newCatGroup').value;
       const price = Number(document.getElementById('newCatPrice').value) || 0;
@@ -2883,6 +3579,10 @@ function createJsonResponse(obj) {
     }
 
     function updateCatalogPriceById(id, newPrice) {
+      if (!isAdmin) {
+        showToast('Cần quyền Admin để chỉnh sửa giá!', 'warning');
+        return;
+      }
       const item = priceCatalog.find(p => p.id === id);
       if (item) {
         item.price = Number(newPrice) || 0;
@@ -2891,6 +3591,10 @@ function createJsonResponse(obj) {
     }
 
     async function deleteCatalogItemById(id) {
+      if (!isAdmin) {
+        showToast('Cần quyền Admin để xoá sản phẩm!', 'warning');
+        return;
+      }
       const item = priceCatalog.find(p => p.id === id);
       if (!item) return;
       const confirmed = await showStudioConfirm({
@@ -2915,11 +3619,19 @@ function createJsonResponse(obj) {
     }
 
     function saveAndCloseCatalogModal() {
+      if (!isAdmin) {
+        closeCatalogModal();
+        return;
+      }
       saveCatalogToStorage(true);
       closeCatalogModal();
     }
 
     async function resetDefaultCatalog() {
+      if (!isAdmin) {
+        showToast('Cần quyền Admin để khôi phục mặc định!', 'warning');
+        return;
+      }
       const confirmed = await showStudioConfirm({
         title: 'Khôi phục bảng giá mặc định',
         subtitle: 'Khôi phục lại toàn bộ bảng giá mẫu xưởng về dữ liệu chuẩn ban đầu?',
@@ -2964,6 +3676,7 @@ function createJsonResponse(obj) {
         item.payment = item.payment === 'Đã thanh toán' ? 'Chưa thanh toán' : 'Đã thanh toán';
         saveToStorage();
         renderAll();
+        syncSelectionUI();
 
         if (gasUrl) {
           sendCloudPost({ action: 'togglePayment', id: id, payment: item.payment });
@@ -3209,8 +3922,8 @@ Lưu ý: Anh em thợ kiểm tra kỹ danh sách và xác nhận giúp FU Studio
     function saveZaloConfig() {
       const singleVal = document.getElementById('cfgZaloSingleTemplate').value;
       const batchVal = document.getElementById('cfgZaloBatchTemplate').value;
-      localStorage.setItem('fu_zalo_template_single', singleVal);
-      localStorage.setItem('fu_zalo_template_batch', batchVal);
+      safeSetStorage(STORAGE_KEYS.ZALO_SINGLE, singleVal);
+      safeSetStorage(STORAGE_KEYS.ZALO_BATCH, batchVal);
 
       // Nếu có kết nối Google Sheet thì tự động gửi ngầm lưu lên sheet
       if (gasUrl) {
@@ -3696,42 +4409,7 @@ Lưu ý: Anh em thợ kiểm tra kỹ danh sách và xác nhận giúp FU Studio
       }
     }
 
-    async function deleteOrder(id) {
-      const order = orders.find(o => o.id === id);
-      const name = order ? (order.customer || order.code || 'đơn này') : 'đơn in này';
-      const confirmed = await showStudioConfirm({
-        title: 'Xác nhận xoá đơn in',
-        subtitle: `Bạn có chắc muốn xoá ${name}? Thao tác này sẽ xoá đơn khỏi danh sách và cập nhật lên Google Sheet.`,
-        confirmText: 'Xoá đơn',
-        cancelText: 'Huỷ bỏ',
-        type: 'danger',
-        icon: 'fa-solid fa-trash-can'
-      });
-      if (!confirmed) return;
-      orders = orders.filter(o => o.id !== id);
-      saveToStorage();
-      renderAll();
-
-      if (gasUrl) {
-        sendCloudPost({ action: 'deleteOrder', id: id });
-        showToast('Đã xóa đơn trên Sheet', 'info');
-      }
-    }
-
-    function togglePayment(id) {
-      const item = orders.find(o => o.id === id);
-      if (item) {
-        item.payment = (item.payment === 'Đã thanh toán') ? 'Chưa thanh toán' : 'Đã thanh toán';
-        saveToStorage();
-        renderAll();
-        syncSelectionUI();
-        if (gasUrl) {
-          sendCloudPost({ action: 'saveOrder', order: item });
-        }
-      }
-    }
-
-        function exportCSV() {
+    function exportCSV() {
       const rows = ['﻿Mã Đơn,Tên Khách,Ngày Gửi In,Ngày Nhận Hình,In Gấp,Hạng Mục In,Số Lượng,Đơn Giá,Thành Tiền,Công Nợ,Xưởng In,Link File In'];
       orders.forEach(o => {
         (o.items || []).forEach(it => {
@@ -3758,15 +4436,44 @@ Lưu ý: Anh em thợ kiểm tra kỹ danh sách và xác nhận giúp FU Studio
       }
     }
 
-    // Khởi chạy ứng dụng ban đầu
+    // ================= KHỞI CHẠY MÔ HÌNH OFFLINE-FIRST =================
+    // 1. Tải tức thì dữ liệu từ LocalStorage ra hiển thị ngay lập tức (0ms chờ)
     updateWorkshopFilterOptions();
     applyBackgroundConfig();
     updateCloudBadge();
+    updateAdminUI();
     renderPresetCombosGrid();
     renderAll();
-    // Tự động kiểm tra và kéo dữ liệu mới nhất từ Sheet về nếu đã cấu hình
-    if (gasUrl) {
-      syncFromCloud();
+
+    // 2. Lắng nghe sự kiện Online & Offline của hệ thống
+    window.addEventListener('online', async () => {
+      updateCloudBadge();
+      showToast('Đã có mạng trở lại! Đang tự động đồng bộ Google Sheet... 🔄', 'success');
+      if (gasUrl) {
+        // Tự động kích hoạt hiệu ứng thị giác và tiến trình đồng bộ của nút "Google Sheet Sync"
+        const btn = document.getElementById('btnCloudSync');
+        if (btn) {
+          btn.classList.add('ring-2', 'ring-emerald-500', 'ring-offset-1');
+          setTimeout(() => btn.classList.remove('ring-2', 'ring-emerald-500', 'ring-offset-1'), 1500);
+        }
+        await flushPendingSyncQueue();
+        syncFromCloud(true);
+      }
+    });
+
+    window.addEventListener('offline', () => {
+      updateCloudBadge();
+      showToast('Mất kết nối mạng. Đang xem dữ liệu offline! 📡', 'warning');
+    });
+
+    // 3. Khởi chạy cập nhật ngầm (Background Fetch) từ Google Sheet sau khi giao diện đã nạp xong
+    if (navigator.onLine && gasUrl) {
+      setTimeout(() => {
+        syncFromCloud(false, true);
+      }, 150);
+    } else if (!navigator.onLine) {
+      updateCloudBadge();
+      showToast('Đang xem dữ liệu offline từ bộ nhớ máy! 📡', 'info');
     }
   </script>
 </body>
