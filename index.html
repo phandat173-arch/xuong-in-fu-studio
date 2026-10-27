@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FU STUDIO — Atelier Print Lab & Quản Lý Công Nợ Xưởng v8.0 Premium Glass</title>
+  <title>FU STUDIO — Hệ Thống Quản Trị In Ấn & Đối Soát Công Nợ Xưởng</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -170,21 +170,27 @@
       
       <!-- Top Row on Mobile: Brand Identity + Primary Action ("Lên Đơn Mới" on mobile) -->
       <div class="flex items-center justify-between gap-3">
-        <div class="flex items-center gap-3 min-w-0">
-          <div class="w-10 h-10 shrink-0 rounded-xl bg-zinc-950 text-zinc-100 flex items-center justify-center border border-zinc-800 shadow-sm">
-            <i class="fa-solid fa-camera-retro text-sm"></i>
+        <div id="brandHeaderTrigger" onclick="openBrandModal()" class="group flex items-center gap-3 min-w-0 cursor-pointer rounded-xl p-1 -m-1 hover:bg-zinc-900/5 transition" title="Bấm để đổi tên thương hiệu & cập nhật hình logo">
+          <div id="brandLogoContainer" class="relative w-10 h-10 shrink-0 rounded-xl bg-zinc-950 text-zinc-100 flex items-center justify-center border border-zinc-800 shadow-sm overflow-hidden">
+            <img id="brandLogoImg" src="" alt="Logo Studio" class="hidden w-full h-full object-cover">
+            <i id="brandLogoDefaultIcon" class="fa-solid fa-camera-retro text-sm"></i>
+            <span class="absolute inset-0 bg-zinc-950/60 text-white opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+              <i class="fa-solid fa-pen text-[10px]"></i>
+            </span>
           </div>
           <div class="min-w-0">
             <div class="flex items-center gap-2 flex-wrap">
-              <h1 class="text-base font-brand font-bold tracking-wider text-zinc-950 uppercase truncate">FU STUDIO</h1>
-              <span class="text-[11px] font-mono-val font-semibold px-2 py-0.5 rounded-md bg-zinc-900/5 text-zinc-800 border border-zinc-300/80 shadow-2xs shrink-0">v8.0 Premium</span>
+              <h1 id="brandNameHeading" class="text-base font-brand font-bold tracking-wider text-zinc-950 uppercase truncate">FU STUDIO</h1>
+              <span class="inline-flex items-center justify-center w-5 h-5 rounded-md text-zinc-400 group-hover:text-zinc-800 group-hover:bg-zinc-200/70 opacity-0 group-hover:opacity-100 transition-all" title="Đổi tên & logo">
+                <i class="fa-solid fa-pen-to-square text-[11px]"></i>
+              </span>
               <!-- Offline Status Badge (Tự động xuất hiện khi mất kết nối mạng) -->
-              <span id="offlineIndicatorBadge" class="hidden text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-amber-100/95 text-amber-900 border border-amber-300 shadow-2xs flex items-center gap-1.5 shrink-0 animate-pulse" title="Mất kết nối mạng - Đang xem dữ liệu lưu offline trong máy">
+              <span id="offlineIndicatorBadge" onclick="event.stopPropagation()" class="hidden text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-amber-100/95 text-amber-900 border border-amber-300 shadow-2xs flex items-center gap-1.5 shrink-0 animate-pulse" title="Mất kết nối mạng - Đang xem dữ liệu lưu offline trong máy">
                 <span class="w-1.5 h-1.5 rounded-full bg-amber-600"></span>
                 <span>Đang xem dữ liệu offline</span>
               </span>
             </div>
-            <p class="text-[11px] sm:text-xs text-zinc-600 font-medium truncate">Hệ thống quản trị in ấn & đối soát công nợ xưởng</p>
+            <p id="brandSubtitleText" class="text-[11px] sm:text-xs text-zinc-600 font-medium truncate">Hệ thống quản trị in ấn & đối soát công nợ xưởng</p>
           </div>
         </div>
 
@@ -579,6 +585,22 @@
 
       <!-- Modal Body -->
       <div class="p-6 overflow-y-auto space-y-5 flex-1 custom-scrollbar">
+
+        <!-- Quick Link to Brand Identity (Logo & Name) -->
+        <div class="p-3.5 bg-zinc-50 border border-zinc-200/90 rounded-xl flex items-center justify-between gap-3">
+          <div class="flex items-center gap-3 min-w-0">
+            <div class="w-9 h-9 rounded-xl bg-zinc-950 text-white flex items-center justify-center shrink-0">
+              <i class="fa-solid fa-signature text-xs"></i>
+            </div>
+            <div class="min-w-0">
+              <div class="text-xs font-semibold text-zinc-900 truncate">Đổi Tên Studio & Hình Logo</div>
+              <div class="text-[11px] text-zinc-500 truncate">Tuỳ chỉnh thương hiệu hiển thị trên thanh tiêu đề</div>
+            </div>
+          </div>
+          <button type="button" onclick="closeBgModal(); openBrandModal();" class="shrink-0 px-3 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-semibold rounded-lg transition cursor-pointer">
+            Tuỳ chỉnh
+          </button>
+        </div>
         
         <!-- Preset Gallery Grid -->
         <div>
@@ -626,6 +648,100 @@
         <button type="button" onclick="resetDefaultBg()" class="text-xs font-medium text-rose-600 hover:underline cursor-pointer">Khôi phục nền mặc định</button>
         <button type="button" onclick="closeBgModal()" class="px-5 py-2 bg-zinc-900 text-white text-xs font-medium rounded-lg cursor-pointer hover:bg-zinc-800 transition">Đóng</button>
       </div>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL TUỲ CHỈNH THƯƠNG HIỆU (TÊN & HÌNH LOGO STUDIO) ==================== -->
+  <div id="brandModal" onclick="if (event.target === this) closeBrandModal()" class="fixed inset-0 bg-zinc-950/45 backdrop-blur-md z-[65] hidden flex items-center justify-center p-4">
+    <div class="bg-white/95 backdrop-blur-2xl rounded-2xl shadow-2xl max-w-md w-full overflow-hidden border border-white/80 animate-in fade-in zoom-in-95 duration-150">
+      
+      <!-- Modal Header -->
+      <div class="bg-zinc-950 text-zinc-100 px-5 py-4 flex justify-between items-center border-b border-zinc-800">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 rounded-lg bg-zinc-800 text-amber-400 flex items-center justify-center text-xs border border-zinc-700">
+            <i class="fa-solid fa-camera-retro"></i>
+          </div>
+          <div>
+            <h3 class="font-semibold text-sm tracking-tight text-white">Đổi Tên & Hình Logo Thương Hiệu</h3>
+            <p class="text-[11px] text-zinc-400">Cá nhân hoá nhận diện studio trên thanh tiêu đề</p>
+          </div>
+        </div>
+        <button type="button" onclick="closeBrandModal()" class="w-7 h-7 rounded-md hover:bg-zinc-800 text-zinc-400 hover:text-white flex items-center justify-center transition cursor-pointer" title="Đóng">
+          <i class="fa-solid fa-xmark text-xs"></i>
+        </button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="p-5 space-y-4 text-xs">
+
+        <!-- Live Preview Box -->
+        <div>
+          <label class="block text-[11px] font-semibold text-zinc-500 uppercase tracking-wider mb-1.5">Xem trước hiển thị</label>
+          <div class="p-3.5 rounded-xl bg-zinc-50 border border-zinc-200/90 flex items-center gap-3">
+            <div class="w-11 h-11 shrink-0 rounded-xl bg-zinc-950 text-zinc-100 flex items-center justify-center border border-zinc-800 shadow-sm overflow-hidden">
+              <img id="brandModalPreviewImg" src="" alt="Preview Logo" class="hidden w-full h-full object-cover">
+              <i id="brandModalPreviewIcon" class="fa-solid fa-camera-retro text-sm"></i>
+            </div>
+            <div class="min-w-0 flex-1">
+              <div id="brandModalPreviewName" class="text-base font-brand font-bold tracking-wider text-zinc-950 uppercase truncate">FU STUDIO</div>
+              <div id="brandModalPreviewSubtitle" class="text-xs text-zinc-600 font-medium truncate">Hệ thống quản trị in ấn & đối soát công nợ xưởng</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tên Thương Hiệu / Studio -->
+        <div>
+          <label class="block font-semibold text-zinc-700 mb-1">Tên Thương Hiệu / Studio *</label>
+          <input type="text" id="brandNameInput" oninput="updateBrandModalPreview()" maxlength="50" placeholder="VD: FU STUDIO" class="w-full px-3 py-2 bg-white border border-zinc-300 rounded-xl focus:border-zinc-950 focus:ring-1 focus:ring-zinc-950 outline-none font-semibold text-zinc-900 transition">
+        </div>
+
+        <!-- Dòng Mô Tả Phụ (Subtitle) -->
+        <div>
+          <label class="block font-semibold text-zinc-700 mb-1">Dòng mô tả phụ (bên dưới tên)</label>
+          <input type="text" id="brandSubtitleInput" oninput="updateBrandModalPreview()" maxlength="90" placeholder="VD: Hệ thống quản trị in ấn & đối soát công nợ xưởng" class="w-full px-3 py-2 bg-white border border-zinc-300 rounded-xl focus:border-zinc-950 focus:ring-1 focus:ring-zinc-950 outline-none text-zinc-700 transition">
+        </div>
+
+        <!-- Hình Logo Studio -->
+        <div class="pt-2 border-t border-zinc-200/80 space-y-2.5">
+          <div class="flex items-center justify-between">
+            <label class="font-semibold text-zinc-700">Hình Logo Studio</label>
+            <button type="button" id="btnClearBrandLogo" onclick="clearBrandLogoPreview()" class="text-[11px] font-medium text-rose-600 hover:underline cursor-pointer hidden">
+              Xoá ảnh (Dùng icon mặc định)
+            </button>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <input type="file" id="brandLogoFileInput" accept="image/*" class="hidden" onchange="handleBrandLogoUpload(event)">
+            <button type="button" onclick="document.getElementById('brandLogoFileInput').click()" class="flex-1 py-2 px-3 bg-zinc-900 hover:bg-zinc-800 text-white font-semibold rounded-xl transition cursor-pointer flex items-center justify-center gap-2 shadow-2xs">
+              <i class="fa-solid fa-upload text-xs text-amber-400"></i>
+              <span>Tải ảnh Logo từ máy</span>
+            </button>
+          </div>
+
+          <div>
+            <input type="url" id="brandLogoUrlInput" oninput="handleBrandLogoUrlInput(this.value)" placeholder="Hoặc dán link ảnh Logo (https://...)" class="w-full px-3 py-2 bg-zinc-50 focus:bg-white border border-zinc-300 rounded-xl focus:border-zinc-950 outline-none text-zinc-700 transition">
+          </div>
+          <p class="text-[11px] text-zinc-400 leading-relaxed">Hỗ trợ ảnh vuông PNG, JPG, WebP. Ảnh tải lên từ máy được tự động tối ưu dung lượng nhẹ để lưu trữ bền vững.</p>
+        </div>
+
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="p-4 bg-zinc-50 border-t border-zinc-200 flex items-center justify-between gap-2">
+        <button type="button" onclick="resetDefaultBrandConfig()" class="text-xs font-medium text-rose-600 hover:underline cursor-pointer">
+          Khôi phục mặc định
+        </button>
+        <div class="flex items-center gap-2">
+          <button type="button" onclick="closeBrandModal()" class="px-3.5 py-2 bg-white hover:bg-zinc-100 text-zinc-700 text-xs font-medium rounded-xl border border-zinc-300 transition cursor-pointer">
+            Huỷ
+          </button>
+          <button type="button" onclick="saveBrandConfigFromModal()" class="px-4 py-2 bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-semibold rounded-xl shadow-xs transition cursor-pointer flex items-center gap-1.5">
+            <i class="fa-solid fa-check text-xs text-emerald-400"></i>
+            <span>Lưu Thay Đổi</span>
+          </button>
+        </div>
+      </div>
+
     </div>
   </div>
 
@@ -1185,6 +1301,20 @@
 
       <!-- Modal Body -->
       <div class="p-5 space-y-2.5">
+        <!-- Nút Đổi Tên & Logo Thương Hiệu -->
+        <button type="button" onclick="closeAdminMenuModal(); openBrandModal();" class="w-full text-left p-3.5 rounded-xl border border-zinc-200/90 hover:border-zinc-900 bg-white hover:bg-zinc-50 transition flex items-center justify-between cursor-pointer shadow-2xs group">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-zinc-900/10 text-zinc-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition">
+              <i class="fa-solid fa-camera-retro text-xs"></i>
+            </div>
+            <div>
+              <div class="font-semibold text-zinc-950 text-xs">Đổi tên & Logo thương hiệu</div>
+              <div class="text-[11px] text-zinc-500">Cập nhật tên Studio và hình ảnh Logo</div>
+            </div>
+          </div>
+          <i class="fa-solid fa-chevron-right text-zinc-400 group-hover:text-zinc-900 text-xs transition"></i>
+        </button>
+
         <!-- Nút Đổi Mã PIN Admin -->
         <button type="button" onclick="handleAdminMenuChangePin()" class="w-full text-left p-3.5 rounded-xl border border-zinc-200/90 hover:border-zinc-900 bg-white hover:bg-zinc-50 transition flex items-center justify-between cursor-pointer shadow-2xs group">
           <div class="flex items-center gap-3">
@@ -1751,6 +1881,7 @@ function createJsonResponse(obj) {
       CATALOG: 'fu_studio_catalog_v3',
       COMBOS: 'fu_studio_combos_v1',
       BG_CONFIG: 'fu_studio_bg_config',
+      BRAND_CONFIG: 'fu_studio_brand_config_v1',
       GAS_URL: 'fu_studio_gas_url',
       CATALOG_VER: 'fu_catalog_version',
       ZALO_SINGLE: 'fu_zalo_template_single',
@@ -1830,6 +1961,15 @@ function createJsonResponse(obj) {
       blur: 36,
       opacity: 45
     };
+
+    const DEFAULT_BRAND_CONFIG = {
+      name: 'FU STUDIO',
+      subtitle: 'Hệ thống quản trị in ấn & đối soát công nợ xưởng',
+      logoUrl: ''
+    };
+
+    let brandConfig = safeGetJSON(STORAGE_KEYS.BRAND_CONFIG, null) || { ...DEFAULT_BRAND_CONFIG };
+    let brandLogoDraftUrl = '';
 
     const DEFAULT_GAS_URL = 'https://script.google.com/macros/s/AKfycbw7CjioeUF_h1Ow6pPEYe6rtuJQ0b2gKa689lY9WcPi2w_p-nJrsXugX0B2vJxcMC1s/exec';
     let gasUrl = localStorage.getItem(STORAGE_KEYS.GAS_URL) || DEFAULT_GAS_URL;
@@ -2231,6 +2371,199 @@ function createJsonResponse(obj) {
       showToast('Đã khôi phục nền mờ mặc định', 'info');
     }
 
+    // ================= BRAND IDENTITY MANAGEMENT (TÊN STUDIO & HÌNH LOGO) =================
+    function applyBrandConfig() {
+      const nameStr = (brandConfig && String(brandConfig.name || '').trim()) ? String(brandConfig.name).trim() : DEFAULT_BRAND_CONFIG.name;
+      const subtitleStr = (brandConfig && typeof brandConfig.subtitle === 'string' && brandConfig.subtitle.trim())
+        ? brandConfig.subtitle.trim()
+        : DEFAULT_BRAND_CONFIG.subtitle;
+      const logoUrl = (brandConfig && typeof brandConfig.logoUrl === 'string') ? brandConfig.logoUrl.trim() : '';
+
+      const nameEl = document.getElementById('brandNameHeading');
+      if (nameEl) nameEl.textContent = nameStr;
+
+      const subEl = document.getElementById('brandSubtitleText');
+      if (subEl) subEl.textContent = subtitleStr;
+
+      const imgEl = document.getElementById('brandLogoImg');
+      const iconEl = document.getElementById('brandLogoDefaultIcon');
+      if (imgEl && iconEl) {
+        if (logoUrl) {
+          imgEl.src = logoUrl;
+          imgEl.classList.remove('hidden');
+          iconEl.classList.add('hidden');
+          imgEl.onerror = () => {
+            imgEl.classList.add('hidden');
+            iconEl.classList.remove('hidden');
+          };
+        } else {
+          imgEl.src = '';
+          imgEl.classList.add('hidden');
+          iconEl.classList.remove('hidden');
+        }
+      }
+
+      document.title = `${nameStr} — ${subtitleStr}`;
+    }
+
+    function saveBrandConfigToStorage(syncCloud = true) {
+      safeSetStorage(STORAGE_KEYS.BRAND_CONFIG, brandConfig);
+      if (syncCloud && gasUrl && navigator.onLine) {
+        sendCloudPost({
+          action: 'saveSettings',
+          settings: {
+            fu_studio_brand_config_v1: JSON.stringify(brandConfig)
+          }
+        });
+      }
+    }
+
+    function openBrandModal() {
+      const nameInput = document.getElementById('brandNameInput');
+      const subInput = document.getElementById('brandSubtitleInput');
+      const urlInput = document.getElementById('brandLogoUrlInput');
+      const fileInput = document.getElementById('brandLogoFileInput');
+
+      brandLogoDraftUrl = (brandConfig && brandConfig.logoUrl) ? String(brandConfig.logoUrl).trim() : '';
+
+      if (nameInput) nameInput.value = (brandConfig && brandConfig.name) ? brandConfig.name : DEFAULT_BRAND_CONFIG.name;
+      if (subInput) subInput.value = (brandConfig && brandConfig.subtitle) ? brandConfig.subtitle : DEFAULT_BRAND_CONFIG.subtitle;
+      if (urlInput) {
+        urlInput.value = (brandLogoDraftUrl && !brandLogoDraftUrl.startsWith('data:image/')) ? brandLogoDraftUrl : '';
+      }
+      if (fileInput) fileInput.value = '';
+
+      updateBrandModalPreview();
+      const modal = document.getElementById('brandModal');
+      if (modal) modal.classList.remove('hidden');
+    }
+
+    function closeBrandModal() {
+      const modal = document.getElementById('brandModal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function updateBrandModalPreview() {
+      const nameInput = document.getElementById('brandNameInput');
+      const subInput = document.getElementById('brandSubtitleInput');
+      const previewName = document.getElementById('brandModalPreviewName');
+      const previewSub = document.getElementById('brandModalPreviewSubtitle');
+      const previewImg = document.getElementById('brandModalPreviewImg');
+      const previewIcon = document.getElementById('brandModalPreviewIcon');
+      const clearBtn = document.getElementById('btnClearBrandLogo');
+
+      const nameVal = (nameInput && nameInput.value.trim()) ? nameInput.value.trim() : DEFAULT_BRAND_CONFIG.name;
+      const subVal = (subInput && subInput.value.trim()) ? subInput.value.trim() : DEFAULT_BRAND_CONFIG.subtitle;
+
+      if (previewName) previewName.textContent = nameVal;
+      if (previewSub) previewSub.textContent = subVal;
+
+      if (previewImg && previewIcon) {
+        if (brandLogoDraftUrl) {
+          previewImg.src = brandLogoDraftUrl;
+          previewImg.classList.remove('hidden');
+          previewIcon.classList.add('hidden');
+          previewImg.onerror = () => {
+            previewImg.classList.add('hidden');
+            previewIcon.classList.remove('hidden');
+          };
+        } else {
+          previewImg.src = '';
+          previewImg.classList.add('hidden');
+          previewIcon.classList.remove('hidden');
+        }
+      }
+
+      if (clearBtn) {
+        clearBtn.classList.toggle('hidden', !brandLogoDraftUrl);
+      }
+    }
+
+    function handleBrandLogoUrlInput(val) {
+      brandLogoDraftUrl = String(val || '').trim();
+      updateBrandModalPreview();
+    }
+
+    function clearBrandLogoPreview() {
+      brandLogoDraftUrl = '';
+      const urlInput = document.getElementById('brandLogoUrlInput');
+      const fileInput = document.getElementById('brandLogoFileInput');
+      if (urlInput) urlInput.value = '';
+      if (fileInput) fileInput.value = '';
+      updateBrandModalPreview();
+    }
+
+    function handleBrandLogoUpload(event) {
+      const file = event && event.target && event.target.files ? event.target.files[0] : null;
+      if (!file) return;
+      if (!file.type.startsWith('image/')) {
+        showToast('Vui lòng chọn tệp hình ảnh hợp lệ (PNG, JPG, WebP)!', 'error');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+          const maxDim = 160;
+          let w = img.width || maxDim;
+          let h = img.height || maxDim;
+          if (w > maxDim || h > maxDim) {
+            if (w > h) {
+              h = Math.round((h * maxDim) / w);
+              w = maxDim;
+            } else {
+              w = Math.round((w * maxDim) / h);
+              h = maxDim;
+            }
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = w;
+          canvas.height = h;
+          const ctx = canvas.getContext('2d');
+          ctx.clearRect(0, 0, w, h);
+          ctx.drawImage(img, 0, 0, w, h);
+          brandLogoDraftUrl = canvas.toDataURL('image/png');
+          const urlInput = document.getElementById('brandLogoUrlInput');
+          if (urlInput) urlInput.value = '';
+          updateBrandModalPreview();
+          showToast('Đã tải hình Logo lên! Bấm "Lưu Thay Đổi" để áp dụng.', 'info');
+        };
+        img.onerror = function() {
+          showToast('Không thể đọc tệp ảnh này, vui lòng thử ảnh khác!', 'error');
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function saveBrandConfigFromModal() {
+      const nameInput = document.getElementById('brandNameInput');
+      const subInput = document.getElementById('brandSubtitleInput');
+      const nameVal = (nameInput && nameInput.value.trim()) ? nameInput.value.trim() : DEFAULT_BRAND_CONFIG.name;
+      const subVal = (subInput && subInput.value.trim()) ? subInput.value.trim() : DEFAULT_BRAND_CONFIG.subtitle;
+
+      brandConfig = {
+        name: nameVal,
+        subtitle: subVal,
+        logoUrl: brandLogoDraftUrl || ''
+      };
+
+      applyBrandConfig();
+      saveBrandConfigToStorage(true);
+      closeBrandModal();
+      showToast('Đã cập nhật tên thương hiệu & hình Logo thành công! ✨', 'success');
+    }
+
+    function resetDefaultBrandConfig() {
+      brandConfig = { ...DEFAULT_BRAND_CONFIG };
+      brandLogoDraftUrl = '';
+      applyBrandConfig();
+      saveBrandConfigToStorage(true);
+      openBrandModal();
+      showToast('Đã khôi phục tên & Logo mặc định', 'info');
+    }
+
     // ================= TOAST & VIEW CONTROLS =================
     function showToast(message, type = 'info') {
       const container = document.getElementById('toastContainer');
@@ -2624,6 +2957,20 @@ function createJsonResponse(obj) {
             }
           } catch(e) {}
         }
+        if (data.settings.fu_studio_brand_config_v1) {
+          try {
+            const cloudBrand = JSON.parse(data.settings.fu_studio_brand_config_v1);
+            if (cloudBrand && typeof cloudBrand === 'object') {
+              brandConfig = {
+                name: String(cloudBrand.name || DEFAULT_BRAND_CONFIG.name).trim(),
+                subtitle: String(cloudBrand.subtitle || DEFAULT_BRAND_CONFIG.subtitle).trim(),
+                logoUrl: String(cloudBrand.logoUrl || '').trim()
+              };
+              safeSetStorage(STORAGE_KEYS.BRAND_CONFIG, brandConfig);
+              applyBrandConfig();
+            }
+          } catch(e) {}
+        }
       }
 
       // 2. Lưu cache Đơn hàng vào LocalStorage
@@ -2861,7 +3208,8 @@ function createJsonResponse(obj) {
             orders: orders,
             settings: {
               fu_zalo_template_single: getSingleZaloTemplate(),
-              fu_zalo_template_batch: getBatchZaloTemplate()
+              fu_zalo_template_batch: getBatchZaloTemplate(),
+              fu_studio_brand_config_v1: JSON.stringify(brandConfig)
             }
           })
         }, 20000);
@@ -5207,6 +5555,7 @@ Lưu ý: Anh em thợ kiểm tra kỹ danh sách và xác nhận giúp FU Studio
     // ================= KHỞI CHẠY MÔ HÌNH OFFLINE-FIRST =================
     // 1. Tải tức thì dữ liệu từ LocalStorage ra hiển thị ngay lập tức (0ms chờ)
     updateWorkshopFilterOptions();
+    applyBrandConfig();
     applyBackgroundConfig();
     updateCloudBadge();
     updateAdminUI();
@@ -5239,6 +5588,7 @@ Lưu ý: Anh em thợ kiểm tra kỹ danh sách và xác nhận giúp FU Studio
       if (e.key === 'Escape') {
         const modalPriority = [
           { id: 'deleteOrderModal', close: closeDeleteOrderModal },
+          { id: 'brandModal', close: closeBrandModal },
           { id: 'adminChangePinModal', close: closeChangePinModal },
           { id: 'adminPinModal', close: closeAdminPinModal },
           { id: 'adminMenuModal', close: closeAdminMenuModal },
