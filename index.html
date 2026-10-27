@@ -236,33 +236,37 @@
           <span class="text-xs text-zinc-600 font-medium">Tổng chi phí in ấn</span>
         </div>
         <div class="mt-2.5">
-          <div class="text-2xl sm:text-3xl font-light tracking-tight text-zinc-950 tabular-nums font-mono-val" id="stat-total-cost">0 đ</div>
-          <div class="inline-flex items-center gap-1.5 text-xs text-zinc-600 font-mono-val mt-2">
-            <i class="fa-regular fa-folder-closed text-xs text-zinc-500"></i>
-            <span id="stat-total-orders">0 đơn hàng</span>
+          <div class="text-2xl sm:text-3xl font-bold tracking-tight text-zinc-950 tabular-nums font-mono-val flex items-baseline" id="stat-total-cost">
+            0<span class="text-base sm:text-lg font-semibold ml-0.5 font-sans text-zinc-700">đ</span>
+          </div>
+          <div class="flex items-center flex-wrap gap-1.5 text-xs text-zinc-600 font-mono-val mt-2">
+            <span class="inline-flex items-center gap-1.5">
+              <i class="fa-regular fa-folder-closed text-xs text-zinc-500"></i>
+              <span id="stat-total-orders">0 đơn hàng</span>
+            </span>
+            <span class="text-zinc-300">•</span>
+            <span>Đã thanh toán: <span id="stat-paid-amount" class="text-emerald-600 font-medium">0 đ</span></span>
           </div>
         </div>
       </div>
 
-      <!-- Card 2: Công nợ xưởng (Purposeful Data Indication, Subtle Rose Tint & Glass) -->
+      <!-- Card 2: Công nợ xưởng (Subtle Rose Tint & Glass) -->
       <div class="glass-panel p-5 sm:p-6 rounded-xl shadow-xs flex flex-col justify-between border-rose-200/70">
         <div class="flex items-center justify-between gap-2">
           <span class="text-xs text-rose-700 font-semibold flex items-center gap-1.5">
             <span class="w-1.5 h-1.5 rounded-full bg-rose-600"></span> Công nợ xưởng chưa tất toán
           </span>
-          <span id="stat-debt-count-badge" class="text-xs font-mono-val font-semibold px-2 py-0.5 rounded bg-rose-100 text-rose-800 border border-rose-200 hidden shrink-0">0 đơn nợ</span>
+          <span id="stat-debt-count-badge" class="text-xs font-mono-val font-semibold px-2 py-0.5 rounded bg-rose-100 text-rose-800 border border-rose-200 shrink-0">0 đơn nợ</span>
         </div>
         <div class="mt-2.5">
-          <div class="text-2xl sm:text-3xl font-light tracking-tight text-rose-700 tabular-nums font-mono-val" id="stat-debt">0 đ</div>
-          <div class="flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center justify-between gap-2.5 mt-3 pt-2.5 border-t border-rose-100/80">
-            <div class="text-xs text-zinc-600 flex items-center gap-1.5">
-              <i class="fa-solid fa-arrow-pointer text-xs text-zinc-400"></i>
-              <span>Chạm nhãn để gạch nợ từng đơn lẻ</span>
-            </div>
-            <!-- Nút Quyết toán (min-h 44px cho thao tác ngón cái dễ dàng trên điện thoại) -->
-            <button type="button" onclick="batchSettleDebt()" id="btnBatchSettleDebt" class="min-h-[44px] sm:min-h-[38px] w-full sm:w-auto justify-center px-4 py-2.5 sm:py-2 rounded-xl sm:rounded-lg bg-rose-600 hover:bg-rose-700 active:scale-[0.99] text-white text-xs font-semibold shadow-xs transition flex items-center gap-2 cursor-pointer hidden" title="Gạch nợ toàn bộ các đơn đang hiển thị mà không cần bấm từng đơn">
+          <div class="text-2xl sm:text-3xl font-bold tracking-tight text-rose-700 tabular-nums font-mono-val flex items-baseline" id="stat-debt">
+            0<span class="text-base sm:text-lg font-semibold ml-0.5 font-sans text-rose-600">đ</span>
+          </div>
+          <div class="flex items-center justify-end mt-3 pt-2.5 border-t border-rose-100/80">
+            <!-- Nút Quyết toán căn phải, min-h 44px trên mobile, disabled khi sạch nợ -->
+            <button type="button" onclick="batchSettleDebt()" id="btnBatchSettleDebt" class="min-h-[44px] sm:min-h-[36px] w-full sm:w-auto px-4 py-2 sm:py-1.5 rounded-xl sm:rounded-lg bg-rose-600 hover:bg-rose-700 active:scale-[0.99] text-white text-xs font-semibold shadow-xs transition flex items-center justify-center gap-2 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-rose-600" title="Quyết toán công nợ các đơn đang hiển thị">
               <i class="fa-solid fa-receipt text-xs"></i>
-              <span id="btnBatchSettleDebtLabel">Quyết toán & Gạch nợ toàn bộ</span>
+              <span id="btnBatchSettleDebtLabel">Quyết toán tất cả (0 đơn)</span>
             </button>
           </div>
         </div>
@@ -1499,7 +1503,11 @@ function readAllOrders(sheet) {
       date: formatDate(row[3]),
       workshop: String(row[4] || 'TPS'),
       payment: String(row[5] || 'Chưa thanh toán'),
-      items: items
+      items: items,
+      deliveryDate: formatDate(row[10]),
+      isUrgent: row[11] === true || String(row[11]).toLowerCase() === 'true',
+      driveUrl: String(row[12] || ''),
+      note: String(row[13] || '')
     });
   }
   orders.reverse();
@@ -1508,13 +1516,31 @@ function readAllOrders(sheet) {
 
 function formatDate(d) {
   if (!d) return '';
-  if (d instanceof Date) {
+  if (d instanceof Date || Object.prototype.toString.call(d) === '[object Date]') {
     var yyyy = d.getFullYear();
-    var mm = String(d.getMonth() + 1).padStart(2, '0');
-    var dd = String(d.getDate()).padStart(2, '0');
-    return yyyy + '-' + mm + '-' + dd;
+    var m = d.getMonth() + 1;
+    var da = d.getDate();
+    return yyyy + '-' + (m < 10 ? '0' : '') + m + '-' + (da < 10 ? '0' : '') + da;
   }
-  return String(d).split('T')[0];
+  var str = String(d).trim();
+  if (/^\d{4}-\d{2}-\d{2}/.test(str)) {
+    return str.substring(0, 10);
+  }
+  var vnMatch = str.match(/^(\d{1,2})[\/\.-](\d{1,2})[\/\.-](\d{4})/);
+  if (vnMatch) {
+    var vnD = vnMatch[1].length === 1 ? '0' + vnMatch[1] : vnMatch[1];
+    var vnM = vnMatch[2].length === 1 ? '0' + vnMatch[2] : vnMatch[2];
+    return vnMatch[3] + '-' + vnM + '-' + vnD;
+  }
+  var cleaned = str.replace(/\s*GM.*$/, '').trim();
+  var parsed = new Date(cleaned);
+  if (!isNaN(parsed.getTime())) {
+    var y = parsed.getFullYear();
+    var mo = parsed.getMonth() + 1;
+    var dday = parsed.getDate();
+    return y + '-' + (mo < 10 ? '0' : '') + mo + '-' + (dday < 10 ? '0' : '') + dday;
+  }
+  return str;
 }
 
 function saveOrUpdateOrder(sheet, order) {
@@ -1562,12 +1588,13 @@ function saveOrUpdateOrder(sheet, order) {
   var rowData = [
     order.id, order.code, order.name, order.date, order.workshop || 'TPS',
     order.payment || 'Chưa thanh toán', totalCost, itemsSummary.join(' | '),
-    JSON.stringify(order.items || []), new Date()
+    JSON.stringify(order.items || []), new Date(),
+    order.deliveryDate || '', !!order.isUrgent, order.driveUrl || '', order.note || ''
   ];
   if (rowIndex > 0) {
     sheet.getRange(rowIndex, 1, 1, rowData.length).setValues([rowData]);
-    if (sheet.getLastColumn() > 10) {
-      sheet.getRange(rowIndex, 11, 1, sheet.getLastColumn() - 10).clearContent();
+    if (sheet.getLastColumn() > rowData.length) {
+      sheet.getRange(rowIndex, rowData.length + 1, 1, sheet.getLastColumn() - rowData.length).clearContent();
     }
   } else {
     sheet.appendRow(rowData);
@@ -1824,6 +1851,14 @@ function createJsonResponse(obj) {
     window.selectedOrderIds = selectedOrderIds;
     window.currentDeletingOrderId = null;
 
+    function getTodayISO() {
+      const now = new Date();
+      const yyyy = now.getFullYear();
+      const mm = String(now.getMonth() + 1).padStart(2, '0');
+      const dd = String(now.getDate()).padStart(2, '0');
+      return `${yyyy}-${mm}-${dd}`;
+    }
+
     function normalizeDateToISO(val) {
       if (!val) return '';
       if (val instanceof Date && !isNaN(val.getTime())) {
@@ -1832,23 +1867,73 @@ function createJsonResponse(obj) {
         const dd = String(val.getDate()).padStart(2, '0');
         return `${yyyy}-${mm}-${dd}`;
       }
-      const str = String(val).trim();
+      let str = String(val).trim();
+      if (!str) return '';
+
+      // 1. Dạng chuẩn YYYY-MM-DD
       if (/^\d{4}-\d{2}-\d{2}$/.test(str)) return str;
-      const vnMatch = str.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+
+      // 2. Chuỗi ISO bắt đầu bằng YYYY-MM-DD (cắt bỏ phần giờ T...)
+      const isoPrefix = str.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+      if (isoPrefix) {
+        return `${isoPrefix[1]}-${isoPrefix[2].padStart(2, '0')}-${isoPrefix[3].padStart(2, '0')}`;
+      }
+
+      // 3. Chuẩn ngày Việt Nam DD/MM/YYYY, DD-MM-YYYY, DD.MM.YYYY
+      const vnMatch = str.match(/^(\d{1,2})[\/\.-](\d{1,2})[\/\.-](\d{4})/);
       if (vnMatch) {
         return `${vnMatch[3]}-${vnMatch[2].padStart(2, '0')}-${vnMatch[1].padStart(2, '0')}`;
       }
-      const parsed = new Date(str);
+
+      // 4. Timestamp dạng số miligiây hoặc giây
+      if (/^\d{10,13}$/.test(str)) {
+        const num = Number(str);
+        const d = new Date(num > 1e11 ? num : num * 1000);
+        if (!isNaN(d.getTime())) {
+          const yyyy = d.getFullYear();
+          const mm = String(d.getMonth() + 1).padStart(2, '0');
+          const dd = String(d.getDate()).padStart(2, '0');
+          return `${yyyy}-${mm}-${dd}`;
+        }
+      }
+
+      // 5. Chuỗi ngày từ Google Sheets bị cắt 'GM' hoặc chứa 'GMT...' (ví dụ: 'Mon Oct 26 2026 00:00:00 GM')
+      const cleaned = str.replace(/\s*GM.*$/i, '').trim();
+      const parsed = new Date(cleaned);
       if (!isNaN(parsed.getTime())) {
         const yyyy = parsed.getFullYear();
         const mm = String(parsed.getMonth() + 1).padStart(2, '0');
         const dd = String(parsed.getDate()).padStart(2, '0');
         return `${yyyy}-${mm}-${dd}`;
       }
-      return str;
+
+      return '';
     }
 
-    function sanitizeOrders(list) {
+    function calculateDeliveryDate(baseDateStr, daysToAdd = 2) {
+      if (!baseDateStr) return '';
+      const iso = normalizeDateToISO(baseDateStr);
+      if (iso && /^\d{4}-\d{2}-\d{2}$/.test(iso)) {
+        const parts = iso.split('-');
+        const d = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+        d.setDate(d.getDate() + Number(daysToAdd || 0));
+        const yyyy = d.getFullYear();
+        const mm = String(d.getMonth() + 1).padStart(2, '0');
+        const dd = String(d.getDate()).padStart(2, '0');
+        return `${yyyy}-${mm}-${dd}`;
+      }
+      const d = new Date(baseDateStr);
+      if (!isNaN(d.getTime())) {
+        d.setDate(d.getDate() + Number(daysToAdd || 0));
+        const yyyy = d.getFullYear();
+        const mm = String(d.getMonth() + 1).padStart(2, '0');
+        const dd = String(d.getDate()).padStart(2, '0');
+        return `${yyyy}-${mm}-${dd}`;
+      }
+      return '';
+    }
+
+    function sanitizeOrders(list, existingOrders = []) {
       if (!Array.isArray(list)) return [];
       let maxId = 0;
       list.forEach(o => {
@@ -1857,14 +1942,61 @@ function createJsonResponse(obj) {
           maxId = num;
         }
       });
+
       return list.map(o => {
         const num = Number(o.id);
         const validId = (!isNaN(num) && num > 0 && num < 1000000000) ? num : ++maxId;
+
+        // Đối chiếu với đơn đang có trong bộ nhớ (nếu có) để bảo tồn các trường dữ liệu
+        const existing = Array.isArray(existingOrders)
+          ? existingOrders.find(e => e && ((e.id === validId) || (e.code && o.code && String(e.code).trim().toUpperCase() === String(o.code).trim().toUpperCase())))
+          : null;
+
+        const isUrgent = (typeof o.isUrgent !== 'undefined') ? !!o.isUrgent : (existing ? !!existing.isUrgent : false);
+        const diffDays = isUrgent ? 1 : 2;
+
+        // 1. Phục hồi và chuẩn hóa Ngày gửi in (date)
+        let normDate = normalizeDateToISO(o.date);
+        if (!normDate && existing) {
+          normDate = normalizeDateToISO(existing.date);
+        }
+
+        // 2. Phục hồi và chuẩn hóa Ngày nhận hàng (deliveryDate)
+        let normDelivery = normalizeDateToISO(o.deliveryDate);
+        if (!normDelivery && existing) {
+          normDelivery = normalizeDateToISO(existing.deliveryDate);
+        }
+
+        // Tự động khôi phục ngày gửi in nếu bị thiếu (lùi từ ngày nhận hoặc lấy ngày hôm nay)
+        if (!normDate) {
+          if (normDelivery) {
+            normDate = calculateDeliveryDate(normDelivery, -diffDays);
+          } else {
+            normDate = getTodayISO();
+          }
+        }
+
+        // Tự động khôi phục ngày nhận hàng nếu bị thiếu (tính cộng từ ngày gửi in)
+        if (!normDelivery) {
+          normDelivery = calculateDeliveryDate(normDate, diffDays);
+        }
+
+        // Bảo toàn link Google Drive và ghi chú
+        const driveUrl = (typeof o.driveUrl !== 'undefined' && o.driveUrl !== '')
+          ? o.driveUrl
+          : (existing && existing.driveUrl ? existing.driveUrl : '');
+        const note = (typeof o.note !== 'undefined' && o.note !== '')
+          ? o.note
+          : (existing && existing.note ? existing.note : '');
+
         return {
           ...o,
           id: validId,
-          date: normalizeDateToISO(o.date),
-          deliveryDate: normalizeDateToISO(o.deliveryDate)
+          date: normDate,
+          deliveryDate: normDelivery,
+          isUrgent: isUrgent,
+          driveUrl: driveUrl,
+          note: note
         };
       });
     }
@@ -1935,6 +2067,9 @@ function createJsonResponse(obj) {
     // Nạp dữ liệu Offline-First: Ưu tiên lấy từ LocalStorage ra ngay lập tức
     let rawStoredOrders = safeGetJSON(STORAGE_KEYS.ORDERS, null) || DEFAULT_SAMPLE_ORDERS;
     let orders = sanitizeOrders(rawStoredOrders);
+    if (JSON.stringify(orders) !== JSON.stringify(rawStoredOrders)) {
+      safeSetStorage(STORAGE_KEYS.ORDERS, orders);
+    }
 
     // ================= BACKGROUND MANAGEMENT =================
     function applyBackgroundConfig() {
@@ -2230,11 +2365,12 @@ function createJsonResponse(obj) {
     function formatDateVN(dateStr) {
       if (!dateStr) return '';
       const iso = normalizeDateToISO(dateStr);
+      if (!iso) return '';
       const parts = iso.split('-');
       if (parts.length === 3 && parts[0].length === 4) {
         return `${parts[2]}/${parts[1]}/${parts[0]}`;
       }
-      return dateStr;
+      return iso;
     }
 
     function switchView(mode) {
@@ -2361,7 +2497,7 @@ function createJsonResponse(obj) {
 
       // 2. Lưu cache Đơn hàng vào LocalStorage
       if (Array.isArray(data.orders)) {
-        const sanitized = sanitizeOrders(data.orders);
+        const sanitized = sanitizeOrders(data.orders, orders);
         if (JSON.stringify(sanitized) !== JSON.stringify(orders)) {
           hasNewChanges = true;
           orders = sanitized;
@@ -3102,22 +3238,8 @@ function createJsonResponse(obj) {
       renderCartTotalOnly();
     }
 
-    function calculateDeliveryDate(baseDateStr, daysToAdd = 2) {
-      if (!baseDateStr) return '';
-      const parts = String(baseDateStr).split('T')[0].split('-');
-      if (parts.length === 3) {
-        const d = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
-        d.setDate(d.getDate() + Number(daysToAdd));
-        const yyyy = d.getFullYear();
-        const mm = String(d.getMonth() + 1).padStart(2, '0');
-        const dd = String(d.getDate()).padStart(2, '0');
-        return `${yyyy}-${mm}-${dd}`;
-      }
-      return '';
-    }
-
     function onPrintDateChange() {
-      const pDate = document.getElementById('printDate').value;
+      const pDate = document.getElementById('printDate').value || getTodayISO();
       const isUrgent = document.getElementById('isUrgent').checked;
       document.getElementById('deliveryDate').value = calculateDeliveryDate(pDate, isUrgent ? 1 : 2);
     }
@@ -3126,7 +3248,7 @@ function createJsonResponse(obj) {
       const isUrgent = (days === 1);
       document.getElementById('isUrgent').checked = isUrgent;
       updateUrgentUI(isUrgent);
-      const pDate = document.getElementById('printDate').value || new Date().toISOString().split('T')[0];
+      const pDate = document.getElementById('printDate').value || getTodayISO();
       document.getElementById('deliveryDate').value = calculateDeliveryDate(pDate, days);
     }
 
@@ -3158,10 +3280,11 @@ function createJsonResponse(obj) {
           document.getElementById('orderId').value = order.id;
           document.getElementById('orderCode').value = order.code;
           document.getElementById('clientName').value = order.name;
-          document.getElementById('printDate').value = normalizeDateToISO(order.date);
+          const normPDate = normalizeDateToISO(order.date) || getTodayISO();
+          document.getElementById('printDate').value = normPDate;
           const isUrgent = !!order.isUrgent;
           document.getElementById('isUrgent').checked = isUrgent;
-          document.getElementById('deliveryDate').value = normalizeDateToISO(order.deliveryDate) || calculateDeliveryDate(normalizeDateToISO(order.date), isUrgent ? 1 : 2);
+          document.getElementById('deliveryDate').value = normalizeDateToISO(order.deliveryDate) || calculateDeliveryDate(normPDate, isUrgent ? 1 : 2);
           updateUrgentUI(isUrgent);
           document.getElementById('workshopName').value = order.workshop || 'TPS';
           document.getElementById('paymentStatus').value = order.payment;
@@ -3181,7 +3304,7 @@ function createJsonResponse(obj) {
       } else {
         document.getElementById('modalTitle').innerText = 'Lên Đơn In Gửi Xưởng';
         document.getElementById('orderId').value = '';
-        const today = new Date().toISOString().split('T')[0];
+        const today = getTodayISO();
         document.getElementById('printDate').value = today;
         document.getElementById('isUrgent').checked = false;
         document.getElementById('deliveryDate').value = calculateDeliveryDate(today, 2);
@@ -3225,9 +3348,9 @@ function createJsonResponse(obj) {
         price: Number(c.price) || 0
       }));
 
-      const printDateVal = document.getElementById('printDate').value;
+      const printDateVal = normalizeDateToISO(document.getElementById('printDate').value) || getTodayISO();
       const isUrgent = document.getElementById('isUrgent').checked;
-      const deliveryDateVal = document.getElementById('deliveryDate').value || calculateDeliveryDate(printDateVal, isUrgent ? 1 : 2);
+      const deliveryDateVal = normalizeDateToISO(document.getElementById('deliveryDate').value) || calculateDeliveryDate(printDateVal, isUrgent ? 1 : 2);
 
       const orderData = {
         id: validEditId || getNextOrderId(),
@@ -3275,9 +3398,10 @@ function createJsonResponse(obj) {
       document.getElementById('modalTitle').innerText = 'Nhân Bản Đơn In (Từ ' + source.code + ')';
       document.getElementById('orderCode').value = source.code + '_COPY';
       document.getElementById('clientName').value = source.name;
-      document.getElementById('printDate').value = source.date;
+      const normPDate = normalizeDateToISO(source.date) || getTodayISO();
+      document.getElementById('printDate').value = normPDate;
       document.getElementById('isUrgent').checked = !!source.isUrgent;
-      document.getElementById('deliveryDate').value = source.deliveryDate || calculateDeliveryDate(source.date, source.isUrgent ? 1 : 2);
+      document.getElementById('deliveryDate').value = normalizeDateToISO(source.deliveryDate) || calculateDeliveryDate(normPDate, source.isUrgent ? 1 : 2);
       updateUrgentUI(!!source.isUrgent);
       document.getElementById('workshopName').value = source.workshop || 'TPS';
       document.getElementById('paymentStatus').value = source.payment;
@@ -4297,50 +4421,88 @@ Lưu ý: Anh em thợ kiểm tra kỹ danh sách và xác nhận giúp FU Studio
       });
     }
 
-    function renderAll() {
-      const filtered = getFilteredOrders();
-
+    // ================= TÍNH TOÁN VÀ CẬP NHẬT STATS CARDS =================
+    function updateStats(filtered) {
       let totalCost = 0;
-      let debtAmount = 0;
+      let paidAmount = 0;
+      let unpaidAmount = 0;
+      let unpaidCount = 0;
 
-      filtered.forEach(o => {
-        const orderTotal = (o.items || []).reduce((sum, it) => sum + (it.qty * it.price), 0);
+      (filtered || []).forEach(o => {
+        const orderTotal = (o.items || []).reduce((sum, it) => sum + ((Number(it.qty) || 0) * (Number(it.price) || 0)), 0);
         totalCost += orderTotal;
-        if (o.payment === 'Chưa thanh toán') debtAmount += orderTotal;
+        if (o.payment === 'Đã thanh toán') {
+          paidAmount += orderTotal;
+        } else {
+          unpaidAmount += orderTotal;
+          unpaidCount++;
+        }
       });
 
-      const unpaidOrders = filtered.filter(o => o.payment !== 'Đã thanh toán');
-      const unpaidCount = unpaidOrders.length;
+      // 1. Cập nhật thẻ Cột 1: Tổng chi phí in ấn
+      const statTotalCostEl = document.getElementById('stat-total-cost');
+      if (statTotalCostEl) {
+        statTotalCostEl.innerHTML = `${Number(totalCost).toLocaleString('vi-VN')}<span class="text-base sm:text-lg font-semibold ml-0.5 font-sans text-zinc-700">đ</span>`;
+      }
 
-      document.getElementById('stat-total-cost').innerText = formatMoney(totalCost);
-      document.getElementById('stat-total-orders').innerText = `${filtered.length} đơn hàng`;
-      document.getElementById('stat-debt').innerText = formatMoney(debtAmount);
+      const statTotalOrdersEl = document.getElementById('stat-total-orders');
+      if (statTotalOrdersEl) {
+        statTotalOrdersEl.innerText = `${filtered.length} đơn hàng`;
+      }
 
-      const btnSettle = document.getElementById('btnBatchSettleDebt');
+      const statPaidAmountEl = document.getElementById('stat-paid-amount');
+      if (statPaidAmountEl) {
+        statPaidAmountEl.innerText = formatMoney(paidAmount);
+      }
+
+      // 2. Cập nhật thẻ Cột 2: Công nợ xưởng chưa tất toán
+      const statDebtEl = document.getElementById('stat-debt');
+      if (statDebtEl) {
+        statDebtEl.innerHTML = `${Number(unpaidAmount).toLocaleString('vi-VN')}<span class="text-base sm:text-lg font-semibold ml-0.5 font-sans text-rose-600">đ</span>`;
+      }
+
       const badgeDebtCount = document.getElementById('stat-debt-count-badge');
-      if (btnSettle) {
-        if (debtAmount > 0) {
-          btnSettle.classList.remove('hidden');
-          const workshopFilter = document.getElementById('filterWorkshop') ? document.getElementById('filterWorkshop').value : '';
-          const monthFilter = document.getElementById('filterMonth') ? document.getElementById('filterMonth').value : '';
-          let label = `Quyết toán tất cả (${unpaidCount} đơn)`;
-          if (workshopFilter) label = `Quyết toán ${workshopFilter} (${unpaidCount} đơn)`;
-          else if (monthFilter) label = `Quyết toán Th.${monthFilter} (${unpaidCount} đơn)`;
-          document.getElementById('btnBatchSettleDebtLabel').innerText = label;
-          if (badgeDebtCount) {
-            badgeDebtCount.classList.remove('hidden');
-            badgeDebtCount.className = 'text-xs font-mono-val font-semibold px-2 py-0.5 rounded bg-rose-100 text-rose-800 border border-rose-200';
-            badgeDebtCount.innerText = `${unpaidCount} đơn nợ`;
-          }
+      if (badgeDebtCount) {
+        if (unpaidCount > 0) {
+          badgeDebtCount.className = 'text-xs font-mono-val font-semibold px-2 py-0.5 rounded bg-rose-100 text-rose-800 border border-rose-200 shrink-0';
+          badgeDebtCount.innerText = `${unpaidCount} đơn nợ`;
         } else {
-          btnSettle.classList.add('hidden');
-          if (badgeDebtCount) {
-            badgeDebtCount.classList.remove('hidden');
-            badgeDebtCount.className = 'text-xs font-mono-val font-semibold px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 border border-emerald-200';
-            badgeDebtCount.innerText = 'Sạch nợ';
-          }
+          badgeDebtCount.className = 'text-xs font-mono-val font-semibold px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 border border-emerald-200 shrink-0';
+          badgeDebtCount.innerText = 'Sạch nợ';
         }
       }
+
+      // 3. Cập nhật nút Quyết toán công nợ (căn phải, disabled khi sạch nợ)
+      const btnSettle = document.getElementById('btnBatchSettleDebt');
+      const labelSettle = document.getElementById('btnBatchSettleDebtLabel');
+      if (btnSettle) {
+        const monthFilter = document.getElementById('filterMonth') ? document.getElementById('filterMonth').value : '';
+        let label = `Quyết toán tất cả (${unpaidCount} đơn)`;
+        if (monthFilter) {
+          const monthNum = parseInt(monthFilter, 10);
+          label = `Quyết toán Th.${isNaN(monthNum) ? monthFilter : monthNum} (${unpaidCount} đơn)`;
+        }
+        if (labelSettle) labelSettle.innerText = label;
+
+        if (unpaidCount > 0) {
+          btnSettle.disabled = false;
+          btnSettle.classList.remove('opacity-40', 'cursor-not-allowed');
+          btnSettle.classList.add('cursor-pointer');
+        } else {
+          btnSettle.disabled = true;
+          btnSettle.classList.add('opacity-40', 'cursor-not-allowed');
+          btnSettle.classList.remove('cursor-pointer');
+        }
+      }
+
+      return { totalCost, paidAmount, unpaidAmount, unpaidCount };
+    }
+    window.updateStats = updateStats;
+    window.renderStats = updateStats;
+
+    function renderAll() {
+      const filtered = getFilteredOrders();
+      updateStats(filtered);
 
       const cardContainer = document.getElementById('cardViewContainer');
       const cardSelectionBar = document.getElementById('cardSelectionBar');
