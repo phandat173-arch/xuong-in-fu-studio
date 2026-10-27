@@ -100,6 +100,17 @@
     .custom-scrollbar::-webkit-scrollbar-thumb { background: #D4D4D8; border-radius: 2px; }
     .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #A1A1AA; }
 
+    /* Hide scrollbar on mobile horizontal toolbars while preserving smooth touch scroll */
+    @media (max-width: 640px) {
+      .mobile-scroll-strip {
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+      }
+      .mobile-scroll-strip::-webkit-scrollbar {
+        display: none;
+      }
+    }
+
     /* POS Button Touch feedback */
     .pos-btn {
       transition: all 0.12s ease;
@@ -117,7 +128,7 @@
     }
   </style>
 </head>
-<body class="min-h-screen flex flex-col selection:bg-zinc-900 selection:text-zinc-100">
+<body class="min-h-screen flex flex-col selection:bg-zinc-900 selection:text-zinc-100 overflow-x-hidden">
 
   <!-- Fixed Artistic Blurred Background Layer (Frosted Glass backdrop) -->
   <div id="appBackgroundContainer">
@@ -130,64 +141,72 @@
 
   <!-- Top Navigation Bar: Minimal Luxury Frosted Glass Style -->
   <header class="glass-panel border-b border-white/80 sticky top-0 z-30">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex flex-wrap justify-between items-center gap-4">
+    <div class="max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8 py-3 sm:py-3.5 flex flex-col sm:flex-row sm:flex-wrap justify-between items-stretch sm:items-center gap-2.5 sm:gap-4">
       
-      <!-- Brand & Studio Identity -->
-      <div class="flex items-center gap-3.5">
-        <div class="w-10 h-10 rounded-lg bg-zinc-950 text-zinc-100 flex items-center justify-center border border-zinc-800 shadow-xs">
-          <i class="fa-solid fa-camera-retro text-sm"></i>
-        </div>
-        <div>
-          <div class="flex items-center gap-2.5">
-            <h1 class="text-base font-brand font-bold tracking-wider text-zinc-950 uppercase">FU STUDIO</h1>
-            <span class="text-xs font-mono-val font-semibold px-2 py-0.5 rounded bg-white/70 text-zinc-700 border border-zinc-200/80 shadow-2xs">v7.0 Glass</span>
+      <!-- Top Row on Mobile: Brand Identity + Primary Action ("Lên Đơn Mới" on mobile) -->
+      <div class="flex items-center justify-between gap-3">
+        <div class="flex items-center gap-3 min-w-0">
+          <div class="w-10 h-10 shrink-0 rounded-lg bg-zinc-950 text-zinc-100 flex items-center justify-center border border-zinc-800 shadow-xs">
+            <i class="fa-solid fa-camera-retro text-sm"></i>
           </div>
-          <p class="text-xs text-zinc-500 font-medium">Hệ thống quản lý in ấn & đối soát công nợ xưởng</p>
+          <div class="min-w-0">
+            <div class="flex items-center gap-2">
+              <h1 class="text-base font-brand font-bold tracking-wider text-zinc-950 uppercase truncate">FU STUDIO</h1>
+              <span class="text-[11px] sm:text-xs font-mono-val font-semibold px-2 py-0.5 rounded bg-white/70 text-zinc-700 border border-zinc-200/80 shadow-2xs shrink-0">v7.0 Glass</span>
+            </div>
+            <p class="text-[11px] sm:text-xs text-zinc-500 font-medium truncate">Hệ thống quản lý in ấn & đối soát công nợ xưởng</p>
+          </div>
         </div>
+
+        <!-- Primary Action Button on Mobile (min-h 44px for easy thumb reach) -->
+        <button type="button" onclick="openModal()" class="sm:hidden min-h-[44px] bg-zinc-950 hover:bg-zinc-800 active:scale-[0.98] text-zinc-100 px-3.5 py-2.5 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 shadow-sm transition cursor-pointer border border-zinc-900 shrink-0">
+          <i class="fa-solid fa-plus text-xs text-zinc-300"></i>
+          <span>Lên Đơn Mới</span>
+        </button>
       </div>
 
-      <!-- Action Tools & Header Controls -->
-      <div class="flex items-center gap-2 flex-wrap">
+      <!-- Action Tools & Header Controls (Horizontal Scroll on Mobile, Clean Wrap on Desktop) -->
+      <div class="flex items-center gap-2 overflow-x-auto sm:overflow-visible sm:flex-wrap pb-0.5 sm:pb-0 mobile-scroll-strip custom-scrollbar">
         
         <!-- View Switcher (Card vs Table) -->
-        <div class="hidden sm:flex items-center bg-zinc-100/70 p-0.5 rounded-lg border border-zinc-200/80 mr-1 backdrop-blur-xs">
-          <button type="button" id="btnViewCard" onclick="switchView('card')" class="px-2.5 py-1.5 rounded-md text-xs font-medium transition flex items-center gap-1.5 bg-white text-zinc-900 shadow-xs cursor-pointer">
+        <div class="flex shrink-0 items-center bg-zinc-100/70 p-0.5 rounded-lg border border-zinc-200/80 mr-0.5 sm:mr-1 backdrop-blur-xs">
+          <button type="button" id="btnViewCard" onclick="switchView('card')" class="min-h-[36px] sm:min-h-0 px-2.5 py-1.5 rounded-md text-xs font-medium transition flex items-center gap-1.5 bg-white text-zinc-900 shadow-xs cursor-pointer whitespace-nowrap">
             <i class="fa-solid fa-grip text-xs"></i> Thẻ Studio
           </button>
-          <button type="button" id="btnViewTable" onclick="switchView('table')" class="px-2.5 py-1.5 rounded-md text-xs font-medium transition flex items-center gap-1.5 text-zinc-500 hover:text-zinc-900 cursor-pointer">
+          <button type="button" id="btnViewTable" onclick="switchView('table')" class="min-h-[36px] sm:min-h-0 px-2.5 py-1.5 rounded-md text-xs font-medium transition flex items-center gap-1.5 text-zinc-500 hover:text-zinc-900 cursor-pointer whitespace-nowrap">
             <i class="fa-solid fa-table-list text-xs"></i> Bảng Gọn
           </button>
         </div>
 
         <!-- Background Presets Modal Trigger (Đổi Nền Mờ) -->
-        <button type="button" onclick="openBgModal()" class="bg-white/80 hover:bg-white text-zinc-700 border border-zinc-200/80 px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5 transition cursor-pointer shadow-xs">
+        <button type="button" onclick="openBgModal()" class="shrink-0 min-h-[38px] sm:min-h-0 bg-white/80 hover:bg-white text-zinc-700 border border-zinc-200/80 px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5 transition cursor-pointer shadow-xs whitespace-nowrap">
           <i class="fa-solid fa-wand-magic-sparkles text-amber-600 text-xs"></i>
           <span>Đổi Nền Mờ</span>
         </button>
 
         <!-- Google Sheet Cloud Sync Button -->
-        <button type="button" id="btnCloudSync" onclick="openCloudModal()" class="bg-white/80 hover:bg-white text-zinc-700 border border-zinc-200/80 px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-2 transition cursor-pointer shadow-xs">
+        <button type="button" id="btnCloudSync" onclick="openCloudModal()" class="shrink-0 min-h-[38px] sm:min-h-0 bg-white/80 hover:bg-white text-zinc-700 border border-zinc-200/80 px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-2 transition cursor-pointer shadow-xs whitespace-nowrap">
           <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
           <span>Nối Google Sheet</span>
         </button>
 
         <!-- Quick Refresh from Cloud Button -->
-        <button type="button" onclick="syncFromCloud(true)" class="bg-white/80 hover:bg-white text-zinc-600 hover:text-zinc-900 w-8 h-8 rounded-lg text-xs flex items-center justify-center border border-zinc-200/80 shadow-xs transition cursor-pointer" title="Đồng bộ dữ liệu mới nhất từ Google Sheet">
+        <button type="button" onclick="syncFromCloud(true)" class="shrink-0 min-h-[38px] min-w-[38px] sm:min-h-0 sm:min-w-0 sm:w-8 sm:h-8 bg-white/80 hover:bg-white text-zinc-600 hover:text-zinc-900 rounded-lg text-xs flex items-center justify-center border border-zinc-200/80 shadow-xs transition cursor-pointer" title="Đồng bộ dữ liệu mới nhất từ Google Sheet">
           <i id="syncIcon" class="fa-solid fa-arrows-rotate text-xs"></i>
         </button>
 
         <!-- Catalog / Price Settings -->
-        <button type="button" onclick="openCatalogModal()" class="bg-white/80 hover:bg-white text-zinc-700 px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5 border border-zinc-200/80 shadow-xs transition cursor-pointer">
-          <i class="fa-solid fa-sliders text-zinc-500 text-xs"></i> <span class="hidden md:inline">Bảng Giá Mẫu</span>
+        <button type="button" onclick="openCatalogModal()" class="shrink-0 min-h-[38px] sm:min-h-0 bg-white/80 hover:bg-white text-zinc-700 px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5 border border-zinc-200/80 shadow-xs transition cursor-pointer whitespace-nowrap">
+          <i class="fa-solid fa-sliders text-zinc-500 text-xs"></i> <span>Bảng Giá Mẫu</span>
         </button>
 
         <!-- Export CSV Button -->
-        <button type="button" onclick="exportCSV()" class="bg-white/80 hover:bg-white text-zinc-700 px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5 border border-zinc-200/80 shadow-xs transition cursor-pointer">
-          <i class="fa-solid fa-file-arrow-down text-zinc-500 text-xs"></i> <span class="hidden md:inline">Xuất File</span>
+        <button type="button" onclick="exportCSV()" class="shrink-0 min-h-[38px] sm:min-h-0 bg-white/80 hover:bg-white text-zinc-700 px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5 border border-zinc-200/80 shadow-xs transition cursor-pointer whitespace-nowrap">
+          <i class="fa-solid fa-file-arrow-down text-zinc-500 text-xs"></i> <span>Xuất File</span>
         </button>
 
-        <!-- New Order Action Button (Minimal Luxury Obsidian Button) -->
-        <button type="button" onclick="openModal()" class="bg-zinc-950 hover:bg-zinc-800 text-zinc-100 px-3.5 py-1.5 rounded-lg text-xs font-medium flex items-center gap-2 shadow-xs transition cursor-pointer border border-zinc-900">
+        <!-- New Order Action Button on Desktop (min-h 44px for ergonomics) -->
+        <button type="button" onclick="openModal()" class="hidden sm:flex min-h-[44px] sm:min-h-[38px] bg-zinc-950 hover:bg-zinc-800 text-zinc-100 px-4 py-2 rounded-lg text-xs font-semibold items-center gap-2 shadow-xs transition cursor-pointer border border-zinc-900 shrink-0 whitespace-nowrap">
           <i class="fa-solid fa-plus text-xs text-zinc-300"></i> Lên Đơn Mới
         </button>
       </div>
@@ -195,18 +214,18 @@
   </header>
 
   <!-- Main Content Layout -->
-  <main class="max-w-7xl mx-auto w-full px-4 sm:px-6 py-6 space-y-6 flex-1">
+  <main class="max-w-7xl mx-auto w-full px-3.5 sm:px-6 lg:px-8 py-5 sm:py-7 space-y-5 sm:space-y-6 pb-24 flex-1">
     
     <!-- KPI Summary Bento Cards: Frosted Glass & Editorial Type-First -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5 lg:gap-6">
       
       <!-- Card 1: Tổng chi phí in -->
-      <div class="glass-panel p-5 rounded-xl shadow-xs flex flex-col justify-between">
+      <div class="glass-panel p-5 sm:p-6 rounded-xl shadow-xs flex flex-col justify-between">
         <div class="flex items-center justify-between">
           <span class="text-xs text-zinc-600 font-medium">Tổng chi phí in ấn</span>
         </div>
-        <div class="mt-2">
-          <div class="text-3xl font-light tracking-tight text-zinc-950 tabular-nums font-mono-val" id="stat-total-cost">0 đ</div>
+        <div class="mt-2.5">
+          <div class="text-2xl sm:text-3xl font-light tracking-tight text-zinc-950 tabular-nums font-mono-val" id="stat-total-cost">0 đ</div>
           <div class="inline-flex items-center gap-1.5 text-xs text-zinc-600 font-mono-val mt-2">
             <i class="fa-regular fa-folder-closed text-xs text-zinc-500"></i>
             <span id="stat-total-orders">0 đơn hàng</span>
@@ -215,21 +234,22 @@
       </div>
 
       <!-- Card 2: Công nợ xưởng (Purposeful Data Indication, Subtle Rose Tint & Glass) -->
-      <div class="glass-panel p-5 rounded-xl shadow-xs flex flex-col justify-between border-rose-200/70">
-        <div class="flex items-center justify-between">
+      <div class="glass-panel p-5 sm:p-6 rounded-xl shadow-xs flex flex-col justify-between border-rose-200/70">
+        <div class="flex items-center justify-between gap-2">
           <span class="text-xs text-rose-700 font-semibold flex items-center gap-1.5">
             <span class="w-1.5 h-1.5 rounded-full bg-rose-600"></span> Công nợ xưởng chưa tất toán
           </span>
-          <span id="stat-debt-count-badge" class="text-xs font-mono-val font-semibold px-2 py-0.5 rounded bg-rose-100 text-rose-800 border border-rose-200 hidden">0 đơn nợ</span>
+          <span id="stat-debt-count-badge" class="text-xs font-mono-val font-semibold px-2 py-0.5 rounded bg-rose-100 text-rose-800 border border-rose-200 hidden shrink-0">0 đơn nợ</span>
         </div>
-        <div class="mt-2">
-          <div class="text-3xl font-light tracking-tight text-rose-700 tabular-nums font-mono-val" id="stat-debt">0 đ</div>
-          <div class="flex flex-wrap items-center justify-between gap-2 mt-2 pt-2 border-t border-rose-100/80">
+        <div class="mt-2.5">
+          <div class="text-2xl sm:text-3xl font-light tracking-tight text-rose-700 tabular-nums font-mono-val" id="stat-debt">0 đ</div>
+          <div class="flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center justify-between gap-2.5 mt-3 pt-2.5 border-t border-rose-100/80">
             <div class="text-xs text-zinc-600 flex items-center gap-1.5">
               <i class="fa-solid fa-arrow-pointer text-xs text-zinc-400"></i>
               <span>Chạm nhãn để gạch nợ từng đơn lẻ</span>
             </div>
-            <button type="button" onclick="batchSettleDebt()" id="btnBatchSettleDebt" class="px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold shadow-xs transition flex items-center gap-1.5 cursor-pointer hidden" title="Gạch nợ toàn bộ các đơn đang hiển thị mà không cần bấm từng đơn">
+            <!-- Nút Quyết toán (min-h 44px cho thao tác ngón cái dễ dàng trên điện thoại) -->
+            <button type="button" onclick="batchSettleDebt()" id="btnBatchSettleDebt" class="min-h-[44px] sm:min-h-[38px] w-full sm:w-auto justify-center px-4 py-2.5 sm:py-2 rounded-xl sm:rounded-lg bg-rose-600 hover:bg-rose-700 active:scale-[0.99] text-white text-xs font-semibold shadow-xs transition flex items-center gap-2 cursor-pointer hidden" title="Gạch nợ toàn bộ các đơn đang hiển thị mà không cần bấm từng đơn">
               <i class="fa-solid fa-receipt text-xs"></i>
               <span id="btnBatchSettleDebtLabel">Quyết toán & Gạch nợ toàn bộ</span>
             </button>
@@ -239,86 +259,89 @@
     </div>
 
     <!-- Smart Filter & Search Bar: Frosted Glass -->
-    <div class="glass-panel p-3 rounded-xl shadow-xs flex flex-col lg:flex-row gap-3 items-stretch lg:items-center justify-between">
+    <div class="glass-panel p-3 sm:p-3.5 rounded-xl shadow-xs flex flex-col lg:flex-row gap-3 items-stretch lg:items-center justify-between">
       
-      <!-- Quick Status Filter (Lọc theo công nợ) -->
-      <div class="flex items-center gap-1.5 overflow-x-auto pb-1 lg:pb-0 custom-scrollbar">
-        <button type="button" onclick="setQuickPaymentFilter('')" data-pay="" class="pay-pill bg-zinc-900 text-white text-xs font-medium px-3.5 py-1.5 rounded-md transition whitespace-nowrap flex items-center gap-2 cursor-pointer shadow-xs border border-zinc-900">
+      <!-- Quick Status Filter (Lọc theo công nợ - Cuộn ngang mượt mà trên Mobile) -->
+      <div class="flex items-center gap-1.5 overflow-x-auto pb-0.5 lg:pb-0 mobile-scroll-strip custom-scrollbar">
+        <button type="button" onclick="setQuickPaymentFilter('')" data-pay="" class="pay-pill shrink-0 min-h-[38px] sm:min-h-0 bg-zinc-900 text-white text-xs font-medium px-3.5 py-2 sm:py-1.5 rounded-lg sm:rounded-md transition whitespace-nowrap flex items-center gap-2 cursor-pointer shadow-xs border border-zinc-900">
           Tất cả đơn
         </button>
-        <button type="button" onclick="setQuickPaymentFilter('Chưa thanh toán')" data-pay="Chưa thanh toán" class="pay-pill bg-white/80 hover:bg-white text-zinc-600 hover:text-zinc-900 text-xs font-medium px-3.5 py-1.5 rounded-md transition whitespace-nowrap flex items-center gap-1.5 cursor-pointer border border-zinc-200/80 shadow-2xs">
+        <button type="button" onclick="setQuickPaymentFilter('Chưa thanh toán')" data-pay="Chưa thanh toán" class="pay-pill shrink-0 min-h-[38px] sm:min-h-0 bg-white/80 hover:bg-white text-zinc-600 hover:text-zinc-900 text-xs font-medium px-3.5 py-2 sm:py-1.5 rounded-lg sm:rounded-md transition whitespace-nowrap flex items-center gap-1.5 cursor-pointer border border-zinc-200/80 shadow-2xs">
           <span class="w-1.5 h-1.5 rounded-full bg-rose-600"></span> Chưa thanh toán (Nợ xưởng)
         </button>
-        <button type="button" onclick="setQuickPaymentFilter('Đã thanh toán')" data-pay="Đã thanh toán" class="pay-pill bg-white/80 hover:bg-white text-zinc-600 hover:text-zinc-900 text-xs font-medium px-3.5 py-1.5 rounded-md transition whitespace-nowrap flex items-center gap-1.5 cursor-pointer border border-zinc-200/80 shadow-2xs">
+        <button type="button" onclick="setQuickPaymentFilter('Đã thanh toán')" data-pay="Đã thanh toán" class="pay-pill shrink-0 min-h-[38px] sm:min-h-0 bg-white/80 hover:bg-white text-zinc-600 hover:text-zinc-900 text-xs font-medium px-3.5 py-2 sm:py-1.5 rounded-lg sm:rounded-md transition whitespace-nowrap flex items-center gap-1.5 cursor-pointer border border-zinc-200/80 shadow-2xs">
           <span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span> Đã thanh toán
         </button>
       </div>
 
-      <!-- Search, Month & Workshop Selectors -->
-      <div class="flex flex-wrap items-center gap-2">
-        <div class="relative flex-1 min-w-[200px]">
+      <!-- Search, Month & Workshop Selectors (Tự động co giãn & cuộn ngang trên Mobile) -->
+      <div class="flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center gap-2.5 sm:gap-2">
+        <div class="relative w-full sm:w-auto sm:flex-1 sm:min-w-[200px]">
           <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 text-xs"></i>
-          <input type="text" id="searchInput" oninput="renderAll()" placeholder="Tìm mã FU, Dâu Rể..." class="w-full pl-8 pr-3 py-1.5 text-xs font-medium bg-white/70 border border-zinc-200/80 rounded-md focus:bg-white focus:border-zinc-900 outline-none transition backdrop-blur-xs">
+          <input type="text" id="searchInput" oninput="renderAll()" placeholder="Tìm mã FU, Dâu Rể..." class="w-full min-h-[42px] sm:min-h-0 pl-8 pr-3 py-2 sm:py-1.5 text-xs font-medium bg-white/70 border border-zinc-200/80 rounded-lg sm:rounded-md focus:bg-white focus:border-zinc-900 outline-none transition backdrop-blur-xs">
         </div>
 
-        <!-- Workshop Filter (Lọc theo xưởng) -->
-        <select id="filterWorkshop" onchange="renderAll()" class="text-xs font-medium border border-zinc-200/80 rounded-md px-2.5 py-1.5 bg-white/70 text-zinc-700 outline-none focus:bg-white focus:border-zinc-900 cursor-pointer backdrop-blur-xs">
-          <option value="">Tất cả xưởng</option>
-          <option value="TPS">Xưởng TPS</option>
-          <option value="Xưởng Khung">Xưởng Khung</option>
-          <option value="Lab Sài Gòn">Lab Sài Gòn</option>
-        </select>
+        <div class="flex items-center gap-2 overflow-x-auto pb-0.5 sm:pb-0 mobile-scroll-strip custom-scrollbar">
+          <!-- Workshop Filter (Lọc theo xưởng) -->
+          <select id="filterWorkshop" onchange="renderAll()" class="shrink-0 min-h-[40px] sm:min-h-0 text-xs font-medium border border-zinc-200/80 rounded-lg sm:rounded-md px-2.5 py-1.5 bg-white/70 text-zinc-700 outline-none focus:bg-white focus:border-zinc-900 cursor-pointer backdrop-blur-xs">
+            <option value="">Tất cả xưởng</option>
+            <option value="TPS">Xưởng TPS</option>
+            <option value="Xưởng Khung">Xưởng Khung</option>
+            <option value="Lab Sài Gòn">Lab Sài Gòn</option>
+          </select>
 
-        <select id="filterMonth" onchange="renderAll()" class="text-xs font-medium border border-zinc-200/80 rounded-md px-2.5 py-1.5 bg-white/70 text-zinc-700 outline-none focus:bg-white focus:border-zinc-900 cursor-pointer backdrop-blur-xs">
-          <option value="">Toàn bộ tháng</option>
-          <option value="1">Tháng 01</option>
-          <option value="2">Tháng 02</option>
-          <option value="3">Tháng 03</option>
-          <option value="4">Tháng 04</option>
-          <option value="5">Tháng 05</option>
-          <option value="6">Tháng 06</option>
-          <option value="7">Tháng 07</option>
-          <option value="8">Tháng 08</option>
-          <option value="9">Tháng 09</option>
-          <option value="10">Tháng 10</option>
-          <option value="11">Tháng 11</option>
-          <option value="12">Tháng 12</option>
-        </select>
+          <select id="filterMonth" onchange="renderAll()" class="shrink-0 min-h-[40px] sm:min-h-0 text-xs font-medium border border-zinc-200/80 rounded-lg sm:rounded-md px-2.5 py-1.5 bg-white/70 text-zinc-700 outline-none focus:bg-white focus:border-zinc-900 cursor-pointer backdrop-blur-xs">
+            <option value="">Toàn bộ tháng</option>
+            <option value="1">Tháng 01</option>
+            <option value="2">Tháng 02</option>
+            <option value="3">Tháng 03</option>
+            <option value="4">Tháng 04</option>
+            <option value="5">Tháng 05</option>
+            <option value="6">Tháng 06</option>
+            <option value="7">Tháng 07</option>
+            <option value="8">Tháng 08</option>
+            <option value="9">Tháng 09</option>
+            <option value="10">Tháng 10</option>
+            <option value="11">Tháng 11</option>
+            <option value="12">Tháng 12</option>
+          </select>
 
-        <button type="button" onclick="resetFilters()" class="text-xs text-zinc-400 hover:text-zinc-700 px-2 py-1.5 cursor-pointer transition" title="Xoá bộ lọc">
-          <i class="fa-solid fa-rotate-right"></i>
-        </button>
+          <button type="button" onclick="resetFilters()" class="shrink-0 min-h-[40px] min-w-[36px] sm:min-h-0 sm:min-w-0 text-xs text-zinc-400 hover:text-zinc-700 px-2.5 py-1.5 rounded-lg sm:rounded-md bg-white/50 sm:bg-transparent border border-zinc-200/60 sm:border-0 cursor-pointer transition flex items-center justify-center" title="Xoá bộ lọc">
+            <i class="fa-solid fa-rotate-right"></i>
+          </button>
 
-        <div class="h-4 w-px bg-zinc-200/80 mx-0.5 hidden sm:block"></div>
+          <div class="h-4 w-px bg-zinc-200/80 mx-0.5 shrink-0"></div>
 
-        <!-- Nút Tổng Hợp Zalo Toàn Bộ Đơn Đang Lọc -->
-        <button type="button" onclick="openBatchZaloModal()" class="text-xs font-medium px-2.5 py-1.5 rounded-md bg-white/80 hover:bg-white text-zinc-800 border border-zinc-200/80 shadow-2xs transition flex items-center gap-1.5 cursor-pointer backdrop-blur-xs hover:border-zinc-400" title="Tổng hợp toàn bộ các đơn đang lọc thành 1 tin nhắn gửi Zalo cho xưởng">
-          <i class="fa-solid fa-comments text-sky-600 text-xs"></i>
-          <span>Tổng hợp Zalo</span>
-        </button>
+          <!-- Nút Tổng Hợp Zalo Toàn Bộ Đơn Đang Lọc (min-h 44px trên mobile) -->
+          <button type="button" onclick="openBatchZaloModal()" class="shrink-0 min-h-[44px] sm:min-h-0 text-xs font-semibold sm:font-medium px-3.5 sm:px-2.5 py-2 sm:py-1.5 rounded-xl sm:rounded-md bg-white/80 hover:bg-white text-zinc-800 border border-zinc-200/80 shadow-2xs transition flex items-center gap-1.5 cursor-pointer backdrop-blur-xs hover:border-zinc-400 whitespace-nowrap" title="Tổng hợp toàn bộ các đơn đang lọc thành 1 tin nhắn gửi Zalo cho xưởng">
+            <i class="fa-solid fa-comments text-sky-600 text-xs"></i>
+            <span>Tổng hợp Zalo</span>
+          </button>
 
-        <!-- Nút Cài Đặt Mẫu Tin Nhắn Mặc Định -->
-        <button type="button" onclick="openZaloConfigModal()" class="text-xs font-medium px-2.5 py-1.5 rounded-md bg-white/80 hover:bg-white text-zinc-600 hover:text-zinc-900 border border-zinc-200/80 shadow-2xs transition flex items-center gap-1.5 cursor-pointer backdrop-blur-xs hover:border-zinc-400" title="Cài đặt mẫu tin nhắn Zalo mặc định">
-          <i class="fa-solid fa-sliders text-zinc-500 text-xs"></i>
-          <span>Mẫu tin</span>
-        </button>
+          <!-- Nút Cài Đặt Mẫu Tin Nhắn Mặc Định -->
+          <button type="button" onclick="openZaloConfigModal()" class="shrink-0 min-h-[40px] sm:min-h-0 text-xs font-medium px-3 sm:px-2.5 py-1.5 rounded-lg sm:rounded-md bg-white/80 hover:bg-white text-zinc-600 hover:text-zinc-900 border border-zinc-200/80 shadow-2xs transition flex items-center gap-1.5 cursor-pointer backdrop-blur-xs hover:border-zinc-400 whitespace-nowrap" title="Cài đặt mẫu tin nhắn Zalo mặc định">
+            <i class="fa-solid fa-sliders text-zinc-500 text-xs"></i>
+            <span>Mẫu tin</span>
+          </button>
+        </div>
       </div>
     </div>
 
     <!-- VIEW 1: MODERN STUDIO CARDS GRID (Default) -->
     <!-- Card Selection Bar for Studio Cards View -->
-    <div id="cardSelectionBar" class="flex items-center justify-between px-3.5 py-2 mb-3 text-xs bg-white/70 border border-zinc-200/80 rounded-xl backdrop-blur-xs shadow-2xs">
-      <label class="flex items-center gap-2.5 cursor-pointer font-medium hover:text-zinc-900 select-none" title="Chọn tất cả các đơn trong trang">
-        <input type="checkbox" id="selectAllCardsCheckbox" onchange="toggleSelectAllOrders(this.checked)" class="rounded border-zinc-300 text-zinc-950 focus:ring-0 cursor-pointer scale-110">
+    <div id="cardSelectionBar" class="flex items-center justify-between px-4 py-2.5 mb-3 text-xs bg-white/70 border border-zinc-200/80 rounded-xl backdrop-blur-xs shadow-2xs">
+      <label class="flex items-center gap-2.5 cursor-pointer font-medium hover:text-zinc-900 select-none min-h-[28px]" title="Chọn tất cả các đơn trong trang">
+        <input type="checkbox" id="selectAllCardsCheckbox" onchange="toggleSelectAllOrders(this.checked)" class="w-4 h-4 rounded border-zinc-300 text-zinc-950 focus:ring-0 cursor-pointer">
         <span class="text-xs font-semibold text-zinc-800">Chọn tất cả (<span id="selectAllCardsCount">0</span> đơn)</span>
       </label>
       <div class="flex items-center gap-3">
         <span class="text-[11px] text-zinc-400 hidden sm:inline">Chạm vào đơn để chọn gạch nợ hàng loạt</span>
-        <button type="button" onclick="clearSelectedOrders()" class="text-zinc-500 hover:text-rose-600 text-xs font-medium cursor-pointer transition">Bỏ chọn</button>
+        <button type="button" onclick="clearSelectedOrders()" class="text-zinc-500 hover:text-rose-600 text-xs font-medium cursor-pointer transition py-1 px-2">Bỏ chọn</button>
       </div>
     </div>
 
-    <div id="cardViewContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 items-start">
+    <!-- Desktop: Căn chỉnh padding/gap cân đối (gap-5 lg:gap-6) | Mobile: 1 cột duy nhất full width (grid-cols-1) -->
+    <div id="cardViewContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 lg:gap-6 items-stretch w-full">
       <!-- Dynamic Cards Rendered by JS -->
     </div>
 
@@ -328,7 +351,7 @@
         <table class="w-full text-left text-sm text-zinc-700">
           <thead class="bg-white/40 text-xs font-mono-val font-medium text-zinc-600 border-b border-zinc-200/70">
             <tr>
-              <th class="py-3 px-3 w-8 text-center"><input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAllOrders(this.checked)" class="rounded border-zinc-300 text-zinc-950 focus:ring-0 cursor-pointer" title="Chọn tất cả để gạch nợ"></th>
+              <th class="py-3 px-3 w-8 text-center"><input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAllOrders(this.checked)" class="w-4 h-4 rounded border-zinc-300 text-zinc-950 focus:ring-0 cursor-pointer" title="Chọn tất cả để gạch nợ"></th>
               <th class="py-3 px-4">Hợp đồng / Dâu rể</th>
               <th class="py-3 px-4">Ngày gửi</th>
               <th class="py-3 px-4">Chi tiết sản phẩm in</th>
@@ -352,19 +375,19 @@
     </div>
 
     <!-- Floating Batch Actions Bar (Khi chọn checkbox các đơn) -->
-    <div id="floatingBatchBar" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 hidden">
-      <div class="glass-panel bg-zinc-950/95 text-white px-5 py-3 rounded-2xl shadow-2xl border border-white/20 flex items-center gap-4 backdrop-blur-xl animate-fade-in">
-        <div class="flex items-center gap-2">
-          <span class="w-6 h-6 rounded-full bg-rose-600 text-white flex items-center justify-center text-xs font-mono-val font-bold" id="batchSelectedCount">0</span>
-          <span class="text-xs text-zinc-300">đã chọn • Nợ: <b id="batchSelectedDebt" class="text-rose-400 font-mono-val">0 đ</b></span>
+    <div id="floatingBatchBar" class="fixed bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 z-40 w-[calc(100%-1.5rem)] sm:w-auto max-w-lg hidden">
+      <div class="glass-panel bg-zinc-950/95 text-white px-4 sm:px-5 py-3 rounded-2xl shadow-2xl border border-white/20 flex flex-wrap sm:flex-nowrap items-center justify-between gap-3 sm:gap-4 backdrop-blur-xl animate-fade-in">
+        <div class="flex items-center gap-2 min-w-0">
+          <span class="w-6 h-6 shrink-0 rounded-full bg-rose-600 text-white flex items-center justify-center text-xs font-mono-val font-bold" id="batchSelectedCount">0</span>
+          <span class="text-xs text-zinc-300 truncate">đã chọn • Nợ: <b id="batchSelectedDebt" class="text-rose-400 font-mono-val">0 đ</b></span>
         </div>
-        <div class="h-4 w-px bg-zinc-700"></div>
-        <div class="flex items-center gap-2">
-          <button type="button" onclick="settleSelectedOrders()" class="px-3.5 py-1.5 bg-rose-600 hover:bg-rose-500 text-white text-xs font-semibold rounded-lg transition shadow-xs flex items-center gap-1.5 cursor-pointer">
+        <div class="h-4 w-px bg-zinc-700 hidden sm:block"></div>
+        <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+          <button type="button" onclick="settleSelectedOrders()" class="min-h-[44px] sm:min-h-0 flex-1 sm:flex-initial justify-center px-4 py-2.5 sm:py-1.5 bg-rose-600 hover:bg-rose-500 active:scale-[0.99] text-white text-xs font-semibold rounded-xl sm:rounded-lg transition shadow-xs flex items-center gap-1.5 cursor-pointer">
             <i class="fa-solid fa-check text-xs"></i>
             <span>Gạch nợ đơn đã chọn</span>
           </button>
-          <button type="button" onclick="clearSelectedOrders()" class="px-2.5 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs font-medium rounded-lg transition cursor-pointer">
+          <button type="button" onclick="clearSelectedOrders()" class="min-h-[44px] sm:min-h-0 px-3 py-2.5 sm:py-1.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs font-medium rounded-xl sm:rounded-lg transition cursor-pointer shrink-0">
             Bỏ chọn
           </button>
         </div>
@@ -1874,14 +1897,14 @@ function createJsonResponse(obj) {
         cardContainer.classList.remove('hidden');
         if (cardSelectionBar) cardSelectionBar.classList.remove('hidden');
         tableContainer.classList.add('hidden');
-        btnCard.className = 'px-2.5 py-1.5 rounded-md text-xs font-medium transition flex items-center gap-1.5 bg-white text-zinc-900 shadow-xs cursor-pointer';
-        btnTable.className = 'px-2.5 py-1.5 rounded-md text-xs font-medium transition flex items-center gap-1.5 text-zinc-500 hover:text-zinc-900 cursor-pointer';
+        btnCard.className = 'min-h-[36px] sm:min-h-0 px-2.5 py-1.5 rounded-md text-xs font-medium transition flex items-center gap-1.5 bg-white text-zinc-900 shadow-xs cursor-pointer whitespace-nowrap';
+        btnTable.className = 'min-h-[36px] sm:min-h-0 px-2.5 py-1.5 rounded-md text-xs font-medium transition flex items-center gap-1.5 text-zinc-500 hover:text-zinc-900 cursor-pointer whitespace-nowrap';
       } else {
         cardContainer.classList.add('hidden');
         if (cardSelectionBar) cardSelectionBar.classList.add('hidden');
         tableContainer.classList.remove('hidden');
-        btnTable.className = 'px-2.5 py-1.5 rounded-md text-xs font-medium transition flex items-center gap-1.5 bg-white text-zinc-900 shadow-xs cursor-pointer';
-        btnCard.className = 'px-2.5 py-1.5 rounded-md text-xs font-medium transition flex items-center gap-1.5 text-zinc-500 hover:text-zinc-900 cursor-pointer';
+        btnTable.className = 'min-h-[36px] sm:min-h-0 px-2.5 py-1.5 rounded-md text-xs font-medium transition flex items-center gap-1.5 bg-white text-zinc-900 shadow-xs cursor-pointer whitespace-nowrap';
+        btnCard.className = 'min-h-[36px] sm:min-h-0 px-2.5 py-1.5 rounded-md text-xs font-medium transition flex items-center gap-1.5 text-zinc-500 hover:text-zinc-900 cursor-pointer whitespace-nowrap';
       }
       syncSelectionUI();
     }
@@ -1890,9 +1913,9 @@ function createJsonResponse(obj) {
       currentPaymentQuickFilter = pay;
       document.querySelectorAll('.pay-pill').forEach(btn => {
         if (btn.getAttribute('data-pay') === pay) {
-          btn.className = 'pay-pill bg-zinc-900 text-white text-xs font-medium px-3.5 py-1.5 rounded-md transition whitespace-nowrap flex items-center gap-2 cursor-pointer shadow-xs border border-zinc-900';
+          btn.className = 'pay-pill shrink-0 min-h-[38px] sm:min-h-0 bg-zinc-900 text-white text-xs font-medium px-3.5 py-2 sm:py-1.5 rounded-lg sm:rounded-md transition whitespace-nowrap flex items-center gap-2 cursor-pointer shadow-xs border border-zinc-900';
         } else {
-          btn.className = 'pay-pill bg-white/80 hover:bg-white text-zinc-600 hover:text-zinc-900 text-xs font-medium px-3.5 py-1.5 rounded-md transition whitespace-nowrap flex items-center gap-1.5 cursor-pointer border border-zinc-200/80 shadow-2xs';
+          btn.className = 'pay-pill shrink-0 min-h-[38px] sm:min-h-0 bg-white/80 hover:bg-white text-zinc-600 hover:text-zinc-900 text-xs font-medium px-3.5 py-2 sm:py-1.5 rounded-lg sm:rounded-md transition whitespace-nowrap flex items-center gap-1.5 cursor-pointer border border-zinc-200/80 shadow-2xs';
         }
       });
       renderAll();
@@ -1903,10 +1926,10 @@ function createJsonResponse(obj) {
       const btn = document.getElementById('btnCloudSync');
       if (!btn) return;
       if (gasUrl) {
-        btn.className = 'bg-emerald-50/90 hover:bg-emerald-100 text-emerald-900 border border-emerald-300/80 px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-2 transition cursor-pointer shadow-xs';
-        btn.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse"></span> <span class="hidden sm:inline">Google Sheet Sync</span><span class="sm:hidden">Online</span>`;
+        btn.className = 'shrink-0 min-h-[38px] sm:min-h-0 bg-emerald-50/90 hover:bg-emerald-100 text-emerald-900 border border-emerald-300/80 px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-2 transition cursor-pointer shadow-xs whitespace-nowrap';
+        btn.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse"></span> <span>Google Sheet Sync</span>`;
       } else {
-        btn.className = 'bg-white/80 hover:bg-white text-zinc-700 border border-zinc-200/80 px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-2 transition cursor-pointer shadow-xs';
+        btn.className = 'shrink-0 min-h-[38px] sm:min-h-0 bg-white/80 hover:bg-white text-zinc-700 border border-zinc-200/80 px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-2 transition cursor-pointer shadow-xs whitespace-nowrap';
         btn.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> <span>Nối Google Sheet</span>`;
       }
     }
@@ -3236,15 +3259,15 @@ Lưu ý: Anh em thợ kiểm tra kỹ danh sách và xác nhận giúp FU Studio
       showToast('Đã khôi phục mẫu tin nhắn gốc thành công! ✅', 'info');
     }
 
-    // Nút gạch nợ công nợ xưởng 1 chạm dạng pill cao cấp, thanh lịch, mượt mà
+    // Nút gạch nợ công nợ xưởng 1 chạm dạng pill cao cấp, thanh lịch, mượt mà (đảm bảo min-h-44px trên mobile)
     function getPaymentBadgeHtml(o) {
       if (o.payment === 'Đã thanh toán') {
-        return `<button type="button" onclick="togglePayment(${o.id})" title="Chạm nếu muốn hoàn tác về nợ xưởng" class="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 hover:bg-emerald-100 transition cursor-pointer shadow-2xs whitespace-nowrap">
+        return `<button type="button" onclick="togglePayment(${o.id})" title="Chạm nếu muốn hoàn tác về nợ xưởng" class="inline-flex items-center justify-center gap-1.5 min-h-[44px] sm:min-h-[32px] px-3.5 sm:px-2.5 py-2 sm:py-1 text-xs font-medium rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 hover:bg-emerald-100 transition cursor-pointer shadow-2xs whitespace-nowrap">
           <i class="fa-solid fa-check text-[10px] text-emerald-600"></i>
           <span>Đã thanh toán</span>
         </button>`;
       }
-      return `<button type="button" onclick="togglePayment(${o.id})" title="Chạm 1 lần để gạch nợ đơn này" class="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold rounded-full bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100 hover:border-rose-300 transition cursor-pointer shadow-2xs whitespace-nowrap">
+      return `<button type="button" onclick="togglePayment(${o.id})" title="Chạm 1 lần để gạch nợ đơn này" class="inline-flex items-center justify-center gap-1.5 min-h-[44px] sm:min-h-[32px] px-3.5 sm:px-2.5 py-2 sm:py-1 text-xs font-semibold rounded-full bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100 hover:border-rose-300 transition cursor-pointer shadow-2xs whitespace-nowrap">
         <span class="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse"></span>
         <span>Chưa thanh toán</span>
       </button>`;
@@ -3342,14 +3365,14 @@ Lưu ý: Anh em thợ kiểm tra kỹ danh sách và xác nhận giúp FU Studio
         const paymentBadge = getPaymentBadgeHtml(o);
 
         const driveBtnHtml = o.driveUrl ? `
-          <a href="${o.driveUrl}" target="_blank" rel="noopener noreferrer" class="h-7 px-2 rounded-md bg-white/80 hover:bg-white text-zinc-700 hover:text-emerald-700 border border-zinc-200/90 flex items-center gap-1.5 text-xs font-medium transition shadow-2xs" title="Mở Google Drive file in">
+          <a href="${o.driveUrl}" target="_blank" rel="noopener noreferrer" class="min-h-[44px] sm:min-h-0 sm:h-7 px-3 sm:px-2.5 py-2 sm:py-0 rounded-lg sm:rounded-md bg-white/85 hover:bg-white text-zinc-700 hover:text-emerald-700 border border-zinc-200/90 flex items-center justify-center gap-1.5 text-xs font-medium transition shadow-2xs shrink-0" title="Mở Google Drive file in">
             <i class="fa-brands fa-google-drive text-emerald-600 text-xs"></i>
             <span>Drive</span>
           </a>
         ` : '';
 
         const zaloBtnHtml = `
-          <button type="button" onclick="openZaloModal(${o.id})" class="h-7 px-2 rounded-md bg-white/80 hover:bg-sky-50 text-zinc-700 hover:text-sky-700 border border-zinc-200/90 flex items-center gap-1.5 text-xs font-medium transition cursor-pointer shadow-2xs" title="Xem & soạn tin nhắn gửi Zalo cho xưởng">
+          <button type="button" onclick="openZaloModal(${o.id})" class="min-h-[44px] sm:min-h-0 sm:h-7 px-3.5 sm:px-2.5 py-2 sm:py-0 rounded-lg sm:rounded-md bg-white/85 hover:bg-sky-50 text-zinc-800 hover:text-sky-700 border border-zinc-200/90 flex items-center justify-center gap-1.5 text-xs font-semibold sm:font-medium transition cursor-pointer shadow-2xs shrink-0" title="Xem & soạn tin nhắn gửi Zalo cho xưởng">
             <i class="fa-solid fa-paper-plane text-sky-600 text-xs"></i>
             <span>Zalo</span>
           </button>
@@ -3365,12 +3388,12 @@ Lưu ý: Anh em thợ kiểm tra kỹ danh sách và xác nhận giúp FU Studio
         let cardItemsHtml = '';
         (o.items || []).forEach(it => {
           cardItemsHtml += `
-            <div class="flex items-center justify-between gap-2 py-1.5 border-b border-zinc-100/80 last:border-0 text-xs">
-              <div class="font-medium text-zinc-800 flex items-center gap-2">
-                <span class="px-1.5 py-0.5 rounded bg-zinc-100/90 text-zinc-800 font-mono-val font-semibold text-xs border border-zinc-200/80">${it.qty}×</span>
-                <span class="truncate max-w-[200px]">${it.name}</span>
+            <div class="flex items-center justify-between gap-2.5 py-2 sm:py-1.5 border-b border-zinc-100/80 last:border-0 text-[13px] sm:text-xs">
+              <div class="font-medium text-zinc-800 flex items-center gap-2 min-w-0">
+                <span class="px-1.5 py-0.5 rounded bg-zinc-100/90 text-zinc-800 font-mono-val font-semibold text-xs border border-zinc-200/80 shrink-0">${it.qty}×</span>
+                <span class="leading-snug break-words sm:truncate sm:max-w-[215px]">${it.name}</span>
               </div>
-              <span class="font-mono-val font-medium text-zinc-700 whitespace-nowrap tabular-nums text-xs">${formatMoney(it.qty * it.price)}</span>
+              <span class="font-mono-val font-semibold sm:font-medium text-zinc-900 sm:text-zinc-700 whitespace-nowrap tabular-nums text-sm sm:text-xs shrink-0">${formatMoney(it.qty * it.price)}</span>
             </div>
           `;
         });
@@ -3379,43 +3402,43 @@ Lưu ý: Anh em thợ kiểm tra kỹ danh sách và xác nhận giúp FU Studio
 
         const card = document.createElement('div');
         card.id = `card-order-${o.id}`;
-        card.className = `studio-card rounded-xl flex flex-col justify-between overflow-hidden h-full transition-all duration-150 ${isSelected ? 'ring-2 ring-zinc-950 border-zinc-900 bg-white shadow-md' : ''}`;
+        card.className = `studio-card rounded-2xl sm:rounded-xl flex flex-col justify-between overflow-hidden h-full transition-all duration-150 ${isSelected ? 'ring-2 ring-zinc-950 border-zinc-900 bg-white shadow-md' : ''}`;
         card.innerHTML = `
           <div>
             <!-- Card Header -->
-            <div class="p-3.5 border-b border-zinc-200/60 bg-white/40 space-y-1.5">
-              <div class="flex items-center justify-between gap-2">
-                <label class="flex items-center gap-1.5 flex-wrap cursor-pointer select-none" title="Chạm để chọn đơn này">
-                  <input type="checkbox" class="order-cb order-cb-card rounded border-zinc-300 text-zinc-950 focus:ring-0 cursor-pointer mr-0.5 scale-110" data-id="${o.id}" data-debt="${o.payment !== 'Đã thanh toán' ? orderTotal : 0}" ${isSelected ? 'checked' : ''} onchange="onOrderCheckboxChange(${o.id}, this.checked)">
-                  <span class="text-xs font-mono-val font-semibold px-2 py-0.5 rounded bg-zinc-950 text-zinc-100 tracking-wide">${o.code}</span>
-                  <span class="text-xs font-mono-val px-1.5 py-0.5 rounded bg-white/80 text-zinc-700 border border-zinc-200">${o.workshop}</span>
+            <div class="p-4 sm:p-4 border-b border-zinc-200/60 bg-white/40 space-y-2">
+              <div class="flex items-start sm:items-center justify-between gap-2">
+                <label class="flex items-center gap-1.5 flex-wrap cursor-pointer select-none min-h-[36px] sm:min-h-0" title="Chạm để chọn đơn này">
+                  <input type="checkbox" class="order-cb order-cb-card rounded border-zinc-300 text-zinc-950 focus:ring-0 cursor-pointer mr-1 w-4 h-4 sm:w-3.5 sm:h-3.5 scale-110" data-id="${o.id}" data-debt="${o.payment !== 'Đã thanh toán' ? orderTotal : 0}" ${isSelected ? 'checked' : ''} onchange="onOrderCheckboxChange(${o.id}, this.checked)">
+                  <span class="text-sm sm:text-xs font-mono-val font-bold px-2.5 py-1 sm:py-0.5 rounded-md bg-zinc-950 text-zinc-100 tracking-wider shadow-2xs">${o.code}</span>
+                  <span class="text-xs font-mono-val font-semibold px-2 py-0.5 rounded bg-white/85 text-zinc-700 border border-zinc-200">${o.workshop}</span>
                   <span class="text-xs font-mono-val text-zinc-500 whitespace-nowrap">Gửi: ${formatDateVN(o.date)}</span>
                   ${deliveryHtml}
                 </label>
                 <div class="flex items-center gap-1 shrink-0">
                   ${driveBtnHtml}
                   ${zaloBtnHtml}
-                  <button type="button" onclick="openModal(${o.id})" class="w-6 h-6 rounded hover:bg-zinc-200/70 text-zinc-500 hover:text-zinc-900 flex items-center justify-center transition cursor-pointer" title="Chỉnh sửa"><i class="fa-solid fa-pen text-xs"></i></button>
-                  <button type="button" onclick="deleteOrder(${o.id})" class="w-6 h-6 rounded hover:bg-rose-50 text-zinc-300 hover:text-rose-600 flex items-center justify-center transition cursor-pointer" title="Xoá"><i class="fa-regular fa-trash-can text-xs"></i></button>
+                  <button type="button" onclick="openModal(${o.id})" class="min-h-[44px] min-w-[38px] sm:min-h-0 sm:min-w-0 sm:w-7 sm:h-7 rounded-lg sm:rounded hover:bg-zinc-200/70 text-zinc-500 hover:text-zinc-900 flex items-center justify-center transition cursor-pointer" title="Chỉnh sửa"><i class="fa-solid fa-pen text-xs"></i></button>
+                  <button type="button" onclick="deleteOrder(${o.id})" class="min-h-[44px] min-w-[36px] sm:min-h-0 sm:min-w-0 sm:w-7 sm:h-7 rounded-lg sm:rounded hover:bg-rose-50 text-zinc-300 hover:text-rose-600 flex items-center justify-center transition cursor-pointer" title="Xoá"><i class="fa-regular fa-trash-can text-xs"></i></button>
                 </div>
               </div>
-              <h4 class="text-sm font-semibold text-zinc-950 tracking-tight">${o.name}</h4>
+              <h4 class="text-base sm:text-sm font-bold sm:font-semibold text-zinc-950 tracking-tight leading-snug">${o.name}</h4>
             </div>
 
             <!-- Card Body: Items -->
-            <div class="px-3.5 py-2">
+            <div class="px-4 py-2.5 sm:py-3">
               ${cardItemsHtml}
             </div>
           </div>
 
           <!-- Card Footer -->
-          <div class="px-3.5 py-2.5 bg-white/50 border-t border-zinc-200/60 flex items-center justify-between gap-2">
+          <div class="px-4 py-3 sm:py-3 bg-white/50 border-t border-zinc-200/60 flex items-center justify-between gap-2">
             <div>
               ${paymentBadge}
             </div>
             <div class="text-right">
-              <div class="text-xs font-mono-val font-medium text-zinc-500">Tổng Đơn</div>
-              <div class="text-sm font-mono-val font-semibold text-zinc-950 tabular-nums">${formatMoney(orderTotal)}</div>
+              <div class="text-[11px] sm:text-xs font-mono-val font-medium text-zinc-500 uppercase tracking-wider">Tổng Đơn</div>
+              <div class="text-lg sm:text-base font-mono-val font-bold text-zinc-950 tabular-nums tracking-tight">${formatMoney(orderTotal)}</div>
             </div>
           </div>
         `;
