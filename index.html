@@ -1054,8 +1054,68 @@
     </div>
   </div>
 
+  <!-- ==================== MODAL TUỲ CHỌN QUẢN TRỊ VIÊN (ADMIN MENU) ==================== -->
+  <div id="adminMenuModal" class="fixed inset-0 bg-zinc-950/50 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white/95 backdrop-blur-2xl rounded-2xl shadow-2xl max-w-sm w-full overflow-hidden border border-white/80 animate-in fade-in zoom-in-95 duration-150">
+      
+      <!-- Modal Header -->
+      <div class="bg-zinc-950 text-white px-5 py-4 flex items-center justify-between border-b border-zinc-800">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/30">
+            <i class="fa-solid fa-shield-halved text-sm"></i>
+          </div>
+          <div>
+            <h4 class="font-bold text-sm tracking-tight text-white">Tuỳ Chọn Quản Trị Viên</h4>
+            <p class="text-[11px] text-zinc-400">Đang ở chế độ Admin (Đã mở khoá)</p>
+          </div>
+        </div>
+        <button type="button" onclick="closeAdminMenuModal()" class="w-7 h-7 rounded-md hover:bg-zinc-800 text-zinc-400 hover:text-white flex items-center justify-center transition cursor-pointer" title="Đóng">
+          <i class="fa-solid fa-xmark text-xs"></i>
+        </button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="p-5 space-y-2.5">
+        <!-- Nút Đổi Mã PIN Admin -->
+        <button type="button" onclick="handleAdminMenuChangePin()" class="w-full text-left p-3.5 rounded-xl border border-zinc-200/90 hover:border-zinc-900 bg-white hover:bg-zinc-50 transition flex items-center justify-between cursor-pointer shadow-2xs group">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-amber-500/15 text-amber-700 flex items-center justify-center shrink-0 group-hover:scale-105 transition">
+              <i class="fa-solid fa-key text-xs"></i>
+            </div>
+            <div>
+              <div class="font-semibold text-zinc-950 text-xs">Đổi mã PIN Admin</div>
+              <div class="text-[11px] text-zinc-500">Cập nhật mã PIN bảo vệ mới</div>
+            </div>
+          </div>
+          <i class="fa-solid fa-chevron-right text-zinc-400 group-hover:text-zinc-900 text-xs transition"></i>
+        </button>
+
+        <!-- Nút Khoá Quyền Admin -->
+        <button type="button" onclick="handleAdminMenuLock()" class="w-full text-left p-3.5 rounded-xl border border-rose-200/80 hover:border-rose-400 bg-rose-50/50 hover:bg-rose-50 transition flex items-center justify-between cursor-pointer shadow-2xs group text-rose-700">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-rose-500/15 text-rose-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition">
+              <i class="fa-solid fa-lock text-xs"></i>
+            </div>
+            <div>
+              <div class="font-semibold text-rose-950 text-xs">Khoá quyền Admin (Đăng xuất)</div>
+              <div class="text-[11px] text-rose-600/80">Quay về chế độ xem chỉ đọc</div>
+            </div>
+          </div>
+          <i class="fa-solid fa-chevron-right text-rose-400 group-hover:text-rose-700 text-xs transition"></i>
+        </button>
+      </div>
+
+      <!-- Modal Footer (Chỉ 1 nút Đóng duy nhất, không trùng lặp) -->
+      <div class="p-4 bg-zinc-50 border-t border-zinc-200 flex justify-end">
+        <button type="button" onclick="closeAdminMenuModal()" class="w-full py-2 bg-white hover:bg-zinc-100 text-zinc-700 text-xs font-semibold rounded-lg border border-zinc-300 transition cursor-pointer shadow-2xs">
+          Đóng
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- ==================== MODAL NHẬP MÃ PIN XÁC THỰC ADMIN ==================== -->
-  <div id="adminPinModal" class="fixed inset-0 bg-zinc-950/50 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+  <div id="adminPinModal" class="fixed inset-0 bg-zinc-950/50 backdrop-blur-md z-[60] hidden flex items-center justify-center p-4">
     <div class="bg-white/95 backdrop-blur-2xl rounded-2xl shadow-2xl max-w-sm w-full overflow-hidden border border-white/80 animate-in fade-in zoom-in-95 duration-150">
       <div class="bg-zinc-950 text-white px-5 py-4 flex items-center justify-between border-b border-zinc-800">
         <div class="flex items-center gap-2.5">
@@ -1067,7 +1127,7 @@
             <p class="text-[11px] text-zinc-400">Nhập mã PIN để chỉnh sửa bảng giá</p>
           </div>
         </div>
-        <button type="button" onclick="closeAdminPinModal()" class="w-7 h-7 rounded-md hover:bg-zinc-800 text-zinc-400 hover:text-white flex items-center justify-center transition cursor-pointer">
+        <button type="button" onclick="closeAdminPinModal()" class="w-7 h-7 rounded-md hover:bg-zinc-800 text-zinc-400 hover:text-white flex items-center justify-center transition cursor-pointer" title="Đóng">
           <i class="fa-solid fa-xmark text-xs"></i>
         </button>
       </div>
@@ -1077,7 +1137,7 @@
           <label class="block text-xs font-semibold text-zinc-700 mb-1.5">Mã PIN Quản Trị Viên (4-6 số)</label>
           <div class="relative">
             <input type="password" id="adminPinInput" inputmode="numeric" maxlength="6" placeholder="••••" autocomplete="current-password" autofocus class="w-full text-center tracking-[0.4em] text-lg font-mono-val font-bold px-3 py-2.5 bg-zinc-50 border border-zinc-300 rounded-xl focus:bg-white focus:border-zinc-950 focus:ring-1 focus:ring-zinc-950 outline-none transition">
-            <button type="button" onclick="togglePinVisibility('adminPinInput', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-700 p-1 cursor-pointer">
+            <button type="button" onclick="togglePinVisibility('adminPinInput', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-700 p-1 cursor-pointer" title="Ẩn/Hiện mã PIN">
               <i class="fa-regular fa-eye text-xs"></i>
             </button>
           </div>
@@ -1102,8 +1162,8 @@
   </div>
 
   <!-- ==================== MODAL ĐỔI MÃ PIN ADMIN ==================== -->
-  <div id="adminChangePinModal" class="fixed inset-0 bg-zinc-950/50 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-white/95 backdrop-blur-2xl rounded-2xl shadow-2xl max-w-sm w-full overflow-hidden border border-white/80">
+  <div id="adminChangePinModal" class="fixed inset-0 bg-zinc-950/50 backdrop-blur-md z-[60] hidden flex items-center justify-center p-4">
+    <div class="bg-white/95 backdrop-blur-2xl rounded-2xl shadow-2xl max-w-sm w-full overflow-hidden border border-white/80 animate-in fade-in zoom-in-95 duration-150">
       <div class="bg-zinc-950 text-white px-5 py-4 flex items-center justify-between border-b border-zinc-800">
         <div class="flex items-center gap-2.5">
           <div class="w-8 h-8 rounded-lg bg-zinc-800 flex items-center justify-center text-amber-400 border border-zinc-700">
@@ -1114,7 +1174,7 @@
             <p class="text-[11px] text-zinc-400">Thiết lập mã PIN bảo vệ mới</p>
           </div>
         </div>
-        <button type="button" onclick="closeChangePinModal()" class="w-7 h-7 rounded-md hover:bg-zinc-800 text-zinc-400 hover:text-white flex items-center justify-center transition cursor-pointer">
+        <button type="button" onclick="closeChangePinModal()" class="w-7 h-7 rounded-md hover:bg-zinc-800 text-zinc-400 hover:text-white flex items-center justify-center transition cursor-pointer" title="Đóng">
           <i class="fa-solid fa-xmark text-xs"></i>
         </button>
       </div>
@@ -1122,15 +1182,30 @@
       <form onsubmit="handleChangePinSubmit(event)" class="p-5 space-y-3.5 text-xs">
         <div>
           <label class="block font-semibold text-zinc-700 mb-1">Mã PIN hiện tại *</label>
-          <input type="password" id="oldPinInput" inputmode="numeric" maxlength="6" placeholder="Mã PIN cũ" class="w-full px-3 py-2 bg-zinc-50 border border-zinc-300 rounded-lg focus:bg-white focus:border-zinc-950 outline-none font-mono-val">
+          <div class="relative">
+            <input type="password" id="oldPinInput" inputmode="numeric" maxlength="6" placeholder="Nhập PIN cũ" class="w-full px-3 py-2 pr-9 bg-zinc-50 border border-zinc-300 rounded-lg focus:bg-white focus:border-zinc-950 outline-none font-mono-val">
+            <button type="button" onclick="togglePinVisibility('oldPinInput', this)" class="absolute right-2.5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-700 p-1 cursor-pointer">
+              <i class="fa-regular fa-eye text-xs"></i>
+            </button>
+          </div>
         </div>
         <div>
           <label class="block font-semibold text-zinc-700 mb-1">Mã PIN mới (4-6 số) *</label>
-          <input type="password" id="newPinInput" inputmode="numeric" maxlength="6" placeholder="Mã PIN mới" class="w-full px-3 py-2 bg-zinc-50 border border-zinc-300 rounded-lg focus:bg-white focus:border-zinc-950 outline-none font-mono-val">
+          <div class="relative">
+            <input type="password" id="newPinInput" inputmode="numeric" maxlength="6" placeholder="Nhập PIN mới" class="w-full px-3 py-2 pr-9 bg-zinc-50 border border-zinc-300 rounded-lg focus:bg-white focus:border-zinc-950 outline-none font-mono-val">
+            <button type="button" onclick="togglePinVisibility('newPinInput', this)" class="absolute right-2.5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-700 p-1 cursor-pointer">
+              <i class="fa-regular fa-eye text-xs"></i>
+            </button>
+          </div>
         </div>
         <div>
           <label class="block font-semibold text-zinc-700 mb-1">Xác nhận mã PIN mới *</label>
-          <input type="password" id="confirmNewPinInput" inputmode="numeric" maxlength="6" placeholder="Nhập lại mã PIN mới" class="w-full px-3 py-2 bg-zinc-50 border border-zinc-300 rounded-lg focus:bg-white focus:border-zinc-950 outline-none font-mono-val">
+          <div class="relative">
+            <input type="password" id="confirmNewPinInput" inputmode="numeric" maxlength="6" placeholder="Nhập lại PIN mới" class="w-full px-3 py-2 pr-9 bg-zinc-50 border border-zinc-300 rounded-lg focus:bg-white focus:border-zinc-950 outline-none font-mono-val">
+            <button type="button" onclick="togglePinVisibility('confirmNewPinInput', this)" class="absolute right-2.5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-700 p-1 cursor-pointer">
+              <i class="fa-regular fa-eye text-xs"></i>
+            </button>
+          </div>
         </div>
         <p id="changePinError" class="hidden text-rose-600 font-medium"></p>
         <div class="flex items-center gap-2 pt-2">
@@ -3333,6 +3408,13 @@ function createJsonResponse(obj) {
     function closeAdminPinModal() {
       const modal = document.getElementById('adminPinModal');
       if (modal) modal.classList.add('hidden');
+      const input = document.getElementById('adminPinInput');
+      const err = document.getElementById('adminPinError');
+      if (input) {
+        input.value = '';
+        input.classList.remove('ring-2', 'ring-rose-500');
+      }
+      if (err) err.classList.add('hidden');
     }
 
     async function handleAdminPinSubmit(e) {
@@ -3374,55 +3456,28 @@ function createJsonResponse(obj) {
       if (!isAdmin) {
         openAdminPinModal('toolbar');
       } else {
-        handleAdminMenuClick();
+        openAdminMenuModal();
       }
     }
 
-    async function handleAdminMenuClick() {
-      window.__adminAction = null;
-      const confirmed = await showStudioConfirm({
-        title: 'Tuỳ chọn Quản trị viên (Admin)',
-        subtitle: 'Bạn đang ở chế độ Quản trị viên được phép sửa bảng giá. Hãy chọn thao tác mong muốn:',
-        detailsHtml: `
-          <div class="space-y-2 text-xs">
-            <button type="button" onclick="window.__adminAction = 'changePin'; closeStudioConfirmModal(true);" class="w-full text-left p-3 rounded-xl border border-zinc-200 hover:bg-zinc-100 transition flex items-center justify-between cursor-pointer">
-              <div class="flex items-center gap-2.5">
-                <div class="w-7 h-7 rounded-md bg-amber-500/15 text-amber-700 flex items-center justify-center">
-                  <i class="fa-solid fa-key text-xs"></i>
-                </div>
-                <div>
-                  <div class="font-semibold text-zinc-950">Đổi mã PIN Admin</div>
-                  <div class="text-[11px] text-zinc-500">Cập nhật mã bảo vệ mới</div>
-                </div>
-              </div>
-              <i class="fa-solid fa-chevron-right text-zinc-400 text-xs"></i>
-            </button>
-            <button type="button" onclick="window.__adminAction = 'lock'; closeStudioConfirmModal(true);" class="w-full text-left p-3 rounded-xl border border-rose-200 hover:bg-rose-50 transition flex items-center justify-between text-rose-700 cursor-pointer">
-              <div class="flex items-center gap-2.5">
-                <div class="w-7 h-7 rounded-md bg-rose-500/15 text-rose-700 flex items-center justify-center">
-                  <i class="fa-solid fa-lock text-xs"></i>
-                </div>
-                <div>
-                  <div class="font-semibold text-rose-950">Khoá quyền Admin (Đăng xuất)</div>
-                  <div class="text-[11px] text-rose-600/80">Chuyển về chế độ chỉ xem</div>
-                </div>
-              </div>
-              <i class="fa-solid fa-chevron-right text-rose-400 text-xs"></i>
-            </button>
-          </div>
-        `,
-        confirmText: 'Đóng',
-        type: 'info',
-        icon: 'fa-solid fa-shield-halved'
-      });
+    function openAdminMenuModal() {
+      const modal = document.getElementById('adminMenuModal');
+      if (modal) modal.classList.remove('hidden');
+    }
 
-      if (window.__adminAction === 'changePin') {
-        window.__adminAction = null;
-        openChangePinModal();
-      } else if (window.__adminAction === 'lock') {
-        window.__adminAction = null;
-        lockAdmin();
-      }
+    function closeAdminMenuModal() {
+      const modal = document.getElementById('adminMenuModal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function handleAdminMenuChangePin() {
+      closeAdminMenuModal();
+      openChangePinModal();
+    }
+
+    function handleAdminMenuLock() {
+      closeAdminMenuModal();
+      lockAdmin();
     }
 
     function lockAdmin() {
@@ -3433,16 +3488,30 @@ function createJsonResponse(obj) {
     }
 
     function openChangePinModal() {
+      closeAdminMenuModal();
       const modal = document.getElementById('adminChangePinModal');
       const oldPin = document.getElementById('oldPinInput');
       const newPin = document.getElementById('newPinInput');
       const confirmPin = document.getElementById('confirmNewPinInput');
       const err = document.getElementById('changePinError');
 
-      if (oldPin) oldPin.value = '';
-      if (newPin) newPin.value = '';
-      if (confirmPin) confirmPin.value = '';
-      if (err) err.classList.add('hidden');
+      if (oldPin) {
+        oldPin.value = '';
+        oldPin.type = 'password';
+        oldPin.classList.remove('ring-2', 'ring-rose-500');
+      }
+      if (newPin) {
+        newPin.value = '';
+        newPin.type = 'password';
+      }
+      if (confirmPin) {
+        confirmPin.value = '';
+        confirmPin.type = 'password';
+      }
+      if (err) {
+        err.innerText = '';
+        err.classList.add('hidden');
+      }
       if (modal) modal.classList.remove('hidden');
       setTimeout(() => {
         if (oldPin) oldPin.focus();
@@ -3452,34 +3521,70 @@ function createJsonResponse(obj) {
     function closeChangePinModal() {
       const modal = document.getElementById('adminChangePinModal');
       if (modal) modal.classList.add('hidden');
+      // Reset toàn bộ các ô nhập và thông báo lỗi
+      const oldPin = document.getElementById('oldPinInput');
+      const newPin = document.getElementById('newPinInput');
+      const confirmPin = document.getElementById('confirmNewPinInput');
+      const err = document.getElementById('changePinError');
+
+      if (oldPin) {
+        oldPin.value = '';
+        oldPin.type = 'password';
+        oldPin.classList.remove('ring-2', 'ring-rose-500');
+      }
+      if (newPin) {
+        newPin.value = '';
+        newPin.type = 'password';
+      }
+      if (confirmPin) {
+        confirmPin.value = '';
+        confirmPin.type = 'password';
+      }
+      if (err) {
+        err.innerText = '';
+        err.classList.add('hidden');
+      }
     }
 
     async function handleChangePinSubmit(e) {
       if (e) e.preventDefault();
-      const oldPin = (document.getElementById('oldPinInput') ? document.getElementById('oldPinInput').value : '').trim();
-      const newPin = (document.getElementById('newPinInput') ? document.getElementById('newPinInput').value : '').trim();
-      const confirmPin = (document.getElementById('confirmNewPinInput') ? document.getElementById('confirmNewPinInput').value : '').trim();
+      const oldPinInput = document.getElementById('oldPinInput');
+      const newPinInput = document.getElementById('newPinInput');
+      const confirmPinInput = document.getElementById('confirmNewPinInput');
       const err = document.getElementById('changePinError');
 
-      const showError = (msg) => {
+      const oldPin = (oldPinInput ? oldPinInput.value : '').trim();
+      const newPin = (newPinInput ? newPinInput.value : '').trim();
+      const confirmPin = (confirmPinInput ? confirmPinInput.value : '').trim();
+
+      const showError = (msg, targetInput = null) => {
         if (err) {
           err.innerText = msg;
           err.classList.remove('hidden');
         }
+        if (targetInput) {
+          targetInput.focus();
+          targetInput.classList.add('ring-2', 'ring-rose-500');
+          setTimeout(() => targetInput.classList.remove('ring-2', 'ring-rose-500'), 1500);
+        }
       };
 
-      if (!oldPin) return showError('Vui lòng nhập mã PIN hiện tại!');
-      if (!newPin) return showError('Vui lòng nhập mã PIN mới!');
-      if (newPin.length < 4 || newPin.length > 6) return showError('Mã PIN mới phải từ 4 đến 6 chữ số!');
-      if (newPin !== confirmPin) return showError('Xác nhận mã PIN mới không khớp!');
+      if (!oldPin) return showError('Vui lòng nhập mã PIN hiện tại!', oldPinInput);
+      if (!newPin) return showError('Vui lòng nhập mã PIN mới!', newPinInput);
+      if (!/^\d{4,6}$/.test(newPin)) return showError('Mã PIN mới phải gồm 4 đến 6 chữ số!', newPinInput);
+      if (newPin !== confirmPin) return showError('Xác nhận mã PIN mới không khớp!', confirmPinInput);
 
+      // 1. Kiểm tra chính xác mã PIN cũ
       const oldHash = await sha256Hex(oldPin);
       const currentTargetHash = getAdminPinHash();
 
       if (oldHash !== currentTargetHash) {
-        return showError('Mã PIN hiện tại không chính xác!');
+        if (oldPinInput) oldPinInput.value = '';
+        showToast('Mã PIN hiện tại không chính xác! ⚠️', 'error');
+        return showError('Mã PIN hiện tại không chính xác!', oldPinInput);
       }
 
+      // 2. Băm và lưu mã PIN mới vào LocalStorage & Cloud Settings
       const newHash = await sha256Hex(newPin);
       setAdminPinHash(newHash);
       closeChangePinModal();
