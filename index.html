@@ -448,8 +448,55 @@
     </div>
   </div>
 
+  <!-- ==================== MODAL XÁC NHẬN XOÁ ĐƠN IN ==================== -->
+  <div id="deleteOrderModal" onclick="if (event.target === this) closeDeleteOrderModal()" class="fixed inset-0 bg-zinc-950/70 backdrop-blur-md z-[80] hidden flex items-center justify-center p-4">
+    <div class="bg-zinc-950/95 border border-zinc-800/90 text-zinc-100 rounded-2xl shadow-2xl max-w-md w-full overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+      
+      <!-- Top Accent Bar -->
+      <div class="h-1 w-full bg-gradient-to-r from-rose-500 via-red-500 to-rose-600"></div>
+
+      <div class="p-6">
+        <!-- Icon & Title with Close X -->
+        <div class="flex items-start justify-between gap-3">
+          <div class="flex items-start gap-3.5">
+            <div class="w-12 h-12 rounded-xl flex items-center justify-center text-lg shrink-0 bg-rose-500/10 text-rose-400 border border-rose-500/20">
+              <i class="fa-solid fa-trash-can"></i>
+            </div>
+            <div>
+              <h3 class="text-base font-semibold text-white tracking-tight leading-snug">
+                Xác nhận xoá đơn in
+              </h3>
+              <p id="deleteOrderSubtitle" class="text-xs text-zinc-400 mt-1 leading-relaxed">
+                Bạn có chắc chắn muốn xoá đơn này khỏi danh sách?
+              </p>
+            </div>
+          </div>
+          <button type="button" onclick="closeDeleteOrderModal()" class="w-7 h-7 rounded-md hover:bg-zinc-800 text-zinc-400 hover:text-white flex items-center justify-center transition cursor-pointer" title="Đóng">
+            <i class="fa-solid fa-xmark text-xs"></i>
+          </button>
+        </div>
+
+        <!-- Order Details Box -->
+        <div id="deleteOrderDetails" class="mt-4 p-3.5 bg-zinc-900/80 border border-zinc-800 rounded-xl space-y-1.5 text-xs text-zinc-300">
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="mt-6 flex items-center justify-end gap-2.5">
+          <button id="btnCancelDeleteOrder" type="button" onclick="closeDeleteOrderModal()" class="px-4 py-2.5 text-xs font-medium text-zinc-300 bg-zinc-900 hover:bg-zinc-800 border border-zinc-700/80 rounded-xl transition cursor-pointer">
+            Huỷ bỏ
+          </button>
+          <button id="btnConfirmDeleteOrder" type="button" onclick="confirmDeleteOrder()" class="px-5 py-2.5 text-xs font-medium text-white bg-rose-600 hover:bg-rose-500 active:bg-rose-700 rounded-xl shadow-lg shadow-rose-950/50 transition cursor-pointer flex items-center gap-1.5">
+            <i class="fa-solid fa-check text-[11px]"></i>
+            <span id="btnConfirmDeleteOrderText">Xoá đơn</span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
   <!-- ==================== MODAL ĐỔI NỀN MỜ NGHỆ THUẬT (BACKGROUND PRESETS) ==================== -->
-  <div id="bgModal" class="fixed inset-0 bg-zinc-950/40 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+  <div id="bgModal" onclick="if (event.target === this) closeBgModal()" class="fixed inset-0 bg-zinc-950/40 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white/95 backdrop-blur-2xl rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] flex flex-col overflow-hidden border border-white/80">
       
       <!-- Modal Header -->
@@ -521,7 +568,7 @@
   </div>
 
   <!-- ==================== MODAL XEM & SOẠN TIN NHẮN GỬI ZALO XƯỞNG ==================== -->
-  <div id="zaloModal" class="fixed inset-0 bg-zinc-950/40 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+  <div id="zaloModal" onclick="if (event.target === this) closeZaloModal()" class="fixed inset-0 bg-zinc-950/40 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white/95 backdrop-blur-2xl rounded-2xl shadow-2xl max-w-xl w-full max-h-[90vh] flex flex-col overflow-hidden border border-white/80">
       
       <!-- Modal Header -->
@@ -602,7 +649,7 @@
   </div>
 
   <!-- ==================== MODAL CÀI ĐẶT MẪU TIN NHẮN ZALO ==================== -->
-  <div id="zaloConfigModal" class="fixed inset-0 bg-zinc-950/40 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+  <div id="zaloConfigModal" onclick="if (event.target === this) closeZaloConfigModal()" class="fixed inset-0 bg-zinc-950/40 backdrop-blur-md z-[55] hidden flex items-center justify-center p-4">
     <div class="bg-white/95 backdrop-blur-2xl rounded-2xl shadow-2xl max-w-2xl w-full max-h-[92vh] flex flex-col overflow-hidden border border-white/80">
       
       <!-- Modal Header -->
@@ -720,7 +767,7 @@
   </div>
 
   <!-- ==================== MODAL KẾT NỐI GOOGLE SHEET (CLOUD BACKEND) ==================== -->
-  <div id="cloudModal" class="fixed inset-0 bg-zinc-950/40 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+  <div id="cloudModal" onclick="if (event.target === this) closeCloudModal()" class="fixed inset-0 bg-zinc-950/40 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white/95 backdrop-blur-2xl rounded-2xl shadow-2xl max-w-xl w-full max-h-[90vh] flex flex-col overflow-hidden border border-white/80">
       
       <!-- Modal Header -->
@@ -790,7 +837,7 @@
   </div>
 
   <!-- ==================== MODAL TẠO / SỬA ĐƠN IN (STUDIO POS ARCHITECTURAL) ==================== -->
-  <div id="orderModal" class="fixed inset-0 bg-zinc-950/40 backdrop-blur-md z-50 hidden flex items-center justify-center p-2 sm:p-4">
+  <div id="orderModal" onclick="if (event.target === this) closeModal()" class="fixed inset-0 bg-zinc-950/40 backdrop-blur-md z-50 hidden flex items-center justify-center p-2 sm:p-4">
     <div class="bg-white/95 backdrop-blur-2xl rounded-2xl shadow-2xl max-w-6xl w-full max-h-[94vh] flex flex-col overflow-hidden border border-white/80">
       
       <!-- Modal Top Header -->
@@ -959,7 +1006,7 @@
   </div>
 
   <!-- ==================== MODAL QUẢN LÝ BẢNG GIÁ MẪU (HỖ TRỢ PHÂN QUYỀN ADMIN) ==================== -->
-  <div id="catalogModal" class="fixed inset-0 bg-zinc-950/40 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+  <div id="catalogModal" onclick="if (event.target === this) closeCatalogModal()" class="fixed inset-0 bg-zinc-950/40 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white/95 backdrop-blur-2xl rounded-2xl shadow-2xl max-w-xl w-full max-h-[85vh] flex flex-col overflow-hidden border border-white/80">
       
       <div class="bg-zinc-950 text-zinc-100 px-6 py-4 flex justify-between items-center border-b border-zinc-800">
@@ -1055,7 +1102,7 @@
   </div>
 
   <!-- ==================== MODAL TUỲ CHỌN QUẢN TRỊ VIÊN (ADMIN MENU) ==================== -->
-  <div id="adminMenuModal" class="fixed inset-0 bg-zinc-950/50 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+  <div id="adminMenuModal" onclick="if (event.target === this) closeAdminMenuModal()" class="fixed inset-0 bg-zinc-950/50 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white/95 backdrop-blur-2xl rounded-2xl shadow-2xl max-w-sm w-full overflow-hidden border border-white/80 animate-in fade-in zoom-in-95 duration-150">
       
       <!-- Modal Header -->
@@ -1115,7 +1162,7 @@
   </div>
 
   <!-- ==================== MODAL NHẬP MÃ PIN XÁC THỰC ADMIN ==================== -->
-  <div id="adminPinModal" class="fixed inset-0 bg-zinc-950/50 backdrop-blur-md z-[60] hidden flex items-center justify-center p-4">
+  <div id="adminPinModal" onclick="if (event.target === this) closeAdminPinModal()" class="fixed inset-0 bg-zinc-950/50 backdrop-blur-md z-[60] hidden flex items-center justify-center p-4">
     <div class="bg-white/95 backdrop-blur-2xl rounded-2xl shadow-2xl max-w-sm w-full overflow-hidden border border-white/80 animate-in fade-in zoom-in-95 duration-150">
       <div class="bg-zinc-950 text-white px-5 py-4 flex items-center justify-between border-b border-zinc-800">
         <div class="flex items-center gap-2.5">
@@ -1162,7 +1209,7 @@
   </div>
 
   <!-- ==================== MODAL ĐỔI MÃ PIN ADMIN ==================== -->
-  <div id="adminChangePinModal" class="fixed inset-0 bg-zinc-950/50 backdrop-blur-md z-[60] hidden flex items-center justify-center p-4">
+  <div id="adminChangePinModal" onclick="if (event.target === this) closeChangePinModal()" class="fixed inset-0 bg-zinc-950/50 backdrop-blur-md z-[60] hidden flex items-center justify-center p-4">
     <div class="bg-white/95 backdrop-blur-2xl rounded-2xl shadow-2xl max-w-sm w-full overflow-hidden border border-white/80 animate-in fade-in zoom-in-95 duration-150">
       <div class="bg-zinc-950 text-white px-5 py-4 flex items-center justify-between border-b border-zinc-800">
         <div class="flex items-center gap-2.5">
@@ -1221,7 +1268,7 @@
   </div>
 
   <!-- ==================== MODAL QUẢN LÝ COMBO CHỌN NHANH ==================== -->
-  <div id="comboManageModal" class="fixed inset-0 bg-zinc-950/40 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+  <div id="comboManageModal" onclick="if (event.target === this) closeComboManageModal()" class="fixed inset-0 bg-zinc-950/40 backdrop-blur-md z-[55] hidden flex items-center justify-center p-4">
     <div class="bg-white/95 backdrop-blur-2xl rounded-2xl shadow-2xl max-w-xl w-full max-h-[88vh] flex flex-col overflow-hidden border border-white/80">
       
       <!-- Modal Header -->
@@ -1774,6 +1821,8 @@ function createJsonResponse(obj) {
     let currentViewMode = 'card';
     let modalCart = [];
     let selectedOrderIds = new Set();
+    window.selectedOrderIds = selectedOrderIds;
+    window.currentDeletingOrderId = null;
 
     function normalizeDateToISO(val) {
       if (!val) return '';
@@ -2133,6 +2182,26 @@ function createJsonResponse(obj) {
       });
     }
 
+    function optimizeOrdersForStorage(list) {
+      if (!Array.isArray(list)) return [];
+      return list.map(o => ({
+        id: o.id,
+        code: String(o.code || ''),
+        name: String(o.name || ''),
+        date: String(o.date || ''),
+        deliveryDate: String(o.deliveryDate || ''),
+        isUrgent: Boolean(o.isUrgent),
+        workshop: String(o.workshop || 'TPS'),
+        payment: String(o.payment || 'Chưa thanh toán'),
+        driveUrl: String(o.driveUrl || ''),
+        items: Array.isArray(o.items) ? o.items.map(it => ({
+          name: String(it.name || ''),
+          qty: Number(it.qty) || 1,
+          price: Number(it.price) || 0
+        })) : []
+      }));
+    }
+
     function saveToStorage() {
       const optimized = optimizeOrdersForStorage(orders);
       safeSetStorage(STORAGE_KEYS.ORDERS, optimized);
@@ -2218,6 +2287,26 @@ function createJsonResponse(obj) {
       }
     }
 
+    // Hàm gọi mạng an toàn có cơ chế ngắt thời gian chờ (Timeout) để ngăn chặn giao diện bị đơ/treo
+    async function fetchWithTimeout(url, options = {}, timeoutMs = 12000) {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+      try {
+        const response = await fetch(url, {
+          ...options,
+          signal: controller.signal
+        });
+        clearTimeout(timeoutId);
+        return response;
+      } catch (err) {
+        clearTimeout(timeoutId);
+        if (err.name === 'AbortError') {
+          throw new Error(`Quá thời gian phản hồi từ máy chủ Google Sheet (${Math.round(timeoutMs / 1000)}s)`);
+        }
+        throw err;
+      }
+    }
+
     async function flushPendingSyncQueue() {
       if (!gasUrl || !navigator.onLine) return;
       const queue = safeGetJSON(STORAGE_KEYS.PENDING_QUEUE, []);
@@ -2225,11 +2314,11 @@ function createJsonResponse(obj) {
 
       for (const item of queue) {
         try {
-          await fetch(gasUrl, {
+          await fetchWithTimeout(gasUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'text/plain;charset=utf-8' },
             body: JSON.stringify(item.payload)
-          });
+          }, 8000);
         } catch (err) {}
       }
       safeSetStorage(STORAGE_KEYS.PENDING_QUEUE, []);
@@ -2366,7 +2455,7 @@ function createJsonResponse(obj) {
       try {
         showToast('Đang kiểm tra kết nối Google Sheet...', 'info');
         const sep = input.includes('?') ? '&' : '?';
-        const res = await fetch(`${input}${sep}action=getOrders&_t=${Date.now()}`);
+        const res = await fetchWithTimeout(`${input}${sep}action=getOrders&_t=${Date.now()}`, {}, 12000);
         const data = await res.json();
         if (data && data.status === 'success') {
           gasUrl = input;
@@ -2426,7 +2515,7 @@ function createJsonResponse(obj) {
 
       try {
         const sep = gasUrl.includes('?') ? '&' : '?';
-        const res = await fetch(`${gasUrl}${sep}action=getOrders&_t=${Date.now()}`);
+        const res = await fetchWithTimeout(`${gasUrl}${sep}action=getOrders&_t=${Date.now()}`, {}, 12000);
         if (!res.ok) throw new Error(`Mã lỗi HTTP: ${res.status}`);
         const data = await res.json();
         if (data && data.status === 'success') {
@@ -2463,11 +2552,11 @@ function createJsonResponse(obj) {
         return null;
       }
       try {
-        const res = await fetch(gasUrl, {
+        const res = await fetchWithTimeout(gasUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           body: JSON.stringify(payload)
-        });
+        }, 10000);
         return await res.json();
       } catch (err) {
         enqueuePendingAction(payload);
@@ -2490,7 +2579,7 @@ function createJsonResponse(obj) {
       }
       showToast('Đang tải dữ liệu lên Google Sheet...', 'info');
       try {
-        const res = await fetch(gasUrl, {
+        const res = await fetchWithTimeout(gasUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           body: JSON.stringify({
@@ -2501,7 +2590,7 @@ function createJsonResponse(obj) {
               fu_zalo_template_batch: getBatchZaloTemplate()
             }
           })
-        });
+        }, 20000);
         const data = await res.json();
         if (data && data.status === 'success') {
           showToast(`Đã đẩy toàn bộ ${orders.length} đơn và mẫu tin lên Google Sheet thành công!`, 'success');
@@ -3063,7 +3152,7 @@ function createJsonResponse(obj) {
       currentCategoryFilter = 'ALL';
 
       if (editId) {
-        const order = orders.find(o => o.id === editId);
+        const order = orders.find(o => String(o.id) === String(editId));
         if (order) {
           document.getElementById('modalTitle').innerText = 'Chỉnh Sửa Đơn In — ' + order.code;
           document.getElementById('orderId').value = order.id;
@@ -3154,7 +3243,7 @@ function createJsonResponse(obj) {
       };
 
       if (rawId) {
-        const idx = orders.findIndex(o => o.id === Number(rawId) || (o.code && o.code.toUpperCase() === orderCodeVal));
+        const idx = orders.findIndex(o => String(o.id) === String(rawId) || (o.code && o.code.toUpperCase() === orderCodeVal));
         if (idx !== -1) orders[idx] = orderData;
         else orders.unshift(orderData);
       } else {
@@ -3180,7 +3269,7 @@ function createJsonResponse(obj) {
     }
 
     function duplicateOrder(id) {
-      const source = orders.find(o => o.id === id);
+      const source = orders.find(o => String(o.id) === String(id));
       if (!source) return;
       openModal();
       document.getElementById('modalTitle').innerText = 'Nhân Bản Đơn In (Từ ' + source.code + ')';
@@ -3753,30 +3842,124 @@ function createJsonResponse(obj) {
     }
 
     // ================= MAIN RENDER (CARDS & TABLE) =================
-    async function deleteOrder(id) {
-      const order = orders.find(o => o.id === id);
-      const name = order ? (order.customer || order.code || 'đơn này') : 'đơn in này';
-      const confirmed = await showStudioConfirm({
-        title: 'Xác nhận xoá đơn in',
-        subtitle: `Bạn có chắc muốn xoá ${name}? Thao tác này sẽ xoá đơn khỏi danh sách và cập nhật lên Google Sheet.`,
-        confirmText: 'Xoá đơn',
-        cancelText: 'Huỷ bỏ',
-        type: 'danger',
-        icon: 'fa-solid fa-trash-can'
-      });
-      if (!confirmed) return;
-      orders = orders.filter(o => o.id !== id);
-      saveToStorage();
-      renderAll();
+    function openDeleteOrderModal(id) {
+      window.currentDeletingOrderId = id;
+      const order = orders.find(o => String(o.id) === String(id) || (o.code && String(o.code).toUpperCase() === String(id).toUpperCase()));
 
+      const modal = document.getElementById('deleteOrderModal');
+      const subtitleEl = document.getElementById('deleteOrderSubtitle');
+      const detailsEl = document.getElementById('deleteOrderDetails');
+
+      if (order) {
+        window.currentDeletingOrderId = order.id;
+        const orderTotal = (order.items || []).reduce((sum, it) => sum + ((Number(it.qty) || 0) * (Number(it.price) || 0)), 0);
+        const orderName = order.name || order.customer || 'Khách lẻ';
+        const orderCode = order.code || `#${order.id}`;
+        const workshop = order.workshop || 'TPS';
+        const payment = order.payment || 'Chưa thanh toán';
+        const isPaid = payment === 'Đã thanh toán';
+
+        if (subtitleEl) {
+          subtitleEl.innerHTML = `Bạn có chắc muốn xoá đơn <strong class="text-white">${orderCode}</strong> của <strong class="text-white">${orderName}</strong>? Thao tác không thể hoàn tác.`;
+        }
+        if (detailsEl) {
+          detailsEl.innerHTML = `
+            <div class="flex items-center justify-between pb-1.5 border-b border-zinc-800/80">
+              <span class="text-zinc-400">Mã đơn & Xưởng:</span>
+              <span class="font-mono-val font-semibold text-white">${orderCode} • ${workshop}</span>
+            </div>
+            <div class="flex items-center justify-between py-1 border-b border-zinc-800/80">
+              <span class="text-zinc-400">Khách hàng:</span>
+              <span class="font-semibold text-zinc-200">${orderName}</span>
+            </div>
+            <div class="flex items-center justify-between py-1 border-b border-zinc-800/80">
+              <span class="text-zinc-400">Tổng giá trị:</span>
+              <span class="font-mono-val font-bold text-amber-400">${formatMoney(orderTotal)}</span>
+            </div>
+            <div class="flex items-center justify-between pt-1">
+              <span class="text-zinc-400">Trạng thái:</span>
+              <span class="font-mono-val text-[11px] font-semibold px-2 py-0.5 rounded ${isPaid ? 'bg-emerald-950/80 text-emerald-400 border border-emerald-800/80' : 'bg-rose-950/80 text-rose-400 border border-rose-800/80'}">${payment}</span>
+            </div>
+          `;
+          detailsEl.classList.remove('hidden');
+        }
+      } else {
+        if (subtitleEl) {
+          subtitleEl.textContent = 'Bạn có chắc chắn muốn xoá đơn in này? Thao tác không thể hoàn tác.';
+        }
+        if (detailsEl) {
+          detailsEl.innerHTML = `<p class="text-xs text-zinc-400 italic">Mã đơn: #${id}</p>`;
+          detailsEl.classList.remove('hidden');
+        }
+      }
+
+      if (modal) modal.classList.remove('hidden');
+    }
+
+    function closeDeleteOrderModal() {
+      const modal = document.getElementById('deleteOrderModal');
+      if (modal) modal.classList.add('hidden');
+      window.currentDeletingOrderId = null;
+    }
+
+    function confirmDeleteOrder() {
+      const targetId = window.currentDeletingOrderId;
+      if (targetId === null || targetId === undefined || targetId === '') {
+        closeDeleteOrderModal();
+        return;
+      }
+
+      // 1. Đóng Modal xác nhận xoá ngay lập tức
+      closeDeleteOrderModal();
+
+      // 2. Lọc bỏ đơn hàng đó ngay lập tức khỏi mảng dữ liệu (orders array)
+      const targetOrder = orders.find(o => String(o.id) === String(targetId) || (o.code && String(o.code).toUpperCase() === String(targetId).toUpperCase()));
+      const targetCode = targetOrder ? targetOrder.code : null;
+
+      orders = orders.filter(o => {
+        if (String(o.id) === String(targetId)) return false;
+        if (targetCode && o.code && String(o.code).toUpperCase() === String(targetCode).toUpperCase()) return false;
+        return true;
+      });
+
+      // Dọn dẹp cả trong tập hợp đơn đang chọn (selectedOrderIds)
+      if (typeof selectedOrderIds !== 'undefined' && selectedOrderIds) {
+        selectedOrderIds.delete(targetId);
+        selectedOrderIds.delete(Number(targetId));
+        selectedOrderIds.delete(String(targetId));
+        if (targetOrder) {
+          selectedOrderIds.delete(targetOrder.id);
+          selectedOrderIds.delete(Number(targetOrder.id));
+          selectedOrderIds.delete(String(targetOrder.id));
+        }
+      }
+
+      // 3. Cập nhật lại LocalStorage
+      saveToStorage();
+
+      // 4. Gọi hàm render/cập nhật lại toàn bộ giao diện danh sách đơn hàng và tổng tiền công nợ
+      renderAll();
+      if (typeof updateWorkshopFilterOptions === 'function') {
+        updateWorkshopFilterOptions();
+      }
+
+      // 5. Hiển thị thông báo (toast) "Đã xoá đơn hàng thành công"
+      showToast('Đã xoá đơn hàng thành công! 🗑️', 'success');
+
+      // 6. Đồng bộ ngầm lên Google Sheet (background fetch không gián đoạn / rollback UI)
       if (gasUrl) {
-        sendCloudPost({ action: 'deleteOrder', id: id });
-        showToast('Đã xóa đơn trên Sheet', 'info');
+        sendCloudPost({ action: 'deleteOrder', id: targetId }).catch(err => {
+          console.warn('[Sync] Background delete deferred:', err);
+        });
       }
     }
 
+    function deleteOrder(id) {
+      openDeleteOrderModal(id);
+    }
+
     function togglePayment(id) {
-      const item = orders.find(o => o.id === id);
+      const item = orders.find(o => String(o.id) === String(id));
       if (item) {
         item.payment = item.payment === 'Đã thanh toán' ? 'Chưa thanh toán' : 'Đã thanh toán';
         saveToStorage();
@@ -3873,7 +4056,7 @@ Lưu ý: Anh em thợ kiểm tra kỹ danh sách và xác nhận giúp FU Studio
     }
 
     function openZaloModal(id) {
-      const o = orders.find(item => item.id === id);
+      const o = orders.find(item => String(item.id) === String(id));
       if (!o) return;
       currentZaloOrderId = id;
 
@@ -3912,7 +4095,7 @@ Lưu ý: Anh em thợ kiểm tra kỹ danh sách và xác nhận giúp FU Studio
 
     function reloadCurrentZaloMessage() {
       if (currentZaloOrderId !== null) {
-        const o = orders.find(item => item.id === currentZaloOrderId);
+        const o = orders.find(item => String(item.id) === String(currentZaloOrderId));
         if (o) {
           document.getElementById('zaloMessageContent').value = buildSingleZaloMessage(o);
           showToast('Đã điền lại nội dung theo mẫu mặc định đơn lẻ! ✅', 'success');
@@ -4080,12 +4263,12 @@ Lưu ý: Anh em thợ kiểm tra kỹ danh sách và xác nhận giúp FU Studio
     // Nút gạch nợ công nợ xưởng 1 chạm dạng pill cao cấp, thanh lịch, mượt mà (đảm bảo min-h-44px trên mobile)
     function getPaymentBadgeHtml(o) {
       if (o.payment === 'Đã thanh toán') {
-        return `<button type="button" onclick="togglePayment(${o.id})" title="Chạm nếu muốn hoàn tác về nợ xưởng" class="inline-flex items-center justify-center gap-1.5 min-h-[44px] sm:min-h-[32px] px-3.5 sm:px-2.5 py-2 sm:py-1 text-xs font-medium rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 hover:bg-emerald-100 transition cursor-pointer shadow-2xs whitespace-nowrap">
+        return `<button type="button" onclick="togglePayment('${o.id}')" title="Chạm nếu muốn hoàn tác về nợ xưởng" class="inline-flex items-center justify-center gap-1.5 min-h-[44px] sm:min-h-[32px] px-3.5 sm:px-2.5 py-2 sm:py-1 text-xs font-medium rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 hover:bg-emerald-100 transition cursor-pointer shadow-2xs whitespace-nowrap">
           <i class="fa-solid fa-check text-[10px] text-emerald-600"></i>
           <span>Đã thanh toán</span>
         </button>`;
       }
-      return `<button type="button" onclick="togglePayment(${o.id})" title="Chạm 1 lần để gạch nợ đơn này" class="inline-flex items-center justify-center gap-1.5 min-h-[44px] sm:min-h-[32px] px-3.5 sm:px-2.5 py-2 sm:py-1 text-xs font-semibold rounded-full bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100 hover:border-rose-300 transition cursor-pointer shadow-2xs whitespace-nowrap">
+      return `<button type="button" onclick="togglePayment('${o.id}')" title="Chạm 1 lần để gạch nợ đơn này" class="inline-flex items-center justify-center gap-1.5 min-h-[44px] sm:min-h-[32px] px-3.5 sm:px-2.5 py-2 sm:py-1 text-xs font-semibold rounded-full bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100 hover:border-rose-300 transition cursor-pointer shadow-2xs whitespace-nowrap">
         <span class="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse"></span>
         <span>Chưa thanh toán</span>
       </button>`;
@@ -4190,7 +4373,7 @@ Lưu ý: Anh em thợ kiểm tra kỹ danh sách và xác nhận giúp FU Studio
         ` : '';
 
         const zaloBtnHtml = `
-          <button type="button" onclick="openZaloModal(${o.id})" class="min-h-[44px] sm:min-h-0 sm:h-7 px-3.5 sm:px-2.5 py-2 sm:py-0 rounded-lg sm:rounded-md bg-white/85 hover:bg-sky-50 text-zinc-800 hover:text-sky-700 border border-zinc-200/90 flex items-center justify-center gap-1.5 text-xs font-semibold sm:font-medium transition cursor-pointer shadow-2xs shrink-0" title="Xem & soạn tin nhắn gửi Zalo cho xưởng">
+          <button type="button" onclick="openZaloModal('${o.id}')" class="min-h-[44px] sm:min-h-0 sm:h-7 px-3.5 sm:px-2.5 py-2 sm:py-0 rounded-lg sm:rounded-md bg-white/85 hover:bg-sky-50 text-zinc-800 hover:text-sky-700 border border-zinc-200/90 flex items-center justify-center gap-1.5 text-xs font-semibold sm:font-medium transition cursor-pointer shadow-2xs shrink-0" title="Xem & soạn tin nhắn gửi Zalo cho xưởng">
             <i class="fa-solid fa-paper-plane text-sky-600 text-xs"></i>
             <span>Zalo</span>
           </button>
@@ -4216,7 +4399,7 @@ Lưu ý: Anh em thợ kiểm tra kỹ danh sách và xác nhận giúp FU Studio
           `;
         });
 
-        const isSelected = selectedOrderIds.has(o.id);
+        const isSelected = selectedOrderIds.has(o.id) || selectedOrderIds.has(String(o.id));
 
         const card = document.createElement('div');
         card.id = `card-order-${o.id}`;
@@ -4227,7 +4410,7 @@ Lưu ý: Anh em thợ kiểm tra kỹ danh sách và xác nhận giúp FU Studio
             <div class="p-4 sm:p-4 border-b border-zinc-200/60 bg-white/40 space-y-2">
               <div class="flex items-start sm:items-center justify-between gap-2">
                 <label class="flex items-center gap-1.5 flex-wrap cursor-pointer select-none min-h-[36px] sm:min-h-0" title="Chạm để chọn đơn này">
-                  <input type="checkbox" class="order-cb order-cb-card rounded border-zinc-300 text-zinc-950 focus:ring-0 cursor-pointer mr-1 w-4 h-4 sm:w-3.5 sm:h-3.5 scale-110" data-id="${o.id}" data-debt="${o.payment !== 'Đã thanh toán' ? orderTotal : 0}" ${isSelected ? 'checked' : ''} onchange="onOrderCheckboxChange(${o.id}, this.checked)">
+                  <input type="checkbox" class="order-cb order-cb-card rounded border-zinc-300 text-zinc-950 focus:ring-0 cursor-pointer mr-1 w-4 h-4 sm:w-3.5 sm:h-3.5 scale-110" data-id="${o.id}" data-debt="${o.payment !== 'Đã thanh toán' ? orderTotal : 0}" ${isSelected ? 'checked' : ''} onchange="onOrderCheckboxChange('${o.id}', this.checked)">
                   <span class="text-sm sm:text-xs font-mono-val font-bold px-2.5 py-1 sm:py-0.5 rounded-md bg-zinc-950 text-zinc-100 tracking-wider shadow-2xs">${o.code}</span>
                   <span class="text-xs font-mono-val font-semibold px-2 py-0.5 rounded bg-white/85 text-zinc-700 border border-zinc-200">${o.workshop}</span>
                   <span class="text-xs font-mono-val text-zinc-500 whitespace-nowrap">Gửi: ${formatDateVN(o.date)}</span>
@@ -4236,8 +4419,8 @@ Lưu ý: Anh em thợ kiểm tra kỹ danh sách và xác nhận giúp FU Studio
                 <div class="flex items-center gap-1 shrink-0">
                   ${driveBtnHtml}
                   ${zaloBtnHtml}
-                  <button type="button" onclick="openModal(${o.id})" class="min-h-[44px] min-w-[38px] sm:min-h-0 sm:min-w-0 sm:w-7 sm:h-7 rounded-lg sm:rounded hover:bg-zinc-200/70 text-zinc-500 hover:text-zinc-900 flex items-center justify-center transition cursor-pointer" title="Chỉnh sửa"><i class="fa-solid fa-pen text-xs"></i></button>
-                  <button type="button" onclick="deleteOrder(${o.id})" class="min-h-[44px] min-w-[36px] sm:min-h-0 sm:min-w-0 sm:w-7 sm:h-7 rounded-lg sm:rounded hover:bg-rose-50 text-zinc-300 hover:text-rose-600 flex items-center justify-center transition cursor-pointer" title="Xoá"><i class="fa-regular fa-trash-can text-xs"></i></button>
+                  <button type="button" onclick="openModal('${o.id}')" class="min-h-[44px] min-w-[38px] sm:min-h-0 sm:min-w-0 sm:w-7 sm:h-7 rounded-lg sm:rounded hover:bg-zinc-200/70 text-zinc-500 hover:text-zinc-900 flex items-center justify-center transition cursor-pointer" title="Chỉnh sửa"><i class="fa-solid fa-pen text-xs"></i></button>
+                  <button type="button" onclick="deleteOrder('${o.id}')" class="min-h-[44px] min-w-[36px] sm:min-h-0 sm:min-w-0 sm:w-7 sm:h-7 rounded-lg sm:rounded hover:bg-rose-50 text-zinc-300 hover:text-rose-600 flex items-center justify-center transition cursor-pointer" title="Xoá"><i class="fa-regular fa-trash-can text-xs"></i></button>
                 </div>
               </div>
               <h4 class="text-base sm:text-sm font-bold sm:font-semibold text-zinc-950 tracking-tight leading-snug">${o.name}</h4>
@@ -4268,7 +4451,7 @@ Lưu ý: Anh em thợ kiểm tra kỹ danh sách và xác nhận giúp FU Studio
         tr.className = `transition ${isSelected ? 'bg-zinc-100/90' : 'hover:bg-white/60'}`;
         tr.innerHTML = `
           <td class="py-3 px-3 align-top text-center">
-            <input type="checkbox" class="order-cb order-cb-table rounded border-zinc-300 text-zinc-950 focus:ring-0 cursor-pointer scale-110" data-id="${o.id}" data-debt="${o.payment !== 'Đã thanh toán' ? orderTotal : 0}" ${isSelected ? 'checked' : ''} onchange="onOrderCheckboxChange(${o.id}, this.checked)" title="Chọn đơn này">
+            <input type="checkbox" class="order-cb order-cb-table rounded border-zinc-300 text-zinc-950 focus:ring-0 cursor-pointer scale-110" data-id="${o.id}" data-debt="${o.payment !== 'Đã thanh toán' ? orderTotal : 0}" ${isSelected ? 'checked' : ''} onchange="onOrderCheckboxChange('${o.id}', this.checked)" title="Chọn đơn này">
           </td>
           <td class="py-3 px-4 align-top whitespace-nowrap">
             <span class="text-xs font-mono-val font-semibold px-2 py-0.5 rounded bg-zinc-950 text-zinc-100">${o.code}</span>
@@ -4296,8 +4479,8 @@ Lưu ý: Anh em thợ kiểm tra kỹ danh sách và xác nhận giúp FU Studio
             <div class="flex items-center justify-center gap-1">
               ${driveBtnHtml}
               ${zaloBtnHtml}
-              <button type="button" onclick="openModal(${o.id})" class="text-zinc-500 hover:text-zinc-900 p-1 cursor-pointer transition" title="Sửa"><i class="fa-solid fa-pen text-xs"></i></button>
-              <button type="button" onclick="deleteOrder(${o.id})" class="text-zinc-300 hover:text-rose-600 p-1 cursor-pointer transition" title="Xóa"><i class="fa-regular fa-trash-can text-xs"></i></button>
+              <button type="button" onclick="openModal('${o.id}')" class="text-zinc-500 hover:text-zinc-900 p-1 cursor-pointer transition" title="Sửa"><i class="fa-solid fa-pen text-xs"></i></button>
+              <button type="button" onclick="deleteOrder('${o.id}')" class="text-zinc-300 hover:text-rose-600 p-1 cursor-pointer transition" title="Xóa"><i class="fa-regular fa-trash-can text-xs"></i></button>
             </div>
           </td>
         `;
@@ -4312,6 +4495,8 @@ Lưu ý: Anh em thợ kiểm tra kỹ danh sách và xác nhận giúp FU Studio
         selectedOrderIds.add(id);
       } else {
         selectedOrderIds.delete(id);
+        selectedOrderIds.delete(String(id));
+        selectedOrderIds.delete(Number(id));
       }
       syncSelectionUI();
     }
@@ -4321,7 +4506,11 @@ Lưu ý: Anh em thợ kiểm tra kỹ danh sách và xác nhận giúp FU Studio
       if (isChecked) {
         filtered.forEach(o => selectedOrderIds.add(o.id));
       } else {
-        filtered.forEach(o => selectedOrderIds.delete(o.id));
+        filtered.forEach(o => {
+          selectedOrderIds.delete(o.id);
+          selectedOrderIds.delete(String(o.id));
+          selectedOrderIds.delete(Number(o.id));
+        });
       }
       syncSelectionUI();
     }
@@ -4333,15 +4522,15 @@ Lưu ý: Anh em thợ kiểm tra kỹ danh sách và xác nhận giúp FU Studio
 
     function syncSelectionUI() {
       const filtered = getFilteredOrders();
-      const filteredIds = new Set(filtered.map(o => o.id));
+      const filteredIds = new Set(filtered.map(o => String(o.id)));
 
       // 1. Update all checkboxes in DOM and Card highlight styling
       document.querySelectorAll('.order-cb').forEach(cb => {
-        const id = Number(cb.getAttribute('data-id'));
-        const isChecked = selectedOrderIds.has(id);
+        const rawId = cb.getAttribute('data-id');
+        const isChecked = selectedOrderIds.has(rawId) || selectedOrderIds.has(Number(rawId)) || selectedOrderIds.has(String(rawId));
         cb.checked = isChecked;
 
-        const cardEl = document.getElementById(`card-order-${id}`);
+        const cardEl = document.getElementById(`card-order-${rawId}`);
         if (cardEl) {
           if (isChecked) {
             cardEl.classList.add('ring-2', 'ring-zinc-950', 'border-zinc-900', 'bg-white', 'shadow-md');
@@ -4350,7 +4539,7 @@ Lưu ý: Anh em thợ kiểm tra kỹ danh sách và xác nhận giúp FU Studio
           }
         }
 
-        const rowEl = document.getElementById(`row-order-${id}`);
+        const rowEl = document.getElementById(`row-order-${rawId}`);
         if (rowEl) {
           if (isChecked) {
             rowEl.classList.add('bg-zinc-100/90');
@@ -4367,18 +4556,18 @@ Lưu ý: Anh em thợ kiểm tra kỹ danh sách và xác nhận giúp FU Studio
 
       if (cardsCountEl) cardsCountEl.innerText = filtered.length;
 
-      const isAllFilteredSelected = filtered.length > 0 && filtered.every(o => selectedOrderIds.has(o.id));
+      const isAllFilteredSelected = filtered.length > 0 && filtered.every(o => selectedOrderIds.has(o.id) || selectedOrderIds.has(String(o.id)));
       if (selectAllTable) selectAllTable.checked = isAllFilteredSelected;
       if (selectAllCards) selectAllCards.checked = isAllFilteredSelected;
 
       // 3. Calculate selected count and total debt for selected orders
-      const selectedCount = Array.from(selectedOrderIds).filter(id => filteredIds.has(id)).length;
+      const selectedCount = Array.from(selectedOrderIds).filter(id => filteredIds.has(String(id))).length;
       const bar = document.getElementById('floatingBatchBar');
 
       if (selectedCount > 0) {
         let totalDebt = 0;
         orders.forEach(o => {
-          if (selectedOrderIds.has(o.id) && o.payment !== 'Đã thanh toán') {
+          if ((selectedOrderIds.has(o.id) || selectedOrderIds.has(String(o.id))) && o.payment !== 'Đã thanh toán') {
             const orderTotal = (o.items || []).reduce((sum, it) => sum + (it.qty * it.price), 0);
             totalDebt += orderTotal;
           }
@@ -4393,7 +4582,7 @@ Lưu ý: Anh em thợ kiểm tra kỹ danh sách và xác nhận giúp FU Studio
     }
 
     async function settleSelectedOrders() {
-      const selectedList = orders.filter(o => selectedOrderIds.has(o.id));
+      const selectedList = orders.filter(o => selectedOrderIds.has(o.id) || selectedOrderIds.has(String(o.id)) || selectedOrderIds.has(Number(o.id)));
       if (selectedList.length === 0) {
         showToast('Vui lòng tích chọn ít nhất 1 đơn hàng!', 'info');
         return;
@@ -4569,6 +4758,34 @@ Lưu ý: Anh em thợ kiểm tra kỹ danh sách và xác nhận giúp FU Studio
     window.addEventListener('offline', () => {
       updateCloudBadge();
       showToast('Mất kết nối mạng. Đang xem dữ liệu offline! 📡', 'warning');
+    });
+
+    // 3. Lắng nghe phím Escape (ESC) để đóng modal đang mở cao nhất
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        const modalPriority = [
+          { id: 'deleteOrderModal', close: closeDeleteOrderModal },
+          { id: 'adminChangePinModal', close: closeChangePinModal },
+          { id: 'adminPinModal', close: closeAdminPinModal },
+          { id: 'adminMenuModal', close: closeAdminMenuModal },
+          { id: 'comboManageModal', close: closeComboManageModal },
+          { id: 'zaloConfigModal', close: closeZaloConfigModal },
+          { id: 'zaloModal', close: closeZaloModal },
+          { id: 'catalogModal', close: closeCatalogModal },
+          { id: 'cloudModal', close: closeCloudModal },
+          { id: 'bgModal', close: closeBgModal },
+          { id: 'orderModal', close: closeModal }
+        ];
+
+        for (const item of modalPriority) {
+          const el = document.getElementById(item.id);
+          if (el && !el.classList.contains('hidden')) {
+            item.close();
+            e.preventDefault();
+            break;
+          }
+        }
+      }
     });
 
     // 3. Khởi chạy cập nhật ngầm (Background Fetch) từ Google Sheet sau khi giao diện đã nạp xong
