@@ -3,22 +3,22 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FU STUDIO — Atelier Print Lab & Quản Lý Công Nợ Xưởng v7.0 Glass</title>
+  <title>FU STUDIO — Atelier Print Lab & Quản Lý Công Nợ Xưởng v8.0 Premium Glass</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg-canvas: #F8F9FA;
-      --card-bg: rgba(255, 255, 255, 0.82);
-      --ink-primary: #121316;
-      --ink-secondary: #52525B;
-      --ink-tertiary: #71717A;
-      --border-glass: rgba(255, 255, 255, 0.85);
-      --border-subtle: rgba(228, 228, 231, 0.8);
-      --border-strong: #27272A;
+      --bg-canvas: #F4F5F7;
+      --card-bg: rgba(255, 255, 255, 0.88);
+      --ink-primary: #090A0F;
+      --ink-secondary: #3F3F46;
+      --ink-tertiary: #64656E;
+      --border-glass: rgba(255, 255, 255, 0.88);
+      --border-subtle: rgba(228, 228, 231, 0.85);
+      --border-strong: #18181B;
       --studio-obsidian: #090A0C;
     }
 
@@ -65,39 +65,64 @@
     #bgOverlay {
       position: absolute;
       inset: 0;
-      background: rgba(248, 249, 250, 0.62);
-      backdrop-filter: saturate(120%);
-      -webkit-backdrop-filter: saturate(120%);
+      background: linear-gradient(180deg, rgba(248, 250, 252, 0.66) 0%, rgba(244, 245, 247, 0.72) 100%);
+      backdrop-filter: saturate(135%);
+      -webkit-backdrop-filter: saturate(135%);
     }
 
-    /* Frosted Glass Paneling */
+    /* v8.0 Premium Frosted Glass Paneling (High Contrast & Multi-layer Depth) */
     .glass-panel {
-      background: rgba(255, 255, 255, 0.82) !important;
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border: 1px solid rgba(255, 255, 255, 0.85) !important;
-      box-shadow: 0 1px 3px 0 rgba(18, 19, 22, 0.03), 0 1px 2px -1px rgba(18, 19, 22, 0.03);
+      background: rgba(255, 255, 255, 0.86) !important;
+      backdrop-filter: blur(24px) saturate(140%);
+      -webkit-backdrop-filter: blur(24px) saturate(140%);
+      border: 1px solid rgba(255, 255, 255, 0.88) !important;
+      box-shadow:
+        0 8px 30px -4px rgba(15, 23, 42, 0.05),
+        0 2px 6px -1px rgba(15, 23, 42, 0.03),
+        inset 0 1px 0 0 rgba(255, 255, 255, 0.95);
     }
 
-    /* Studio Card with Frosted Glass */
+    /* Studio Card with v8.0 Premium Frosted Glass */
     .studio-card {
-      background: rgba(255, 255, 255, 0.82);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
-      border: 1px solid rgba(255, 255, 255, 0.85);
-      box-shadow: 0 1px 3px 0 rgba(18, 19, 22, 0.03), 0 1px 2px -1px rgba(18, 19, 22, 0.03);
-      transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease, border-color 0.2s ease;
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(22px) saturate(140%);
+      -webkit-backdrop-filter: blur(22px) saturate(140%);
+      border: 1px solid rgba(255, 255, 255, 0.9);
+      box-shadow:
+        0 4px 20px -2px rgba(15, 23, 42, 0.045),
+        0 1px 3px 0 rgba(15, 23, 42, 0.03),
+        inset 0 1px 0 0 rgba(255, 255, 255, 0.95);
+      transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.22s ease, border-color 0.22s ease, background-color 0.2s ease;
     }
     .studio-card:hover {
       transform: translateY(-2px);
+      background: rgba(255, 255, 255, 0.94);
       border-color: rgba(212, 212, 216, 0.95);
-      box-shadow: 0 4px 12px -2px rgba(18, 19, 22, 0.06);
+      box-shadow:
+        0 12px 28px -4px rgba(15, 23, 42, 0.08),
+        0 4px 10px -2px rgba(15, 23, 42, 0.04),
+        inset 0 1px 0 0 rgba(255, 255, 255, 1);
+    }
+
+    /* Smooth item entrance transition */
+    @keyframes fadeSlideUp {
+      from {
+        opacity: 0;
+        transform: translateY(6px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    .animate-view-fade {
+      animation: fadeSlideUp 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
 
     /* Minimal studio scrollbar */
-    .custom-scrollbar::-webkit-scrollbar { width: 4px; height: 4px; }
+    .custom-scrollbar::-webkit-scrollbar { width: 5px; height: 5px; }
     .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-    .custom-scrollbar::-webkit-scrollbar-thumb { background: #D4D4D8; border-radius: 2px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #D4D4D8; border-radius: 3px; }
     .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #A1A1AA; }
 
     /* Hide scrollbar on mobile horizontal toolbars while preserving smooth touch scroll */
@@ -113,10 +138,10 @@
 
     /* POS Button Touch feedback */
     .pos-btn {
-      transition: all 0.12s ease;
+      transition: all 0.14s cubic-bezier(0.16, 1, 0.3, 1);
     }
     .pos-btn:active {
-      transform: scale(0.985);
+      transform: scale(0.98);
     }
 
     @keyframes spin-sync {
@@ -146,20 +171,20 @@
       <!-- Top Row on Mobile: Brand Identity + Primary Action ("Lên Đơn Mới" on mobile) -->
       <div class="flex items-center justify-between gap-3">
         <div class="flex items-center gap-3 min-w-0">
-          <div class="w-10 h-10 shrink-0 rounded-lg bg-zinc-950 text-zinc-100 flex items-center justify-center border border-zinc-800 shadow-xs">
+          <div class="w-10 h-10 shrink-0 rounded-xl bg-zinc-950 text-zinc-100 flex items-center justify-center border border-zinc-800 shadow-sm">
             <i class="fa-solid fa-camera-retro text-sm"></i>
           </div>
           <div class="min-w-0">
             <div class="flex items-center gap-2 flex-wrap">
               <h1 class="text-base font-brand font-bold tracking-wider text-zinc-950 uppercase truncate">FU STUDIO</h1>
-              <span class="text-[11px] sm:text-xs font-mono-val font-semibold px-2 py-0.5 rounded bg-white/70 text-zinc-700 border border-zinc-200/80 shadow-2xs shrink-0">v7.0 Glass</span>
+              <span class="text-[11px] font-mono-val font-semibold px-2 py-0.5 rounded-md bg-zinc-900/5 text-zinc-800 border border-zinc-300/80 shadow-2xs shrink-0">v8.0 Premium</span>
               <!-- Offline Status Badge (Tự động xuất hiện khi mất kết nối mạng) -->
-              <span id="offlineIndicatorBadge" class="hidden text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-amber-100/90 text-amber-900 border border-amber-300 shadow-2xs flex items-center gap-1.5 shrink-0 animate-pulse" title="Mất kết nối mạng - Đang xem dữ liệu lưu offline trong máy">
+              <span id="offlineIndicatorBadge" class="hidden text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-amber-100/95 text-amber-900 border border-amber-300 shadow-2xs flex items-center gap-1.5 shrink-0 animate-pulse" title="Mất kết nối mạng - Đang xem dữ liệu lưu offline trong máy">
                 <span class="w-1.5 h-1.5 rounded-full bg-amber-600"></span>
                 <span>Đang xem dữ liệu offline</span>
               </span>
             </div>
-            <p class="text-[11px] sm:text-xs text-zinc-500 font-medium truncate">Hệ thống quản lý in ấn & đối soát công nợ xưởng</p>
+            <p class="text-[11px] sm:text-xs text-zinc-600 font-medium truncate">Hệ thống quản trị in ấn & đối soát công nợ xưởng</p>
           </div>
         </div>
 
@@ -174,50 +199,50 @@
       <div class="flex items-center gap-2 overflow-x-auto sm:overflow-visible sm:flex-wrap pb-0.5 sm:pb-0 mobile-scroll-strip custom-scrollbar">
         
         <!-- View Switcher (Card vs Table) -->
-        <div class="flex shrink-0 items-center bg-zinc-100/70 p-0.5 rounded-lg border border-zinc-200/80 mr-0.5 sm:mr-1 backdrop-blur-xs">
-          <button type="button" id="btnViewCard" onclick="switchView('card')" class="min-h-[36px] sm:min-h-0 px-2.5 py-1.5 rounded-md text-xs font-medium transition flex items-center gap-1.5 bg-white text-zinc-900 shadow-xs cursor-pointer whitespace-nowrap">
+        <div class="flex shrink-0 items-center bg-zinc-200/60 p-1 rounded-xl border border-zinc-300/60 mr-0.5 sm:mr-1 backdrop-blur-xs">
+          <button type="button" id="btnViewCard" onclick="switchView('card')" class="min-h-[36px] sm:min-h-0 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 flex items-center gap-1.5 bg-white text-zinc-950 shadow-xs cursor-pointer whitespace-nowrap">
             <i class="fa-solid fa-grip text-xs"></i> Thẻ Studio
           </button>
-          <button type="button" id="btnViewTable" onclick="switchView('table')" class="min-h-[36px] sm:min-h-0 px-2.5 py-1.5 rounded-md text-xs font-medium transition flex items-center gap-1.5 text-zinc-500 hover:text-zinc-900 cursor-pointer whitespace-nowrap">
+          <button type="button" id="btnViewTable" onclick="switchView('table')" class="min-h-[36px] sm:min-h-0 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 flex items-center gap-1.5 text-zinc-600 hover:text-zinc-950 cursor-pointer whitespace-nowrap">
             <i class="fa-solid fa-table-list text-xs"></i> Bảng Gọn
           </button>
         </div>
 
         <!-- Background Presets Modal Trigger (Đổi Nền Mờ) -->
-        <button type="button" onclick="openBgModal()" class="shrink-0 min-h-[38px] sm:min-h-0 bg-white/80 hover:bg-white text-zinc-700 border border-zinc-200/80 px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5 transition cursor-pointer shadow-xs whitespace-nowrap">
+        <button type="button" onclick="openBgModal()" class="shrink-0 min-h-[38px] sm:min-h-0 bg-white/90 hover:bg-white text-zinc-800 border border-zinc-200/90 px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer shadow-2xs whitespace-nowrap" title="Tuỳ chỉnh hình nền & độ mờ kính">
           <i class="fa-solid fa-wand-magic-sparkles text-amber-600 text-xs"></i>
           <span>Đổi Nền Mờ</span>
         </button>
 
         <!-- Google Sheet Cloud Sync Button (Mô hình Offline-First) -->
-        <button type="button" id="btnCloudSync" onclick="handleCloudSyncButtonClick()" class="shrink-0 min-h-[38px] sm:min-h-0 bg-white/80 hover:bg-white text-zinc-700 border border-zinc-200/80 px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-2 transition cursor-pointer shadow-xs whitespace-nowrap" title="Bấm để đồng bộ dữ liệu với Google Sheet">
+        <button type="button" id="btnCloudSync" onclick="handleCloudSyncButtonClick()" class="shrink-0 min-h-[38px] sm:min-h-0 bg-white/90 hover:bg-white text-zinc-800 border border-zinc-200/90 px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-2 transition cursor-pointer shadow-2xs whitespace-nowrap" title="Bấm để đồng bộ dữ liệu với Google Sheet">
           <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
           <span>Nối Google Sheet</span>
         </button>
 
         <!-- Quick Refresh from Cloud Button -->
-        <button type="button" onclick="syncFromCloud(true)" class="shrink-0 min-h-[38px] min-w-[38px] sm:min-h-0 sm:min-w-0 sm:w-8 sm:h-8 bg-white/80 hover:bg-white text-zinc-600 hover:text-zinc-900 rounded-lg text-xs flex items-center justify-center border border-zinc-200/80 shadow-xs transition cursor-pointer" title="Đồng bộ dữ liệu mới nhất từ Google Sheet">
+        <button type="button" onclick="syncFromCloud(true)" class="shrink-0 min-h-[38px] min-w-[38px] sm:min-h-0 sm:min-w-0 sm:w-8 sm:h-8 bg-white/90 hover:bg-white text-zinc-700 hover:text-zinc-950 rounded-xl text-xs flex items-center justify-center border border-zinc-200/90 shadow-2xs transition cursor-pointer" title="Làm mới dữ liệu từ Google Sheet">
           <i id="syncIcon" class="fa-solid fa-arrows-rotate text-xs"></i>
         </button>
 
         <!-- Catalog / Price Settings -->
-        <button type="button" onclick="openCatalogModal()" class="shrink-0 min-h-[38px] sm:min-h-0 bg-white/80 hover:bg-white text-zinc-700 px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5 border border-zinc-200/80 shadow-xs transition cursor-pointer whitespace-nowrap">
-          <i class="fa-solid fa-sliders text-zinc-500 text-xs"></i> <span>Bảng Giá Mẫu</span>
+        <button type="button" onclick="openCatalogModal()" class="shrink-0 min-h-[38px] sm:min-h-0 bg-white/90 hover:bg-white text-zinc-800 px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 border border-zinc-200/90 shadow-2xs transition cursor-pointer whitespace-nowrap" title="Xem & cấu hình bảng giá in">
+          <i class="fa-solid fa-sliders text-zinc-600 text-xs"></i> <span>Bảng Giá Mẫu</span>
         </button>
 
         <!-- Admin Role Lock/Unlock Button (Bảo vệ Bảng Giá Mẫu) -->
-        <button type="button" id="btnAdminLock" onclick="handleAdminButtonClick()" class="shrink-0 min-h-[38px] sm:min-h-0 bg-white/80 hover:bg-white text-zinc-700 border border-zinc-200/80 px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5 transition cursor-pointer shadow-xs whitespace-nowrap" title="Bấm để mở khoá quyền Quản trị viên (Admin)">
+        <button type="button" id="btnAdminLock" onclick="handleAdminButtonClick()" class="shrink-0 min-h-[38px] sm:min-h-0 bg-white/90 hover:bg-white text-zinc-800 border border-zinc-200/90 px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer shadow-2xs whitespace-nowrap" title="Bấm để mở khoá quyền Quản trị viên (Admin)">
           <i id="adminLockIcon" class="fa-solid fa-lock text-zinc-500 text-xs"></i>
           <span id="adminLockLabel">Chế độ Admin</span>
         </button>
 
         <!-- Export CSV Button -->
-        <button type="button" onclick="exportCSV()" class="shrink-0 min-h-[38px] sm:min-h-0 bg-white/80 hover:bg-white text-zinc-700 px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5 border border-zinc-200/80 shadow-xs transition cursor-pointer whitespace-nowrap">
-          <i class="fa-solid fa-file-arrow-down text-zinc-500 text-xs"></i> <span>Xuất File</span>
+        <button type="button" onclick="exportCSV()" class="shrink-0 min-h-[38px] sm:min-h-0 bg-white/90 hover:bg-white text-zinc-800 px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 border border-zinc-200/90 shadow-2xs transition cursor-pointer whitespace-nowrap" title="Xuất danh sách đơn ra file Excel/CSV chuẩn tiếng Việt">
+          <i class="fa-solid fa-file-arrow-down text-emerald-600 text-xs"></i> <span>Xuất File</span>
         </button>
 
         <!-- New Order Action Button on Desktop (min-h 44px for ergonomics) -->
-        <button type="button" onclick="openModal()" class="hidden sm:flex min-h-[44px] sm:min-h-[38px] bg-zinc-950 hover:bg-zinc-800 text-zinc-100 px-4 py-2 rounded-lg text-xs font-semibold items-center gap-2 shadow-xs transition cursor-pointer border border-zinc-900 shrink-0 whitespace-nowrap">
+        <button type="button" onclick="openModal()" class="hidden sm:flex min-h-[44px] sm:min-h-[38px] bg-zinc-950 hover:bg-zinc-800 active:scale-[0.98] text-zinc-100 px-4 py-2 rounded-xl text-xs font-semibold items-center gap-2 shadow-sm transition cursor-pointer border border-zinc-900 shrink-0 whitespace-nowrap">
           <i class="fa-solid fa-plus text-xs text-zinc-300"></i> Lên Đơn Mới
         </button>
       </div>
@@ -227,44 +252,67 @@
   <!-- Main Content Layout -->
   <main class="max-w-7xl mx-auto w-full px-3.5 sm:px-6 lg:px-8 py-5 sm:py-7 space-y-5 sm:space-y-6 pb-24 flex-1">
     
-    <!-- KPI Summary Bento Cards: Frosted Glass & Editorial Type-First -->
+    <!-- KPI Summary Bento Cards: v8.0 Frosted Glass & High-Contrast Typography -->
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5 lg:gap-6">
       
-      <!-- Card 1: Tổng chi phí in -->
-      <div class="glass-panel p-5 sm:p-6 rounded-xl shadow-xs flex flex-col justify-between">
-        <div class="flex items-center justify-between">
-          <span class="text-xs text-zinc-600 font-medium">Tổng chi phí in ấn</span>
-        </div>
-        <div class="mt-2.5">
-          <div class="text-2xl sm:text-3xl font-bold tracking-tight text-zinc-950 tabular-nums font-mono-val flex items-baseline" id="stat-total-cost">
-            0<span class="text-base sm:text-lg font-semibold ml-0.5 font-sans text-zinc-700">đ</span>
+      <!-- Bento Card 1: Tổng chi phí in ấn -->
+      <div class="glass-panel p-5 sm:p-6 rounded-2xl flex flex-col justify-between relative overflow-hidden">
+        <div class="flex items-center justify-between gap-2">
+          <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-xl bg-zinc-900/5 border border-zinc-200/80 text-zinc-800 flex items-center justify-center text-xs shadow-2xs">
+              <i class="fa-solid fa-chart-pie"></i>
+            </div>
+            <span class="text-xs sm:text-sm text-zinc-700 font-semibold tracking-tight">Tổng chi phí in ấn</span>
           </div>
-          <div class="flex items-center flex-wrap gap-1.5 text-xs text-zinc-600 font-mono-val mt-2">
-            <span class="inline-flex items-center gap-1.5">
-              <i class="fa-regular fa-folder-closed text-xs text-zinc-500"></i>
-              <span id="stat-total-orders">0 đơn hàng</span>
+          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-zinc-100/90 border border-zinc-200/80 text-xs font-mono-val font-semibold text-zinc-800">
+            <i class="fa-regular fa-folder-closed text-[11px] text-zinc-500"></i>
+            <span id="stat-total-orders">0 đơn hàng</span>
+          </span>
+        </div>
+
+        <div class="mt-4">
+          <div class="text-2xl sm:text-3xl lg:text-[32px] font-extrabold tracking-tight text-zinc-950 tabular-nums font-mono-val flex items-baseline leading-none" id="stat-total-cost">
+            0<span class="text-base sm:text-lg font-semibold ml-1 font-sans text-zinc-600">đ</span>
+          </div>
+
+          <!-- Progress bar tỷ lệ thanh toán -->
+          <div class="w-full h-1.5 bg-zinc-200/70 rounded-full overflow-hidden mt-3.5">
+            <div id="stat-paid-progress" class="h-full bg-emerald-500 rounded-full transition-all duration-500" style="width: 0%"></div>
+          </div>
+
+          <div class="flex items-center justify-between flex-wrap gap-2 text-xs font-mono-val mt-2.5 pt-2 border-t border-zinc-200/60">
+            <span class="text-zinc-600 font-sans font-medium">Đã tất toán xưởng:</span>
+            <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-emerald-50/90 text-emerald-700 border border-emerald-200/80 font-semibold">
+              <i class="fa-solid fa-circle-check text-[10px] text-emerald-600"></i>
+              <span id="stat-paid-amount">0 đ</span>
             </span>
-            <span class="text-zinc-300">•</span>
-            <span>Đã thanh toán: <span id="stat-paid-amount" class="text-emerald-600 font-medium">0 đ</span></span>
           </div>
         </div>
       </div>
 
-      <!-- Card 2: Công nợ xưởng (Subtle Rose Tint & Glass) -->
-      <div class="glass-panel p-5 sm:p-6 rounded-xl shadow-xs flex flex-col justify-between border-rose-200/70">
+      <!-- Bento Card 2: Công nợ xưởng chưa tất toán -->
+      <div id="kpiDebtCard" class="glass-panel p-5 sm:p-6 rounded-2xl flex flex-col justify-between border-rose-200/80 relative overflow-hidden">
         <div class="flex items-center justify-between gap-2">
-          <span class="text-xs text-rose-700 font-semibold flex items-center gap-1.5">
-            <span class="w-1.5 h-1.5 rounded-full bg-rose-600"></span> Công nợ xưởng chưa tất toán
-          </span>
-          <span id="stat-debt-count-badge" class="text-xs font-mono-val font-semibold px-2 py-0.5 rounded bg-rose-100 text-rose-800 border border-rose-200 shrink-0">0 đơn nợ</span>
-        </div>
-        <div class="mt-2.5">
-          <div class="text-2xl sm:text-3xl font-bold tracking-tight text-rose-700 tabular-nums font-mono-val flex items-baseline" id="stat-debt">
-            0<span class="text-base sm:text-lg font-semibold ml-0.5 font-sans text-rose-600">đ</span>
+          <div class="flex items-center gap-2.5">
+            <div id="kpiDebtIconBox" class="w-8 h-8 rounded-xl bg-rose-500/10 border border-rose-200/80 text-rose-600 flex items-center justify-center text-xs shadow-2xs">
+              <i class="fa-solid fa-file-invoice-dollar"></i>
+            </div>
+            <span id="kpiDebtTitle" class="text-xs sm:text-sm text-rose-800 font-semibold tracking-tight flex items-center gap-1.5">
+              Công nợ xưởng chưa tất toán
+            </span>
           </div>
-          <div class="flex items-center justify-end mt-3 pt-2.5 border-t border-rose-100/80">
+          <span id="stat-debt-count-badge" class="text-xs font-mono-val font-semibold px-2.5 py-1 rounded-lg bg-rose-100/90 text-rose-800 border border-rose-200 shrink-0">0 đơn nợ</span>
+        </div>
+
+        <div class="mt-4">
+          <div class="text-2xl sm:text-3xl lg:text-[32px] font-extrabold tracking-tight text-rose-700 tabular-nums font-mono-val flex items-baseline leading-none" id="stat-debt">
+            0<span class="text-base sm:text-lg font-semibold ml-1 font-sans text-rose-600">đ</span>
+          </div>
+
+          <div class="flex items-center justify-between gap-2 mt-3.5 pt-2.5 border-t border-rose-100/90">
+            <span class="text-[11px] text-zinc-500 hidden sm:inline">Cập nhật tức thì không cần tải lại trang</span>
             <!-- Nút Quyết toán căn phải, min-h 44px trên mobile, disabled khi sạch nợ -->
-            <button type="button" onclick="batchSettleDebt()" id="btnBatchSettleDebt" class="min-h-[44px] sm:min-h-[36px] w-full sm:w-auto px-4 py-2 sm:py-1.5 rounded-xl sm:rounded-lg bg-rose-600 hover:bg-rose-700 active:scale-[0.99] text-white text-xs font-semibold shadow-xs transition flex items-center justify-center gap-2 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-rose-600" title="Quyết toán công nợ các đơn đang hiển thị">
+            <button type="button" onclick="batchSettleDebt()" id="btnBatchSettleDebt" class="min-h-[44px] sm:min-h-[36px] w-full sm:w-auto ml-auto px-4 py-2 sm:py-1.5 rounded-xl bg-rose-600 hover:bg-rose-700 active:scale-[0.98] text-white text-xs font-semibold shadow-sm transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-rose-600" title="Quyết toán công nợ tất cả các đơn đang lọc">
               <i class="fa-solid fa-receipt text-xs"></i>
               <span id="btnBatchSettleDebtLabel">Quyết toán tất cả (0 đơn)</span>
             </button>
@@ -273,39 +321,44 @@
       </div>
     </div>
 
-    <!-- Smart Filter & Search Bar: Frosted Glass -->
-    <div class="glass-panel p-3 sm:p-3.5 rounded-xl shadow-xs flex flex-col lg:flex-row gap-3 items-stretch lg:items-center justify-between">
+    <!-- Smart Filter & Search Bar: v8.0 Frosted Glass -->
+    <div class="glass-panel p-3 sm:p-4 rounded-2xl flex flex-col lg:flex-row gap-3 items-stretch lg:items-center justify-between">
       
       <!-- Quick Status Filter (Lọc theo công nợ - Cuộn ngang mượt mà trên Mobile) -->
       <div class="flex items-center gap-1.5 overflow-x-auto pb-0.5 lg:pb-0 mobile-scroll-strip custom-scrollbar">
-        <button type="button" onclick="setQuickPaymentFilter('')" data-pay="" class="pay-pill shrink-0 min-h-[38px] sm:min-h-0 bg-zinc-900 text-white text-xs font-medium px-3.5 py-2 sm:py-1.5 rounded-lg sm:rounded-md transition whitespace-nowrap flex items-center gap-2 cursor-pointer shadow-xs border border-zinc-900">
-          Tất cả đơn
+        <button type="button" onclick="setQuickPaymentFilter('')" data-pay="" class="pay-pill shrink-0 min-h-[38px] sm:min-h-0 bg-zinc-950 text-white text-xs font-semibold px-3.5 py-2 sm:py-1.5 rounded-xl transition-all duration-200 whitespace-nowrap flex items-center gap-2 cursor-pointer shadow-xs border border-zinc-950">
+          <span>Tất cả đơn</span>
         </button>
-        <button type="button" onclick="setQuickPaymentFilter('Chưa thanh toán')" data-pay="Chưa thanh toán" class="pay-pill shrink-0 min-h-[38px] sm:min-h-0 bg-white/80 hover:bg-white text-zinc-600 hover:text-zinc-900 text-xs font-medium px-3.5 py-2 sm:py-1.5 rounded-lg sm:rounded-md transition whitespace-nowrap flex items-center gap-1.5 cursor-pointer border border-zinc-200/80 shadow-2xs">
-          <span class="w-1.5 h-1.5 rounded-full bg-rose-600"></span> Chưa thanh toán (Nợ xưởng)
+        <button type="button" onclick="setQuickPaymentFilter('Chưa thanh toán')" data-pay="Chưa thanh toán" class="pay-pill shrink-0 min-h-[38px] sm:min-h-0 bg-white/90 hover:bg-white text-zinc-700 hover:text-zinc-950 text-xs font-medium px-3.5 py-2 sm:py-1.5 rounded-xl transition-all duration-200 whitespace-nowrap flex items-center gap-1.5 cursor-pointer border border-zinc-200/90 shadow-2xs">
+          <span class="w-2 h-2 rounded-full bg-rose-500"></span>
+          <span>Chưa thanh toán</span>
         </button>
-        <button type="button" onclick="setQuickPaymentFilter('Đã thanh toán')" data-pay="Đã thanh toán" class="pay-pill shrink-0 min-h-[38px] sm:min-h-0 bg-white/80 hover:bg-white text-zinc-600 hover:text-zinc-900 text-xs font-medium px-3.5 py-2 sm:py-1.5 rounded-lg sm:rounded-md transition whitespace-nowrap flex items-center gap-1.5 cursor-pointer border border-zinc-200/80 shadow-2xs">
-          <span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span> Đã thanh toán
+        <button type="button" onclick="setQuickPaymentFilter('Đã thanh toán')" data-pay="Đã thanh toán" class="pay-pill shrink-0 min-h-[38px] sm:min-h-0 bg-white/90 hover:bg-white text-zinc-700 hover:text-zinc-950 text-xs font-medium px-3.5 py-2 sm:py-1.5 rounded-xl transition-all duration-200 whitespace-nowrap flex items-center gap-1.5 cursor-pointer border border-zinc-200/90 shadow-2xs">
+          <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+          <span>Đã thanh toán</span>
         </button>
       </div>
 
       <!-- Search, Month & Workshop Selectors (Tự động co giãn & cuộn ngang trên Mobile) -->
       <div class="flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center gap-2.5 sm:gap-2">
-        <div class="relative w-full sm:w-auto sm:flex-1 sm:min-w-[200px]">
-          <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 text-xs"></i>
-          <input type="text" id="searchInput" oninput="renderAll()" placeholder="Tìm mã FU, Dâu Rể..." class="w-full min-h-[42px] sm:min-h-0 pl-8 pr-3 py-2 sm:py-1.5 text-xs font-medium bg-white/70 border border-zinc-200/80 rounded-lg sm:rounded-md focus:bg-white focus:border-zinc-900 outline-none transition backdrop-blur-xs">
+        <div class="relative w-full sm:w-auto sm:flex-1 sm:min-w-[230px]">
+          <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-400 text-xs pointer-events-none"></i>
+          <input type="text" id="searchInput" oninput="handleSearchInput(this.value)" placeholder="Tìm mã FU, tên Dâu Rể, sản phẩm..." class="w-full min-h-[42px] sm:min-h-0 pl-9 pr-8 py-2 sm:py-1.5 text-xs font-medium text-zinc-900 bg-white/85 border border-zinc-200/90 rounded-xl focus:bg-white focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900/10 outline-none transition backdrop-blur-xs">
+          <button type="button" id="clearSearchBtn" onclick="clearSearchInput()" class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-zinc-200/80 hover:bg-zinc-300 text-zinc-600 flex items-center justify-center text-[10px] cursor-pointer transition" title="Xoá từ khoá tìm kiếm">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
         </div>
 
         <div class="flex items-center gap-2 overflow-x-auto pb-0.5 sm:pb-0 mobile-scroll-strip custom-scrollbar">
           <!-- Workshop Filter (Lọc theo xưởng) -->
-          <select id="filterWorkshop" onchange="renderAll()" class="shrink-0 min-h-[40px] sm:min-h-0 text-xs font-medium border border-zinc-200/80 rounded-lg sm:rounded-md px-2.5 py-1.5 bg-white/70 text-zinc-700 outline-none focus:bg-white focus:border-zinc-900 cursor-pointer backdrop-blur-xs">
+          <select id="filterWorkshop" onchange="renderAll()" class="shrink-0 min-h-[40px] sm:min-h-0 text-xs font-semibold border border-zinc-200/90 rounded-xl px-3 py-1.5 bg-white/85 text-zinc-800 outline-none focus:bg-white focus:border-zinc-900 cursor-pointer backdrop-blur-xs">
             <option value="">Tất cả xưởng</option>
             <option value="TPS">Xưởng TPS</option>
             <option value="Xưởng Khung">Xưởng Khung</option>
             <option value="Lab Sài Gòn">Lab Sài Gòn</option>
           </select>
 
-          <select id="filterMonth" onchange="renderAll()" class="shrink-0 min-h-[40px] sm:min-h-0 text-xs font-medium border border-zinc-200/80 rounded-lg sm:rounded-md px-2.5 py-1.5 bg-white/70 text-zinc-700 outline-none focus:bg-white focus:border-zinc-900 cursor-pointer backdrop-blur-xs">
+          <select id="filterMonth" onchange="renderAll()" class="shrink-0 min-h-[40px] sm:min-h-0 text-xs font-semibold border border-zinc-200/90 rounded-xl px-3 py-1.5 bg-white/85 text-zinc-800 outline-none focus:bg-white focus:border-zinc-900 cursor-pointer backdrop-blur-xs">
             <option value="">Toàn bộ tháng</option>
             <option value="1">Tháng 01</option>
             <option value="2">Tháng 02</option>
@@ -321,20 +374,20 @@
             <option value="12">Tháng 12</option>
           </select>
 
-          <button type="button" onclick="resetFilters()" class="shrink-0 min-h-[40px] min-w-[36px] sm:min-h-0 sm:min-w-0 text-xs text-zinc-400 hover:text-zinc-700 px-2.5 py-1.5 rounded-lg sm:rounded-md bg-white/50 sm:bg-transparent border border-zinc-200/60 sm:border-0 cursor-pointer transition flex items-center justify-center" title="Xoá bộ lọc">
+          <button type="button" onclick="resetFilters()" class="shrink-0 min-h-[40px] min-w-[36px] sm:min-h-0 sm:min-w-0 text-xs text-zinc-500 hover:text-zinc-950 px-2.5 py-1.5 rounded-xl bg-white/80 hover:bg-white border border-zinc-200/80 cursor-pointer transition flex items-center justify-center shadow-2xs" title="Đặt lại toàn bộ bộ lọc">
             <i class="fa-solid fa-rotate-right"></i>
           </button>
 
-          <div class="h-4 w-px bg-zinc-200/80 mx-0.5 shrink-0"></div>
+          <div class="h-4 w-px bg-zinc-300/80 mx-0.5 shrink-0"></div>
 
           <!-- Nút Tổng Hợp Zalo Toàn Bộ Đơn Đang Lọc (min-h 44px trên mobile) -->
-          <button type="button" onclick="openBatchZaloModal()" class="shrink-0 min-h-[44px] sm:min-h-0 text-xs font-semibold sm:font-medium px-3.5 sm:px-2.5 py-2 sm:py-1.5 rounded-xl sm:rounded-md bg-white/80 hover:bg-white text-zinc-800 border border-zinc-200/80 shadow-2xs transition flex items-center gap-1.5 cursor-pointer backdrop-blur-xs hover:border-zinc-400 whitespace-nowrap" title="Tổng hợp toàn bộ các đơn đang lọc thành 1 tin nhắn gửi Zalo cho xưởng">
+          <button type="button" onclick="openBatchZaloModal()" class="shrink-0 min-h-[44px] sm:min-h-0 text-xs font-semibold px-3.5 sm:px-3 py-2 sm:py-1.5 rounded-xl bg-white/90 hover:bg-sky-50 text-zinc-800 hover:text-sky-700 border border-zinc-200/90 hover:border-sky-300 shadow-2xs transition flex items-center gap-1.5 cursor-pointer backdrop-blur-xs whitespace-nowrap" title="Tổng hợp toàn bộ các đơn đang lọc thành 1 tin nhắn gửi Zalo cho xưởng">
             <i class="fa-solid fa-comments text-sky-600 text-xs"></i>
             <span>Tổng hợp Zalo</span>
           </button>
 
           <!-- Nút Cài Đặt Mẫu Tin Nhắn Mặc Định -->
-          <button type="button" onclick="openZaloConfigModal()" class="shrink-0 min-h-[40px] sm:min-h-0 text-xs font-medium px-3 sm:px-2.5 py-1.5 rounded-lg sm:rounded-md bg-white/80 hover:bg-white text-zinc-600 hover:text-zinc-900 border border-zinc-200/80 shadow-2xs transition flex items-center gap-1.5 cursor-pointer backdrop-blur-xs hover:border-zinc-400 whitespace-nowrap" title="Cài đặt mẫu tin nhắn Zalo mặc định">
+          <button type="button" onclick="openZaloConfigModal()" class="shrink-0 min-h-[40px] sm:min-h-0 text-xs font-semibold px-3 sm:px-2.5 py-1.5 rounded-xl bg-white/90 hover:bg-white text-zinc-700 hover:text-zinc-950 border border-zinc-200/90 shadow-2xs transition flex items-center gap-1.5 cursor-pointer backdrop-blur-xs hover:border-zinc-400 whitespace-nowrap" title="Cài đặt mẫu tin nhắn Zalo mặc định">
             <i class="fa-solid fa-sliders text-zinc-500 text-xs"></i>
             <span>Mẫu tin</span>
           </button>
@@ -344,14 +397,14 @@
 
     <!-- VIEW 1: MODERN STUDIO CARDS GRID (Default) -->
     <!-- Card Selection Bar for Studio Cards View -->
-    <div id="cardSelectionBar" class="flex items-center justify-between px-4 py-2.5 mb-3 text-xs bg-white/70 border border-zinc-200/80 rounded-xl backdrop-blur-xs shadow-2xs">
-      <label class="flex items-center gap-2.5 cursor-pointer font-medium hover:text-zinc-900 select-none min-h-[28px]" title="Chọn tất cả các đơn trong trang">
+    <div id="cardSelectionBar" class="flex items-center justify-between px-4 py-2.5 mb-3 text-xs bg-white/80 border border-white/90 rounded-2xl backdrop-blur-md shadow-2xs">
+      <label class="flex items-center gap-2.5 cursor-pointer font-medium hover:text-zinc-950 select-none min-h-[28px]" title="Chọn tất cả các đơn đang hiển thị">
         <input type="checkbox" id="selectAllCardsCheckbox" onchange="toggleSelectAllOrders(this.checked)" class="w-4 h-4 rounded border-zinc-300 text-zinc-950 focus:ring-0 cursor-pointer">
-        <span class="text-xs font-semibold text-zinc-800">Chọn tất cả (<span id="selectAllCardsCount">0</span> đơn)</span>
+        <span class="text-xs font-semibold text-zinc-800">Chọn tất cả (<span id="selectAllCardsCount">0</span> đơn hiển thị)</span>
       </label>
       <div class="flex items-center gap-3">
-        <span class="text-[11px] text-zinc-400 hidden sm:inline">Chạm vào đơn để chọn gạch nợ hàng loạt</span>
-        <button type="button" onclick="clearSelectedOrders()" class="text-zinc-500 hover:text-rose-600 text-xs font-medium cursor-pointer transition py-1 px-2">Bỏ chọn</button>
+        <span class="text-[11px] text-zinc-500 hidden sm:inline">Tích chọn nhiều đơn để gạch nợ hàng loạt</span>
+        <button type="button" onclick="clearSelectedOrders()" class="text-zinc-600 hover:text-rose-600 text-xs font-semibold cursor-pointer transition py-1 px-2 rounded-lg hover:bg-rose-50/60">Bỏ chọn</button>
       </div>
     </div>
 
@@ -360,33 +413,38 @@
       <!-- Dynamic Cards Rendered by JS -->
     </div>
 
-    <!-- VIEW 2: COMPACT EDITORIAL TABLE VIEW (Frosted Glass) -->
-    <div id="tableViewContainer" class="hidden glass-panel rounded-xl shadow-xs overflow-hidden">
-      <div class="overflow-x-auto">
-        <table class="w-full text-left text-sm text-zinc-700">
-          <thead class="bg-white/40 text-xs font-mono-val font-medium text-zinc-600 border-b border-zinc-200/70">
+    <!-- VIEW 2: COMPACT EDITORIAL DATA TABLE VIEW (v8.0 Premium Glass) -->
+    <div id="tableViewContainer" class="hidden glass-panel rounded-2xl overflow-hidden">
+      <div class="overflow-x-auto custom-scrollbar">
+        <table class="w-full text-left text-sm text-zinc-800 border-collapse">
+          <thead class="bg-zinc-900/[0.04] text-xs font-mono-val font-semibold text-zinc-700 border-b border-zinc-200/80 uppercase tracking-wider">
             <tr>
-              <th class="py-3 px-3 w-8 text-center"><input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAllOrders(this.checked)" class="w-4 h-4 rounded border-zinc-300 text-zinc-950 focus:ring-0 cursor-pointer" title="Chọn tất cả để gạch nợ"></th>
-              <th class="py-3 px-4">Hợp đồng / Dâu rể</th>
-              <th class="py-3 px-4">Ngày gửi</th>
-              <th class="py-3 px-4">Chi tiết sản phẩm in</th>
-              <th class="py-3 px-4 text-right">Tổng tiền</th>
-              <th class="py-3 px-4 text-center">Công nợ xưởng</th>
-              <th class="py-3 px-4 text-center">Thao tác</th>
+              <th class="py-3.5 px-3.5 w-10 text-center">
+                <input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAllOrders(this.checked)" class="w-4 h-4 rounded border-zinc-300 text-zinc-950 focus:ring-0 cursor-pointer" title="Chọn tất cả để gạch nợ">
+              </th>
+              <th class="py-3.5 px-4">Hợp đồng / Dâu rể</th>
+              <th class="py-3.5 px-4">Ngày gửi • Nhận & Xưởng</th>
+              <th class="py-3.5 px-4">Chi tiết sản phẩm in</th>
+              <th class="py-3.5 px-4 text-right">Tổng tiền</th>
+              <th class="py-3.5 px-4 text-center">Trạng thái</th>
+              <th class="py-3.5 px-4 text-center">Thao tác</th>
             </tr>
           </thead>
-          <tbody id="orderTableBody" class="divide-y divide-zinc-100/80 font-medium"></tbody>
+          <tbody id="orderTableBody" class="divide-y divide-zinc-200/60 font-medium"></tbody>
         </table>
       </div>
     </div>
 
     <!-- Empty State -->
-    <div id="emptyState" class="hidden glass-panel rounded-xl border border-dashed border-zinc-300 text-center py-16 px-4">
-      <div class="w-12 h-12 rounded-lg bg-white/80 text-zinc-400 flex items-center justify-center mx-auto mb-3 text-lg border border-zinc-200">
+    <div id="emptyState" class="hidden glass-panel rounded-2xl border border-dashed border-zinc-300 text-center py-16 px-4">
+      <div class="w-12 h-12 rounded-2xl bg-white/90 text-zinc-400 flex items-center justify-center mx-auto mb-3 text-lg border border-zinc-200 shadow-2xs">
         <i class="fa-regular fa-folder-open"></i>
       </div>
-      <h3 class="text-sm font-semibold text-zinc-800">Chưa có đơn in nào khớp với bộ lọc</h3>
-      <p class="text-xs text-zinc-400 mt-1">Đổi từ khoá tìm kiếm hoặc bấm "Lên Đơn Mới" ở góc trên.</p>
+      <h3 class="text-sm font-bold text-zinc-800">Không tìm thấy đơn in nào khớp với bộ lọc</h3>
+      <p class="text-xs text-zinc-500 mt-1">Hãy thử xoá bộ lọc tìm kiếm hoặc bấm "Lên Đơn Mới" ở góc trên.</p>
+      <button type="button" onclick="resetFilters()" class="mt-4 px-4 py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-semibold transition cursor-pointer shadow-xs">
+        Đặt lại bộ lọc
+      </button>
     </div>
 
     <!-- Floating Batch Actions Bar (Khi chọn checkbox các đơn) -->
@@ -2317,24 +2375,87 @@ function createJsonResponse(obj) {
       });
     }
 
+    // ================= SAFE MONEY MATH (CHỐNG SAI SỐ FLOATING POINT) =================
+    function calcItemSubtotal(qty, price) {
+      const q = Math.max(0, Math.round(Number(qty) || 0));
+      const p = Math.round(Number(price) || 0);
+      return Math.round(q * p);
+    }
+
+    function calcOrderTotal(order) {
+      if (!order || !Array.isArray(order.items)) return 0;
+      return order.items.reduce((sum, it) => sum + calcItemSubtotal(it.qty, it.price), 0);
+    }
+
+    function formatMoney(amount) {
+      return Math.round(Number(amount) || 0).toLocaleString('vi-VN') + ' đ';
+    }
+
+    // ================= SEARCH DEBOUNCE & VIETNAMESE TONE NORMALIZATION =================
+    let searchDebounceTimer = null;
+
+    function removeVietnameseTones(str) {
+      if (!str) return '';
+      return String(str)
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/đ/g, 'd')
+        .replace(/Đ/g, 'D')
+        .toLowerCase()
+        .trim();
+    }
+
+    function handleSearchInput(val) {
+      const clearBtn = document.getElementById('clearSearchBtn');
+      if (clearBtn) {
+        if (val && String(val).trim().length > 0) {
+          clearBtn.classList.remove('hidden');
+        } else {
+          clearBtn.classList.add('hidden');
+        }
+      }
+      if (searchDebounceTimer) clearTimeout(searchDebounceTimer);
+      searchDebounceTimer = setTimeout(() => {
+        renderAll();
+      }, 140);
+    }
+
+    function clearSearchInput() {
+      const input = document.getElementById('searchInput');
+      if (input) {
+        input.value = '';
+        input.focus();
+      }
+      const clearBtn = document.getElementById('clearSearchBtn');
+      if (clearBtn) clearBtn.classList.add('hidden');
+      if (searchDebounceTimer) clearTimeout(searchDebounceTimer);
+      renderAll();
+    }
+
     function optimizeOrdersForStorage(list) {
       if (!Array.isArray(list)) return [];
-      return list.map(o => ({
-        id: o.id,
-        code: String(o.code || ''),
-        name: String(o.name || ''),
-        date: String(o.date || ''),
-        deliveryDate: String(o.deliveryDate || ''),
-        isUrgent: Boolean(o.isUrgent),
-        workshop: String(o.workshop || 'TPS'),
-        payment: String(o.payment || 'Chưa thanh toán'),
-        driveUrl: String(o.driveUrl || ''),
-        items: Array.isArray(o.items) ? o.items.map(it => ({
-          name: String(it.name || ''),
-          qty: Number(it.qty) || 1,
-          price: Number(it.price) || 0
-        })) : []
-      }));
+      return list.map(o => {
+        const normDate = normalizeDateToISO(o.date) || getTodayISO();
+        const isUrgent = Boolean(o.isUrgent);
+        const normDelivery = normalizeDateToISO(o.deliveryDate) || calculateDeliveryDate(normDate, isUrgent ? 1 : 2);
+        return {
+          id: o.id,
+          code: String(o.code || '').trim(),
+          name: String(o.name || '').trim(),
+          date: normDate,
+          deliveryDate: normDelivery,
+          isUrgent: isUrgent,
+          workshop: String(o.workshop || 'TPS').trim(),
+          payment: String(o.payment || 'Chưa thanh toán'),
+          driveUrl: String(o.driveUrl || '').trim(),
+          note: String(o.note || '').trim(),
+          items: Array.isArray(o.items) ? o.items.map(it => ({
+            name: String(it.name || '').trim(),
+            qty: Math.max(1, Math.round(Number(it.qty) || 1)),
+            price: Math.round(Number(it.price) || 0)
+          })) : []
+        };
+      });
     }
 
     function saveToStorage() {
@@ -2355,10 +2476,6 @@ function createJsonResponse(obj) {
       if (showNotification) {
         showToast('Đã lưu bảng giá xưởng thành công! ✅', 'success');
       }
-    }
-
-    function formatMoney(amount) {
-      return Number(amount || 0).toLocaleString('vi-VN') + ' đ';
     }
 
     // Định dạng ngày theo chuẩn Việt Nam Ngày/Tháng/Năm (DD/MM/YYYY)
@@ -2383,16 +2500,22 @@ function createJsonResponse(obj) {
 
       if (mode === 'card') {
         cardContainer.classList.remove('hidden');
-        if (cardSelectionBar) cardSelectionBar.classList.remove('hidden');
+        cardContainer.classList.remove('animate-view-fade');
+        void cardContainer.offsetWidth;
+        cardContainer.classList.add('animate-view-fade');
+        if (cardSelectionBar && getFilteredOrders().length > 0) cardSelectionBar.classList.remove('hidden');
         tableContainer.classList.add('hidden');
-        btnCard.className = 'min-h-[36px] sm:min-h-0 px-2.5 py-1.5 rounded-md text-xs font-medium transition flex items-center gap-1.5 bg-white text-zinc-900 shadow-xs cursor-pointer whitespace-nowrap';
-        btnTable.className = 'min-h-[36px] sm:min-h-0 px-2.5 py-1.5 rounded-md text-xs font-medium transition flex items-center gap-1.5 text-zinc-500 hover:text-zinc-900 cursor-pointer whitespace-nowrap';
+        btnCard.className = 'min-h-[36px] sm:min-h-0 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 flex items-center gap-1.5 bg-white text-zinc-950 shadow-xs cursor-pointer whitespace-nowrap';
+        btnTable.className = 'min-h-[36px] sm:min-h-0 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 flex items-center gap-1.5 text-zinc-600 hover:text-zinc-950 cursor-pointer whitespace-nowrap';
       } else {
         cardContainer.classList.add('hidden');
         if (cardSelectionBar) cardSelectionBar.classList.add('hidden');
         tableContainer.classList.remove('hidden');
-        btnTable.className = 'min-h-[36px] sm:min-h-0 px-2.5 py-1.5 rounded-md text-xs font-medium transition flex items-center gap-1.5 bg-white text-zinc-900 shadow-xs cursor-pointer whitespace-nowrap';
-        btnCard.className = 'min-h-[36px] sm:min-h-0 px-2.5 py-1.5 rounded-md text-xs font-medium transition flex items-center gap-1.5 text-zinc-500 hover:text-zinc-900 cursor-pointer whitespace-nowrap';
+        tableContainer.classList.remove('animate-view-fade');
+        void tableContainer.offsetWidth;
+        tableContainer.classList.add('animate-view-fade');
+        btnTable.className = 'min-h-[36px] sm:min-h-0 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 flex items-center gap-1.5 bg-white text-zinc-950 shadow-xs cursor-pointer whitespace-nowrap';
+        btnCard.className = 'min-h-[36px] sm:min-h-0 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 flex items-center gap-1.5 text-zinc-600 hover:text-zinc-950 cursor-pointer whitespace-nowrap';
       }
       syncSelectionUI();
     }
@@ -2401,9 +2524,9 @@ function createJsonResponse(obj) {
       currentPaymentQuickFilter = pay;
       document.querySelectorAll('.pay-pill').forEach(btn => {
         if (btn.getAttribute('data-pay') === pay) {
-          btn.className = 'pay-pill shrink-0 min-h-[38px] sm:min-h-0 bg-zinc-900 text-white text-xs font-medium px-3.5 py-2 sm:py-1.5 rounded-lg sm:rounded-md transition whitespace-nowrap flex items-center gap-2 cursor-pointer shadow-xs border border-zinc-900';
+          btn.className = 'pay-pill shrink-0 min-h-[38px] sm:min-h-0 bg-zinc-950 text-white text-xs font-semibold px-3.5 py-2 sm:py-1.5 rounded-xl transition-all duration-200 whitespace-nowrap flex items-center gap-2 cursor-pointer shadow-xs border border-zinc-950';
         } else {
-          btn.className = 'pay-pill shrink-0 min-h-[38px] sm:min-h-0 bg-white/80 hover:bg-white text-zinc-600 hover:text-zinc-900 text-xs font-medium px-3.5 py-2 sm:py-1.5 rounded-lg sm:rounded-md transition whitespace-nowrap flex items-center gap-1.5 cursor-pointer border border-zinc-200/80 shadow-2xs';
+          btn.className = 'pay-pill shrink-0 min-h-[38px] sm:min-h-0 bg-white/90 hover:bg-white text-zinc-700 hover:text-zinc-950 text-xs font-medium px-3.5 py-2 sm:py-1.5 rounded-xl transition-all duration-200 whitespace-nowrap flex items-center gap-1.5 cursor-pointer border border-zinc-200/90 shadow-2xs';
         }
       });
       renderAll();
@@ -2417,6 +2540,8 @@ function createJsonResponse(obj) {
           time: Date.now(),
           payload
         });
+        // Giới hạn tối đa 100 tác vụ trong hàng đợi để tránh tràn bộ nhớ
+        if (queue.length > 100) queue.shift();
         safeSetStorage(STORAGE_KEYS.PENDING_QUEUE, queue);
       } catch (e) {
         console.warn('[SyncQueue] Lỗi xếp hàng đợi đồng bộ offline:', e);
@@ -2448,16 +2573,22 @@ function createJsonResponse(obj) {
       const queue = safeGetJSON(STORAGE_KEYS.PENDING_QUEUE, []);
       if (!Array.isArray(queue) || queue.length === 0) return;
 
+      const remainingQueue = [];
       for (const item of queue) {
         try {
-          await fetchWithTimeout(gasUrl, {
+          const res = await fetchWithTimeout(gasUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'text/plain;charset=utf-8' },
             body: JSON.stringify(item.payload)
           }, 8000);
-        } catch (err) {}
+          if (!res.ok) {
+            remainingQueue.push(item);
+          }
+        } catch (err) {
+          remainingQueue.push(item);
+        }
       }
-      safeSetStorage(STORAGE_KEYS.PENDING_QUEUE, []);
+      safeSetStorage(STORAGE_KEYS.PENDING_QUEUE, remainingQueue);
     }
 
     // Lưu toàn bộ cache đơn hàng, bảng giá, combos và cài đặt từ Google Sheet vào LocalStorage
@@ -2528,7 +2659,7 @@ function createJsonResponse(obj) {
       if (!navigator.onLine) {
         if (offlineBadge) offlineBadge.classList.remove('hidden');
         if (btn) {
-          btn.className = 'shrink-0 min-h-[38px] sm:min-h-0 bg-amber-50/90 hover:bg-amber-100 text-amber-900 border border-amber-300/90 px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-2 transition cursor-pointer shadow-xs whitespace-nowrap';
+          btn.className = 'shrink-0 min-h-[38px] sm:min-h-0 bg-amber-50/95 hover:bg-amber-100 text-amber-900 border border-amber-300 px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-2 transition cursor-pointer shadow-2xs whitespace-nowrap';
           btn.innerHTML = `<span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span> <span>Đang xem offline</span>`;
           btn.title = 'Mất kết nối mạng - Đang xem dữ liệu lưu offline trong máy';
         }
@@ -2547,11 +2678,11 @@ function createJsonResponse(obj) {
           const mm = String(d.getMinutes()).padStart(2, '0');
           timeLabel = ` lúc ${hh}:${mm}`;
         }
-        btn.className = 'shrink-0 min-h-[38px] sm:min-h-0 bg-emerald-50/90 hover:bg-emerald-100 text-emerald-900 border border-emerald-300/80 px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-2 transition cursor-pointer shadow-xs whitespace-nowrap';
+        btn.className = 'shrink-0 min-h-[38px] sm:min-h-0 bg-emerald-50/95 hover:bg-emerald-100 text-emerald-900 border border-emerald-300/90 px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-2 transition cursor-pointer shadow-2xs whitespace-nowrap';
         btn.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse"></span> <span>Google Sheet Sync</span>`;
         btn.title = `Đã kết nối Google Sheet (Đồng bộ gần nhất${timeLabel || ' hôm nay'})`;
       } else {
-        btn.className = 'shrink-0 min-h-[38px] sm:min-h-0 bg-white/80 hover:bg-white text-zinc-700 border border-zinc-200/80 px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-2 transition cursor-pointer shadow-xs whitespace-nowrap';
+        btn.className = 'shrink-0 min-h-[38px] sm:min-h-0 bg-white/90 hover:bg-white text-zinc-800 border border-zinc-200/90 px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-2 transition cursor-pointer shadow-2xs whitespace-nowrap';
         btn.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> <span>Nối Google Sheet</span>`;
         btn.title = 'Chưa nối Google Sheet - Dữ liệu đang được lưu cục bộ trên máy này';
       }
@@ -2592,6 +2723,7 @@ function createJsonResponse(obj) {
         showToast('Đang kiểm tra kết nối Google Sheet...', 'info');
         const sep = input.includes('?') ? '&' : '?';
         const res = await fetchWithTimeout(`${input}${sep}action=getOrders&_t=${Date.now()}`, {}, 12000);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
         if (data && data.status === 'success') {
           gasUrl = input;
@@ -2650,6 +2782,7 @@ function createJsonResponse(obj) {
       if (icon) icon.classList.add('animate-spin-fast');
 
       try {
+        await flushPendingSyncQueue();
         const sep = gasUrl.includes('?') ? '&' : '?';
         const res = await fetchWithTimeout(`${gasUrl}${sep}action=getOrders&_t=${Date.now()}`, {}, 12000);
         if (!res.ok) throw new Error(`Mã lỗi HTTP: ${res.status}`);
@@ -2693,7 +2826,12 @@ function createJsonResponse(obj) {
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           body: JSON.stringify(payload)
         }, 10000);
-        return await res.json();
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        if (data && data.status === 'error') {
+          throw new Error(data.message || 'Apps Script Error');
+        }
+        return data;
       } catch (err) {
         enqueuePendingAction(payload);
         return null;
@@ -3073,8 +3211,8 @@ function createJsonResponse(obj) {
       if (gasUrl) {
         sendCloudPost({ action: 'saveSettings', settings: { fu_studio_combos_v1: JSON.stringify(presetCombos) } });
       }
-      renderComboManageList();
-      renderPresetComboPills();
+      renderComboList();
+      renderPresetCombosGrid();
       showToast('Đã khôi phục 5 combo mặc định!', 'success');
     }
 
@@ -3133,7 +3271,7 @@ function createJsonResponse(obj) {
     function changeCartQty(uid, delta) {
       const idx = modalCart.findIndex(c => c.uid === uid);
       if (idx === -1) return;
-      modalCart[idx].qty += delta;
+      modalCart[idx].qty = Math.round(Number(modalCart[idx].qty) || 1) + delta;
       if (modalCart[idx].qty <= 0) {
         modalCart.splice(idx, 1);
       }
@@ -3144,7 +3282,7 @@ function createJsonResponse(obj) {
     function setCartQtyDirect(uid, val) {
       const item = modalCart.find(c => c.uid === uid);
       if (!item) return;
-      item.qty = Math.max(1, Number(val) || 1);
+      item.qty = Math.max(1, Math.round(Number(val) || 1));
       renderCartTotalOnly();
       renderQuickCatalogGrid();
     }
@@ -3153,7 +3291,7 @@ function createJsonResponse(obj) {
       const item = modalCart.find(c => c.uid === uid);
       if (!item) return;
       if (field === 'price') {
-        item.price = Number(val) || 0;
+        item.price = Math.round(Number(val) || 0);
         renderCartTotalOnly();
       } else {
         item[field] = val;
@@ -3170,9 +3308,9 @@ function createJsonResponse(obj) {
       let total = 0;
       let totalItems = 0;
       modalCart.forEach(c => {
-        const sub = c.qty * c.price;
+        const sub = calcItemSubtotal(c.qty, c.price);
         total += sub;
-        totalItems += c.qty;
+        totalItems += Math.max(1, Math.round(Number(c.qty) || 1));
         const subEl = document.getElementById('sub_' + c.uid);
         if (subEl) subEl.innerText = formatMoney(sub);
       });
@@ -3200,7 +3338,7 @@ function createJsonResponse(obj) {
       }
 
       modalCart.forEach(item => {
-        const sub = item.qty * item.price;
+        const sub = calcItemSubtotal(item.qty, item.price);
         const div = document.createElement('div');
         div.className = 'py-2.5 first:pt-0 last:pb-0 space-y-1.5';
         div.innerHTML = `
@@ -3976,7 +4114,7 @@ function createJsonResponse(obj) {
 
       if (order) {
         window.currentDeletingOrderId = order.id;
-        const orderTotal = (order.items || []).reduce((sum, it) => sum + ((Number(it.qty) || 0) * (Number(it.price) || 0)), 0);
+        const orderTotal = calcOrderTotal(order);
         const orderName = order.name || order.customer || 'Khách lẻ';
         const orderCode = order.code || `#${order.id}`;
         const workshop = order.workshop || 'TPS';
@@ -4092,14 +4230,18 @@ function createJsonResponse(obj) {
 
         if (gasUrl) {
           sendCloudPost({ action: 'togglePayment', id: id, payment: item.payment });
-          showToast(`Đã chuyển: ${item.code} ➔ ${item.payment}`, 'success');
         }
+        showToast(`Đã chuyển: ${item.code} ➔ ${item.payment} ✅`, 'success');
       }
     }
 
     function resetFilters() {
-      document.getElementById('searchInput').value = '';
-      document.getElementById('filterMonth').value = '';
+      const searchEl = document.getElementById('searchInput');
+      if (searchEl) searchEl.value = '';
+      const clearBtn = document.getElementById('clearSearchBtn');
+      if (clearBtn) clearBtn.classList.add('hidden');
+      const monthEl = document.getElementById('filterMonth');
+      if (monthEl) monthEl.value = '';
       const wEl = document.getElementById('filterWorkshop');
       if (wEl) wEl.value = '';
       setQuickPaymentFilter('');
@@ -4136,7 +4278,7 @@ Lưu ý: Anh em thợ kiểm tra kỹ danh sách và xác nhận giúp FU Studio
 
     function buildSingleZaloMessage(o) {
       const tpl = getSingleZaloTemplate();
-      const orderTotal = (o.items || []).reduce((sum, it) => sum + (it.qty * it.price), 0);
+      const orderTotal = calcOrderTotal(o);
       const itemsText = (o.items || []).map(it => `  - ${it.qty}x ${it.name}`).join('\n');
       const driveText = o.driveUrl ? o.driveUrl : 'Đã gửi riêng qua Zalo/Drive';
       const notesText = o.note ? o.note : 'Không có ghi chú thêm';
@@ -4158,12 +4300,12 @@ Lưu ý: Anh em thợ kiểm tra kỹ danh sách và xác nhận giúp FU Studio
 
     function buildBatchZaloMessage(orderList, currentWorkshopFilter) {
       const tpl = getBatchZaloTemplate();
-      const totalAmount = orderList.reduce((sum, o) => sum + (o.items || []).reduce((s, it) => s + (it.qty * it.price), 0), 0);
+      const totalAmount = (orderList || []).reduce((sum, o) => sum + calcOrderTotal(o), 0);
       const workshopLabel = currentWorkshopFilter ? currentWorkshopFilter : 'TẤT CẢ XƯỞNG';
       const todayStr = formatDateVN(new Date());
 
-      const allOrdersText = orderList.map((o, idx) => {
-        const oTotal = (o.items || []).reduce((s, it) => s + (it.qty * it.price), 0);
+      const allOrdersText = (orderList || []).map((o, idx) => {
+        const oTotal = calcOrderTotal(o);
         const items = (o.items || []).map(it => `   - ${it.qty}x ${it.name}`).join('\n');
         const drive = o.driveUrl ? `\n   Link file: ${o.driveUrl}` : '';
         const deliveryStr = o.deliveryDate ? ` | Nhận: ${formatDateVN(o.deliveryDate)}` : '';
@@ -4174,7 +4316,7 @@ Lưu ý: Anh em thợ kiểm tra kỹ danh sách và xác nhận giúp FU Studio
       return tpl
         .replace(/\{XUONG\}/g, workshopLabel)
         .replace(/\{NGAY_HIEN_TAI\}/g, todayStr)
-        .replace(/\{SO_LUONG_DON\}/g, orderList.length)
+        .replace(/\{SO_LUONG_DON\}/g, (orderList || []).length)
         .replace(/\{TONG_TIEN_TOAN_BO\}/g, formatMoney(totalAmount))
         .replace(/\{DANH_SACH_TAT_CA_DON\}/g, allOrdersText);
     }
@@ -4184,7 +4326,7 @@ Lưu ý: Anh em thợ kiểm tra kỹ danh sách và xác nhận giúp FU Studio
       if (!o) return;
       currentZaloOrderId = id;
 
-      const orderTotal = (o.items || []).reduce((sum, it) => sum + (it.qty * it.price), 0);
+      const orderTotal = calcOrderTotal(o);
 
       document.getElementById('zaloModalTitle').innerText = `Soạn Tin Nhắn Gửi Xưởng — ${o.code} (${o.name})`;
       document.getElementById('zaloMetaCode').innerText = o.code;
@@ -4205,7 +4347,7 @@ Lưu ý: Anh em thợ kiểm tra kỹ danh sách và xác nhận giúp FU Studio
       currentZaloOrderId = null; // null biểu thị chế độ tổng hợp toàn bộ đơn
 
       const workshopVal = document.getElementById('filterWorkshop') ? document.getElementById('filterWorkshop').value : '';
-      const totalAmount = filtered.reduce((sum, o) => sum + (o.items || []).reduce((s, it) => s + (it.qty * it.price), 0), 0);
+      const totalAmount = filtered.reduce((sum, o) => sum + calcOrderTotal(o), 0);
 
       document.getElementById('zaloModalTitle').innerText = `Tổng Hợp Toàn Bộ Đơn Gửi Xưởng (${filtered.length} đơn)`;
       document.getElementById('zaloMetaCode').innerText = `TỔNG HỢP`;
@@ -4384,52 +4526,87 @@ Lưu ý: Anh em thợ kiểm tra kỹ danh sách và xác nhận giúp FU Studio
       showToast('Đã khôi phục mẫu tin nhắn gốc thành công! ✅', 'info');
     }
 
-    // Nút gạch nợ công nợ xưởng 1 chạm dạng pill cao cấp, thanh lịch, mượt mà (đảm bảo min-h-44px trên mobile)
+    // Nút gạch nợ công nợ xưởng 1 chạm dạng pill v8.0 cao cấp (min-h-44px trên mobile)
     function getPaymentBadgeHtml(o) {
       if (o.payment === 'Đã thanh toán') {
-        return `<button type="button" onclick="togglePayment('${o.id}')" title="Chạm nếu muốn hoàn tác về nợ xưởng" class="inline-flex items-center justify-center gap-1.5 min-h-[44px] sm:min-h-[32px] px-3.5 sm:px-2.5 py-2 sm:py-1 text-xs font-medium rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 hover:bg-emerald-100 transition cursor-pointer shadow-2xs whitespace-nowrap">
-          <i class="fa-solid fa-check text-[10px] text-emerald-600"></i>
+        return `<button type="button" onclick="togglePayment('${o.id}')" title="Chạm để hoàn tác về trạng thái Chưa thanh toán" class="inline-flex items-center justify-center gap-1.5 min-h-[44px] sm:min-h-[30px] px-3.5 sm:px-2.5 py-2 sm:py-1 text-xs font-semibold rounded-full bg-emerald-50/95 text-emerald-700 border border-emerald-200/90 hover:bg-emerald-100 hover:border-emerald-300 transition-all cursor-pointer shadow-2xs whitespace-nowrap">
+          <i class="fa-solid fa-circle-check text-[11px] text-emerald-600"></i>
           <span>Đã thanh toán</span>
         </button>`;
       }
-      return `<button type="button" onclick="togglePayment('${o.id}')" title="Chạm 1 lần để gạch nợ đơn này" class="inline-flex items-center justify-center gap-1.5 min-h-[44px] sm:min-h-[32px] px-3.5 sm:px-2.5 py-2 sm:py-1 text-xs font-semibold rounded-full bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100 hover:border-rose-300 transition cursor-pointer shadow-2xs whitespace-nowrap">
+      return `<button type="button" onclick="togglePayment('${o.id}')" title="Chạm 1 lần để gạch nợ đơn này" class="inline-flex items-center justify-center gap-1.5 min-h-[44px] sm:min-h-[30px] px-3.5 sm:px-2.5 py-2 sm:py-1 text-xs font-semibold rounded-full bg-rose-50/95 text-rose-700 border border-rose-200/90 hover:bg-rose-100 hover:border-rose-300 transition-all cursor-pointer shadow-2xs whitespace-nowrap">
         <span class="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse"></span>
         <span>Chưa thanh toán</span>
       </button>`;
     }
 
     function getFilteredOrders() {
-      const search = (document.getElementById('searchInput') ? document.getElementById('searchInput').value : '').toLowerCase().trim();
+      const rawSearch = (document.getElementById('searchInput') ? document.getElementById('searchInput').value : '').trim();
+      const searchLower = rawSearch.toLowerCase();
+      const searchNoTone = removeVietnameseTones(rawSearch);
       const month = document.getElementById('filterMonth') ? document.getElementById('filterMonth').value : '';
       const workshop = document.getElementById('filterWorkshop') ? document.getElementById('filterWorkshop').value : '';
 
+      if (!Array.isArray(orders)) return [];
+
       return orders.filter(o => {
-        const matchSearch = o.code.toLowerCase().includes(search) || o.name.toLowerCase().includes(search);
+        if (!o) return false;
+
+        // 1. Tìm kiếm theo Mã đơn, Tên Dâu Rể, Xưởng hoặc Tên Sản phẩm (hỗ trợ cả có dấu & không dấu)
+        let matchSearch = true;
+        if (searchLower) {
+          const codeStr = String(o.code || '').toLowerCase();
+          const nameStr = String(o.name || '').toLowerCase();
+          const nameNoTone = removeVietnameseTones(o.name);
+          const workshopStr = String(o.workshop || '').toLowerCase();
+          const workshopNoTone = removeVietnameseTones(o.workshop);
+          const itemsMatch = Array.isArray(o.items) && o.items.some(it => {
+            const itName = String(it && it.name ? it.name : '').toLowerCase();
+            return itName.includes(searchLower) || removeVietnameseTones(itName).includes(searchNoTone);
+          });
+
+          matchSearch =
+            codeStr.includes(searchLower) ||
+            nameStr.includes(searchLower) ||
+            nameNoTone.includes(searchNoTone) ||
+            workshopStr.includes(searchLower) ||
+            workshopNoTone.includes(searchNoTone) ||
+            itemsMatch;
+        }
+
+        // 2. Lọc theo tháng gửi in
         let matchMonth = true;
         if (month) {
           const iso = normalizeDateToISO(o.date);
           const parts = iso.split('-');
-          const m = parts.length >= 2 ? parseInt(parts[1], 10) : (new Date(o.date).getMonth() + 1);
-          matchMonth = (m == month);
+          const m = parts.length >= 2 ? parseInt(parts[1], 10) : NaN;
+          matchMonth = (!isNaN(m) && m === parseInt(month, 10));
         }
+
+        // 3. Lọc theo trạng thái thanh toán
         const matchPayment = !currentPaymentQuickFilter || o.payment === currentPaymentQuickFilter;
+
+        // 4. Lọc theo xưởng
         let matchWorkshop = true;
         if (workshop) {
-          matchWorkshop = (o.workshop || 'TPS').toLowerCase() === workshop.toLowerCase();
+          matchWorkshop = String(o.workshop || 'TPS').trim().toLowerCase() === workshop.trim().toLowerCase();
         }
+
         return matchSearch && matchMonth && matchPayment && matchWorkshop;
       });
     }
 
-    // ================= TÍNH TOÁN VÀ CẬP NHẬT STATS CARDS =================
+    // ================= TÍNH TOÁN VÀ CẬP NHẬT BENTO KPI CARDS =================
     function updateStats(filtered) {
       let totalCost = 0;
       let paidAmount = 0;
       let unpaidAmount = 0;
       let unpaidCount = 0;
 
-      (filtered || []).forEach(o => {
-        const orderTotal = (o.items || []).reduce((sum, it) => sum + ((Number(it.qty) || 0) * (Number(it.price) || 0)), 0);
+      const list = Array.isArray(filtered) ? filtered : [];
+
+      list.forEach(o => {
+        const orderTotal = calcOrderTotal(o);
         totalCost += orderTotal;
         if (o.payment === 'Đã thanh toán') {
           paidAmount += orderTotal;
@@ -4439,15 +4616,19 @@ Lưu ý: Anh em thợ kiểm tra kỹ danh sách và xác nhận giúp FU Studio
         }
       });
 
-      // 1. Cập nhật thẻ Cột 1: Tổng chi phí in ấn
+      totalCost = Math.round(totalCost);
+      paidAmount = Math.round(paidAmount);
+      unpaidAmount = Math.round(unpaidAmount);
+
+      // 1. Cập nhật Bento Card 1: Tổng chi phí in ấn
       const statTotalCostEl = document.getElementById('stat-total-cost');
       if (statTotalCostEl) {
-        statTotalCostEl.innerHTML = `${Number(totalCost).toLocaleString('vi-VN')}<span class="text-base sm:text-lg font-semibold ml-0.5 font-sans text-zinc-700">đ</span>`;
+        statTotalCostEl.innerHTML = `${totalCost.toLocaleString('vi-VN')}<span class="text-base sm:text-lg font-semibold ml-1 font-sans text-zinc-600">đ</span>`;
       }
 
       const statTotalOrdersEl = document.getElementById('stat-total-orders');
       if (statTotalOrdersEl) {
-        statTotalOrdersEl.innerText = `${filtered.length} đơn hàng`;
+        statTotalOrdersEl.innerText = `${list.length} đơn hàng`;
       }
 
       const statPaidAmountEl = document.getElementById('stat-paid-amount');
@@ -4455,20 +4636,54 @@ Lưu ý: Anh em thợ kiểm tra kỹ danh sách và xác nhận giúp FU Studio
         statPaidAmountEl.innerText = formatMoney(paidAmount);
       }
 
-      // 2. Cập nhật thẻ Cột 2: Công nợ xưởng chưa tất toán
-      const statDebtEl = document.getElementById('stat-debt');
-      if (statDebtEl) {
-        statDebtEl.innerHTML = `${Number(unpaidAmount).toLocaleString('vi-VN')}<span class="text-base sm:text-lg font-semibold ml-0.5 font-sans text-rose-600">đ</span>`;
+      const progressEl = document.getElementById('stat-paid-progress');
+      if (progressEl) {
+        const pct = totalCost > 0 ? Math.min(100, Math.round((paidAmount / totalCost) * 100)) : (list.length > 0 ? 100 : 0);
+        progressEl.style.width = `${pct}%`;
       }
 
+      // 2. Cập nhật Bento Card 2: Công nợ xưởng chưa tất toán
+      const statDebtEl = document.getElementById('stat-debt');
+      const kpiDebtCard = document.getElementById('kpiDebtCard');
+      const kpiDebtIconBox = document.getElementById('kpiDebtIconBox');
+      const kpiDebtTitle = document.getElementById('kpiDebtTitle');
       const badgeDebtCount = document.getElementById('stat-debt-count-badge');
-      if (badgeDebtCount) {
-        if (unpaidCount > 0) {
-          badgeDebtCount.className = 'text-xs font-mono-val font-semibold px-2 py-0.5 rounded bg-rose-100 text-rose-800 border border-rose-200 shrink-0';
-          badgeDebtCount.innerText = `${unpaidCount} đơn nợ`;
-        } else {
-          badgeDebtCount.className = 'text-xs font-mono-val font-semibold px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 border border-emerald-200 shrink-0';
-          badgeDebtCount.innerText = 'Sạch nợ';
+
+      if (unpaidCount > 0) {
+        if (statDebtEl) {
+          statDebtEl.className = 'text-2xl sm:text-3xl lg:text-[32px] font-extrabold tracking-tight text-rose-700 tabular-nums font-mono-val flex items-baseline leading-none';
+          statDebtEl.innerHTML = `${unpaidAmount.toLocaleString('vi-VN')}<span class="text-base sm:text-lg font-semibold ml-1 font-sans text-rose-600">đ</span>`;
+        }
+        if (kpiDebtCard) {
+          kpiDebtCard.className = 'glass-panel p-5 sm:p-6 rounded-2xl flex flex-col justify-between border-rose-200/80 relative overflow-hidden';
+        }
+        if (kpiDebtIconBox) {
+          kpiDebtIconBox.className = 'w-8 h-8 rounded-xl bg-rose-500/10 border border-rose-200/80 text-rose-600 flex items-center justify-center text-xs shadow-2xs';
+        }
+        if (kpiDebtTitle) {
+          kpiDebtTitle.className = 'text-xs sm:text-sm text-rose-800 font-semibold tracking-tight flex items-center gap-1.5';
+        }
+        if (badgeDebtCount) {
+          badgeDebtCount.className = 'text-xs font-mono-val font-semibold px-2.5 py-1 rounded-lg bg-rose-100/90 text-rose-800 border border-rose-200 shrink-0 flex items-center gap-1.5';
+          badgeDebtCount.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-rose-600 animate-pulse"></span><span>${unpaidCount} đơn nợ</span>`;
+        }
+      } else {
+        if (statDebtEl) {
+          statDebtEl.className = 'text-2xl sm:text-3xl lg:text-[32px] font-extrabold tracking-tight text-emerald-700 tabular-nums font-mono-val flex items-baseline leading-none';
+          statDebtEl.innerHTML = `0<span class="text-base sm:text-lg font-semibold ml-1 font-sans text-emerald-600">đ</span>`;
+        }
+        if (kpiDebtCard) {
+          kpiDebtCard.className = 'glass-panel p-5 sm:p-6 rounded-2xl flex flex-col justify-between border-emerald-200/80 relative overflow-hidden';
+        }
+        if (kpiDebtIconBox) {
+          kpiDebtIconBox.className = 'w-8 h-8 rounded-xl bg-emerald-500/10 border border-emerald-200/80 text-emerald-600 flex items-center justify-center text-xs shadow-2xs';
+        }
+        if (kpiDebtTitle) {
+          kpiDebtTitle.className = 'text-xs sm:text-sm text-emerald-800 font-semibold tracking-tight flex items-center gap-1.5';
+        }
+        if (badgeDebtCount) {
+          badgeDebtCount.className = 'text-xs font-mono-val font-semibold px-2.5 py-1 rounded-lg bg-emerald-100/90 text-emerald-800 border border-emerald-200 shrink-0 flex items-center gap-1';
+          badgeDebtCount.innerHTML = `<i class="fa-solid fa-check text-[10px]"></i><span>Sạch nợ</span>`;
         }
       }
 
@@ -4524,18 +4739,18 @@ Lưu ý: Anh em thợ kiểm tra kỹ danh sách và xác nhận giúp FU Studio
       }
 
       filtered.forEach(o => {
-        const orderTotal = (o.items || []).reduce((sum, it) => sum + (it.qty * it.price), 0);
+        const orderTotal = calcOrderTotal(o);
         const paymentBadge = getPaymentBadgeHtml(o);
 
-        const driveBtnHtml = o.driveUrl ? `
-          <a href="${o.driveUrl}" target="_blank" rel="noopener noreferrer" class="min-h-[44px] sm:min-h-0 sm:h-7 px-3 sm:px-2.5 py-2 sm:py-0 rounded-lg sm:rounded-md bg-white/85 hover:bg-white text-zinc-700 hover:text-emerald-700 border border-zinc-200/90 flex items-center justify-center gap-1.5 text-xs font-medium transition shadow-2xs shrink-0" title="Mở Google Drive file in">
+        const driveBtnCardHtml = o.driveUrl ? `
+          <a href="${o.driveUrl}" target="_blank" rel="noopener noreferrer" class="min-h-[44px] sm:min-h-0 sm:h-7 px-3 sm:px-2.5 py-2 sm:py-0 rounded-xl sm:rounded-lg bg-white/90 hover:bg-emerald-50 text-zinc-700 hover:text-emerald-700 border border-zinc-200/90 hover:border-emerald-300 flex items-center justify-center gap-1.5 text-xs font-semibold transition shadow-2xs shrink-0" title="Mở thư mục Google Drive chứa file in">
             <i class="fa-brands fa-google-drive text-emerald-600 text-xs"></i>
             <span>Drive</span>
           </a>
         ` : '';
 
-        const zaloBtnHtml = `
-          <button type="button" onclick="openZaloModal('${o.id}')" class="min-h-[44px] sm:min-h-0 sm:h-7 px-3.5 sm:px-2.5 py-2 sm:py-0 rounded-lg sm:rounded-md bg-white/85 hover:bg-sky-50 text-zinc-800 hover:text-sky-700 border border-zinc-200/90 flex items-center justify-center gap-1.5 text-xs font-semibold sm:font-medium transition cursor-pointer shadow-2xs shrink-0" title="Xem & soạn tin nhắn gửi Zalo cho xưởng">
+        const zaloBtnCardHtml = `
+          <button type="button" onclick="openZaloModal('${o.id}')" class="min-h-[44px] sm:min-h-0 sm:h-7 px-3.5 sm:px-2.5 py-2 sm:py-0 rounded-xl sm:rounded-lg bg-white/90 hover:bg-sky-50 text-zinc-800 hover:text-sky-700 border border-zinc-200/90 hover:border-sky-300 flex items-center justify-center gap-1.5 text-xs font-semibold transition cursor-pointer shadow-2xs shrink-0" title="Soạn & sao chép tin nhắn gửi Zalo cho xưởng">
             <i class="fa-solid fa-paper-plane text-sky-600 text-xs"></i>
             <span>Zalo</span>
           </button>
@@ -4543,49 +4758,54 @@ Lưu ý: Anh em thợ kiểm tra kỹ danh sách và xác nhận giúp FU Studio
 
         const deliveryHtml = o.deliveryDate ? (
           o.isUrgent
-            ? `<span class="text-xs font-mono-val font-semibold px-2 py-0.5 rounded bg-rose-500/15 text-rose-800 border border-rose-300 flex items-center gap-1" title="Đơn in gấp (Giao trong 1 ngày: ${formatDateVN(o.deliveryDate)})"><i class="fa-solid fa-bolt text-rose-600 text-xs"></i> Gấp: ${formatDateVN(o.deliveryDate)}</span>`
-            : `<span class="text-xs font-mono-val text-zinc-600 px-1.5 py-0.5 rounded bg-white/80 border border-zinc-200" title="Ngày nhận hình dự kiến (+2 ngày)">Nhận: ${formatDateVN(o.deliveryDate)}</span>`
+            ? `<span class="text-xs font-mono-val font-semibold px-2 py-0.5 rounded-md bg-rose-500/15 text-rose-800 border border-rose-300 flex items-center gap-1" title="Đơn in gấp (Giao trong 1 ngày: ${formatDateVN(o.deliveryDate)})"><i class="fa-solid fa-bolt text-rose-600 text-[11px]"></i> Gấp: ${formatDateVN(o.deliveryDate)}</span>`
+            : `<span class="text-xs font-mono-val font-medium text-zinc-700 px-2 py-0.5 rounded-md bg-zinc-100/90 border border-zinc-200/90" title="Ngày nhận hình dự kiến (+2 ngày)">Nhận: ${formatDateVN(o.deliveryDate)}</span>`
         ) : '';
 
-        // 1. Render Studio Card (Architectural & Minimal Luxury Frosted Glass)
+        // 1. Render Studio Card (v8.0 Premium Frosted Glass)
         let cardItemsHtml = '';
         (o.items || []).forEach(it => {
+          const itemSub = calcItemSubtotal(it.qty, it.price);
           cardItemsHtml += `
-            <div class="flex items-center justify-between gap-2.5 py-2 sm:py-1.5 border-b border-zinc-100/80 last:border-0 text-[13px] sm:text-xs">
-              <div class="font-medium text-zinc-800 flex items-center gap-2 min-w-0">
-                <span class="px-1.5 py-0.5 rounded bg-zinc-100/90 text-zinc-800 font-mono-val font-semibold text-xs border border-zinc-200/80 shrink-0">${it.qty}×</span>
-                <span class="leading-snug break-words sm:truncate sm:max-w-[215px]">${it.name}</span>
+            <div class="flex items-center justify-between gap-2.5 py-2 sm:py-1.5 border-b border-zinc-200/50 last:border-0 text-[13px] sm:text-xs">
+              <div class="font-medium text-zinc-900 flex items-center gap-2 min-w-0">
+                <span class="px-1.5 py-0.5 rounded-md bg-zinc-100 text-zinc-900 font-mono-val font-semibold text-xs border border-zinc-200/90 shrink-0 tabular-nums">${it.qty}×</span>
+                <span class="leading-snug break-words sm:truncate sm:max-w-[220px]" title="${it.name}">${it.name}</span>
               </div>
-              <span class="font-mono-val font-semibold sm:font-medium text-zinc-900 sm:text-zinc-700 whitespace-nowrap tabular-nums text-sm sm:text-xs shrink-0">${formatMoney(it.qty * it.price)}</span>
+              <span class="font-mono-val font-semibold text-zinc-900 whitespace-nowrap tabular-nums text-sm sm:text-xs shrink-0">${formatMoney(itemSub)}</span>
             </div>
           `;
         });
 
-        const isSelected = selectedOrderIds.has(o.id) || selectedOrderIds.has(String(o.id));
+        const isSelected = selectedOrderIds.has(o.id) || selectedOrderIds.has(String(o.id)) || selectedOrderIds.has(Number(o.id));
 
         const card = document.createElement('div');
         card.id = `card-order-${o.id}`;
-        card.className = `studio-card rounded-2xl sm:rounded-xl flex flex-col justify-between overflow-hidden h-full transition-all duration-150 ${isSelected ? 'ring-2 ring-zinc-950 border-zinc-900 bg-white shadow-md' : ''}`;
+        card.className = `studio-card rounded-2xl flex flex-col justify-between overflow-hidden h-full ${isSelected ? 'ring-2 ring-zinc-950 border-zinc-900 bg-white/95 shadow-lg' : ''}`;
         card.innerHTML = `
           <div>
             <!-- Card Header -->
-            <div class="p-4 sm:p-4 border-b border-zinc-200/60 bg-white/40 space-y-2">
+            <div class="p-4 border-b border-zinc-200/60 bg-white/50 space-y-2.5">
               <div class="flex items-start sm:items-center justify-between gap-2">
-                <label class="flex items-center gap-1.5 flex-wrap cursor-pointer select-none min-h-[36px] sm:min-h-0" title="Chạm để chọn đơn này">
+                <label class="flex items-center gap-1.5 flex-wrap cursor-pointer select-none min-h-[36px] sm:min-h-0" title="Tích chọn đơn này để thao tác hàng loạt">
                   <input type="checkbox" class="order-cb order-cb-card rounded border-zinc-300 text-zinc-950 focus:ring-0 cursor-pointer mr-1 w-4 h-4 sm:w-3.5 sm:h-3.5 scale-110" data-id="${o.id}" data-debt="${o.payment !== 'Đã thanh toán' ? orderTotal : 0}" ${isSelected ? 'checked' : ''} onchange="onOrderCheckboxChange('${o.id}', this.checked)">
-                  <span class="text-sm sm:text-xs font-mono-val font-bold px-2.5 py-1 sm:py-0.5 rounded-md bg-zinc-950 text-zinc-100 tracking-wider shadow-2xs">${o.code}</span>
-                  <span class="text-xs font-mono-val font-semibold px-2 py-0.5 rounded bg-white/85 text-zinc-700 border border-zinc-200">${o.workshop}</span>
-                  <span class="text-xs font-mono-val text-zinc-500 whitespace-nowrap">Gửi: ${formatDateVN(o.date)}</span>
-                  ${deliveryHtml}
+                  <span class="text-sm sm:text-xs font-mono-val font-bold px-2.5 py-1 sm:py-0.5 rounded-lg bg-zinc-950 text-zinc-100 tracking-wider shadow-2xs">${o.code}</span>
+                  <span class="text-xs font-mono-val font-semibold px-2 py-0.5 rounded-md bg-white/90 text-zinc-800 border border-zinc-200/90 shadow-2xs">${o.workshop}</span>
                 </label>
                 <div class="flex items-center gap-1 shrink-0">
-                  ${driveBtnHtml}
-                  ${zaloBtnHtml}
-                  <button type="button" onclick="openModal('${o.id}')" class="min-h-[44px] min-w-[38px] sm:min-h-0 sm:min-w-0 sm:w-7 sm:h-7 rounded-lg sm:rounded hover:bg-zinc-200/70 text-zinc-500 hover:text-zinc-900 flex items-center justify-center transition cursor-pointer" title="Chỉnh sửa"><i class="fa-solid fa-pen text-xs"></i></button>
-                  <button type="button" onclick="deleteOrder('${o.id}')" class="min-h-[44px] min-w-[36px] sm:min-h-0 sm:min-w-0 sm:w-7 sm:h-7 rounded-lg sm:rounded hover:bg-rose-50 text-zinc-300 hover:text-rose-600 flex items-center justify-center transition cursor-pointer" title="Xoá"><i class="fa-regular fa-trash-can text-xs"></i></button>
+                  ${driveBtnCardHtml}
+                  ${zaloBtnCardHtml}
+                  <button type="button" onclick="openModal('${o.id}')" class="min-h-[44px] min-w-[38px] sm:min-h-0 sm:min-w-0 sm:w-7 sm:h-7 rounded-xl sm:rounded-lg hover:bg-zinc-200/70 text-zinc-600 hover:text-zinc-950 flex items-center justify-center transition cursor-pointer" title="Chỉnh sửa đơn hàng ${o.code}"><i class="fa-solid fa-pen text-xs"></i></button>
+                  <button type="button" onclick="deleteOrder('${o.id}')" class="min-h-[44px] min-w-[36px] sm:min-h-0 sm:min-w-0 sm:w-7 sm:h-7 rounded-xl sm:rounded-lg hover:bg-rose-50 text-zinc-400 hover:text-rose-600 flex items-center justify-center transition cursor-pointer" title="Xoá đơn hàng ${o.code}"><i class="fa-regular fa-trash-can text-xs"></i></button>
                 </div>
               </div>
-              <h4 class="text-base sm:text-sm font-bold sm:font-semibold text-zinc-950 tracking-tight leading-snug">${o.name}</h4>
+              <div class="flex items-center justify-between gap-2 flex-wrap">
+                <h4 class="text-base sm:text-sm font-bold text-zinc-950 tracking-tight leading-snug">${o.name}</h4>
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  <span class="text-xs font-mono-val font-medium text-zinc-600 whitespace-nowrap"><i class="fa-regular fa-calendar text-[11px] text-zinc-400 mr-1"></i>Gửi: ${formatDateVN(o.date)}</span>
+                  ${deliveryHtml}
+                </div>
+              </div>
             </div>
 
             <!-- Card Body: Items -->
@@ -4595,54 +4815,73 @@ Lưu ý: Anh em thợ kiểm tra kỹ danh sách và xác nhận giúp FU Studio
           </div>
 
           <!-- Card Footer -->
-          <div class="px-4 py-3 sm:py-3 bg-white/50 border-t border-zinc-200/60 flex items-center justify-between gap-2">
+          <div class="px-4 py-3 bg-white/60 border-t border-zinc-200/60 flex items-center justify-between gap-2">
             <div>
               ${paymentBadge}
             </div>
             <div class="text-right">
-              <div class="text-[11px] sm:text-xs font-mono-val font-medium text-zinc-500 uppercase tracking-wider">Tổng Đơn</div>
+              <div class="text-[10px] font-mono-val font-semibold text-zinc-500 uppercase tracking-wider">Tổng Đơn</div>
               <div class="text-lg sm:text-base font-mono-val font-bold text-zinc-950 tabular-nums tracking-tight">${formatMoney(orderTotal)}</div>
             </div>
           </div>
         `;
         cardContainer.appendChild(card);
 
-        // 2. Render Table Row (Clean Editorial Lines, Monospaced Figures)
+        // 2. Render Table Row (v8.0 Editorial Data Table: Clean Spacing, Hover Highlight, Compact Tooltip Icons)
+        const driveBtnTableHtml = o.driveUrl ? `
+          <a href="${o.driveUrl}" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-lg bg-white/90 hover:bg-emerald-50 text-emerald-600 hover:text-emerald-700 border border-zinc-200/90 hover:border-emerald-300 flex items-center justify-center transition shadow-2xs" title="Mở link Google Drive file in (${o.code})">
+            <i class="fa-brands fa-google-drive text-xs"></i>
+          </a>
+        ` : '';
+
         const tr = document.createElement('tr');
         tr.id = `row-order-${o.id}`;
-        tr.className = `transition ${isSelected ? 'bg-zinc-100/90' : 'hover:bg-white/60'}`;
+        tr.className = `transition-colors duration-150 ${isSelected ? 'bg-zinc-900/[0.06]' : 'hover:bg-white/85'}`;
         tr.innerHTML = `
-          <td class="py-3 px-3 align-top text-center">
-            <input type="checkbox" class="order-cb order-cb-table rounded border-zinc-300 text-zinc-950 focus:ring-0 cursor-pointer scale-110" data-id="${o.id}" data-debt="${o.payment !== 'Đã thanh toán' ? orderTotal : 0}" ${isSelected ? 'checked' : ''} onchange="onOrderCheckboxChange('${o.id}', this.checked)" title="Chọn đơn này">
+          <td class="py-3.5 px-3.5 align-top text-center">
+            <input type="checkbox" class="order-cb order-cb-table rounded border-zinc-300 text-zinc-950 focus:ring-0 cursor-pointer scale-110 mt-1" data-id="${o.id}" data-debt="${o.payment !== 'Đã thanh toán' ? orderTotal : 0}" ${isSelected ? 'checked' : ''} onchange="onOrderCheckboxChange('${o.id}', this.checked)" title="Chọn đơn ${o.code}">
           </td>
-          <td class="py-3 px-4 align-top whitespace-nowrap">
-            <span class="text-xs font-mono-val font-semibold px-2 py-0.5 rounded bg-zinc-950 text-zinc-100">${o.code}</span>
-            <div class="text-xs font-semibold text-zinc-900 mt-1">${o.name}</div>
+          <td class="py-3.5 px-4 align-top whitespace-nowrap">
+            <span class="text-xs font-mono-val font-bold px-2.5 py-0.5 rounded-md bg-zinc-950 text-zinc-100 shadow-2xs">${o.code}</span>
+            <div class="text-xs sm:text-[13px] font-bold text-zinc-950 mt-1.5 tracking-tight">${o.name}</div>
           </td>
-          <td class="py-3 px-4 align-top text-xs font-mono-val whitespace-nowrap">
-            <div class="text-zinc-600">Gửi: ${formatDateVN(o.date)}</div>
+          <td class="py-3.5 px-4 align-top text-xs font-mono-val whitespace-nowrap space-y-1">
+            <div class="text-zinc-800 font-medium flex items-center gap-1.5">
+              <i class="fa-regular fa-paper-plane text-[10px] text-zinc-400"></i>
+              <span>Gửi: <b>${formatDateVN(o.date)}</b></span>
+            </div>
             ${o.deliveryDate ? `
-              <div class="mt-0.5 ${o.isUrgent ? 'text-rose-700 font-semibold flex items-center gap-1' : 'text-zinc-500'}">
-                ${o.isUrgent ? '<i class="fa-solid fa-bolt text-rose-600 text-xs"></i> Gấp: ' : 'Nhận: '}${formatDateVN(o.deliveryDate)}
+              <div class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md ${o.isUrgent ? 'bg-rose-50 text-rose-700 border border-rose-200 font-semibold' : 'bg-zinc-100/90 text-zinc-700 border border-zinc-200/80'}">
+                ${o.isUrgent ? '<i class="fa-solid fa-bolt text-rose-600 text-[10px]"></i> Gấp: ' : '<i class="fa-regular fa-clock text-[10px] text-zinc-400"></i> Nhận: '}${formatDateVN(o.deliveryDate)}
               </div>
             ` : ''}
-            <div class="text-xs text-zinc-500 mt-0.5">Xưởng: ${o.workshop}</div>
+            <div>
+              <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-white/90 border border-zinc-200/90 text-zinc-700 font-semibold text-[11px]">
+                <i class="fa-solid fa-industry text-[10px] text-zinc-400"></i> ${o.workshop}
+              </span>
+            </div>
           </td>
-          <td class="py-3 px-4 align-top min-w-[260px]">
+          <td class="py-3.5 px-4 align-top min-w-[270px]">
             ${cardItemsHtml}
           </td>
-          <td class="py-3 px-4 align-top text-right font-mono-val font-semibold text-zinc-950 whitespace-nowrap text-xs tabular-nums">
+          <td class="py-3.5 px-4 align-top text-right font-mono-val font-bold text-zinc-950 whitespace-nowrap text-sm tabular-nums">
             ${formatMoney(orderTotal)}
           </td>
-          <td class="py-3 px-4 align-top text-center whitespace-nowrap">
+          <td class="py-3.5 px-4 align-top text-center whitespace-nowrap">
             <div class="inline-flex">${paymentBadge}</div>
           </td>
-          <td class="py-3 px-4 align-top text-center whitespace-nowrap">
-            <div class="flex items-center justify-center gap-1">
-              ${driveBtnHtml}
-              ${zaloBtnHtml}
-              <button type="button" onclick="openModal('${o.id}')" class="text-zinc-500 hover:text-zinc-900 p-1 cursor-pointer transition" title="Sửa"><i class="fa-solid fa-pen text-xs"></i></button>
-              <button type="button" onclick="deleteOrder('${o.id}')" class="text-zinc-300 hover:text-rose-600 p-1 cursor-pointer transition" title="Xóa"><i class="fa-regular fa-trash-can text-xs"></i></button>
+          <td class="py-3.5 px-4 align-top text-center whitespace-nowrap">
+            <div class="flex items-center justify-center gap-1.5">
+              ${driveBtnTableHtml}
+              <button type="button" onclick="openZaloModal('${o.id}')" class="w-8 h-8 rounded-lg bg-white/90 hover:bg-sky-50 text-sky-600 hover:text-sky-700 border border-zinc-200/90 hover:border-sky-300 flex items-center justify-center transition cursor-pointer shadow-2xs" title="Gửi thông báo Zalo đơn ${o.code}">
+                <i class="fa-solid fa-paper-plane text-xs"></i>
+              </button>
+              <button type="button" onclick="openModal('${o.id}')" class="w-8 h-8 rounded-lg bg-white/90 hover:bg-zinc-100 text-zinc-600 hover:text-zinc-950 border border-zinc-200/90 hover:border-zinc-300 flex items-center justify-center transition cursor-pointer shadow-2xs" title="Chỉnh sửa đơn ${o.code}">
+                <i class="fa-solid fa-pen text-xs"></i>
+              </button>
+              <button type="button" onclick="deleteOrder('${o.id}')" class="w-8 h-8 rounded-lg bg-white/90 hover:bg-rose-50 text-zinc-400 hover:text-rose-600 border border-zinc-200/90 hover:border-rose-200 flex items-center justify-center transition cursor-pointer shadow-2xs" title="Xoá đơn ${o.code}">
+                <i class="fa-regular fa-trash-can text-xs"></i>
+              </button>
             </div>
           </td>
         `;
@@ -4654,7 +4893,7 @@ Lưu ý: Anh em thợ kiểm tra kỹ danh sách và xác nhận giúp FU Studio
     // ================= UNIFIED SYNCHRONIZED SELECTION SYSTEM =================
     function onOrderCheckboxChange(id, isChecked) {
       if (isChecked) {
-        selectedOrderIds.add(id);
+        selectedOrderIds.add(String(id));
       } else {
         selectedOrderIds.delete(id);
         selectedOrderIds.delete(String(id));
@@ -4666,7 +4905,7 @@ Lưu ý: Anh em thợ kiểm tra kỹ danh sách và xác nhận giúp FU Studio
     function toggleSelectAllOrders(isChecked) {
       const filtered = getFilteredOrders();
       if (isChecked) {
-        filtered.forEach(o => selectedOrderIds.add(o.id));
+        filtered.forEach(o => selectedOrderIds.add(String(o.id)));
       } else {
         filtered.forEach(o => {
           selectedOrderIds.delete(o.id);
@@ -4684,9 +4923,8 @@ Lưu ý: Anh em thợ kiểm tra kỹ danh sách và xác nhận giúp FU Studio
 
     function syncSelectionUI() {
       const filtered = getFilteredOrders();
-      const filteredIds = new Set(filtered.map(o => String(o.id)));
 
-      // 1. Update all checkboxes in DOM and Card highlight styling
+      // 1. Update all checkboxes in DOM and Card/Row highlight styling
       document.querySelectorAll('.order-cb').forEach(cb => {
         const rawId = cb.getAttribute('data-id');
         const isChecked = selectedOrderIds.has(rawId) || selectedOrderIds.has(Number(rawId)) || selectedOrderIds.has(String(rawId));
@@ -4695,18 +4933,18 @@ Lưu ý: Anh em thợ kiểm tra kỹ danh sách và xác nhận giúp FU Studio
         const cardEl = document.getElementById(`card-order-${rawId}`);
         if (cardEl) {
           if (isChecked) {
-            cardEl.classList.add('ring-2', 'ring-zinc-950', 'border-zinc-900', 'bg-white', 'shadow-md');
+            cardEl.classList.add('ring-2', 'ring-zinc-950', 'border-zinc-900', 'bg-white/95', 'shadow-lg');
           } else {
-            cardEl.classList.remove('ring-2', 'ring-zinc-950', 'border-zinc-900', 'bg-white', 'shadow-md');
+            cardEl.classList.remove('ring-2', 'ring-zinc-950', 'border-zinc-900', 'bg-white/95', 'shadow-lg');
           }
         }
 
         const rowEl = document.getElementById(`row-order-${rawId}`);
         if (rowEl) {
           if (isChecked) {
-            rowEl.classList.add('bg-zinc-100/90');
+            rowEl.classList.add('bg-zinc-900/[0.06]');
           } else {
-            rowEl.classList.remove('bg-zinc-100/90');
+            rowEl.classList.remove('bg-zinc-900/[0.06]');
           }
         }
       });
@@ -4718,20 +4956,20 @@ Lưu ý: Anh em thợ kiểm tra kỹ danh sách và xác nhận giúp FU Studio
 
       if (cardsCountEl) cardsCountEl.innerText = filtered.length;
 
-      const isAllFilteredSelected = filtered.length > 0 && filtered.every(o => selectedOrderIds.has(o.id) || selectedOrderIds.has(String(o.id)));
+      const isAllFilteredSelected = filtered.length > 0 && filtered.every(o => selectedOrderIds.has(o.id) || selectedOrderIds.has(String(o.id)) || selectedOrderIds.has(Number(o.id)));
       if (selectAllTable) selectAllTable.checked = isAllFilteredSelected;
       if (selectAllCards) selectAllCards.checked = isAllFilteredSelected;
 
-      // 3. Calculate selected count and total debt for selected orders
-      const selectedCount = Array.from(selectedOrderIds).filter(id => filteredIds.has(String(id))).length;
+      // 3. Calculate selected count and total debt consistently from filtered orders
+      const selectedFilteredOrders = filtered.filter(o => selectedOrderIds.has(o.id) || selectedOrderIds.has(String(o.id)) || selectedOrderIds.has(Number(o.id)));
+      const selectedCount = selectedFilteredOrders.length;
       const bar = document.getElementById('floatingBatchBar');
 
       if (selectedCount > 0) {
         let totalDebt = 0;
-        orders.forEach(o => {
-          if ((selectedOrderIds.has(o.id) || selectedOrderIds.has(String(o.id))) && o.payment !== 'Đã thanh toán') {
-            const orderTotal = (o.items || []).reduce((sum, it) => sum + (it.qty * it.price), 0);
-            totalDebt += orderTotal;
+        selectedFilteredOrders.forEach(o => {
+          if (o.payment !== 'Đã thanh toán') {
+            totalDebt += calcOrderTotal(o);
           }
         });
 
@@ -4744,7 +4982,8 @@ Lưu ý: Anh em thợ kiểm tra kỹ danh sách và xác nhận giúp FU Studio
     }
 
     async function settleSelectedOrders() {
-      const selectedList = orders.filter(o => selectedOrderIds.has(o.id) || selectedOrderIds.has(String(o.id)) || selectedOrderIds.has(Number(o.id)));
+      const filtered = getFilteredOrders();
+      const selectedList = filtered.filter(o => selectedOrderIds.has(o.id) || selectedOrderIds.has(String(o.id)) || selectedOrderIds.has(Number(o.id)));
       if (selectedList.length === 0) {
         showToast('Vui lòng tích chọn ít nhất 1 đơn hàng!', 'info');
         return;
@@ -4757,7 +4996,7 @@ Lưu ý: Anh em thợ kiểm tra kỹ danh sách và xác nhận giúp FU Studio
         return;
       }
 
-      const totalDebt = unpaidOrders.reduce((sum, o) => sum + (o.items || []).reduce((s, it) => s + (it.qty * it.price), 0), 0);
+      const totalDebt = unpaidOrders.reduce((sum, o) => sum + calcOrderTotal(o), 0);
 
       const confirmed = await showStudioConfirm({
         title: 'Xác nhận gạch nợ đơn đã chọn',
@@ -4786,8 +5025,8 @@ Lưu ý: Anh em thợ kiểm tra kỹ danh sách và xác nhận giúp FU Studio
         o.payment = 'Đã thanh toán';
       });
       saveToStorage();
-      renderAll();
       clearSelectedOrders();
+      renderAll();
 
       if (gasUrl) {
         showToast('Đang cập nhật gạch nợ lên Google Sheet...', 'info');
@@ -4808,7 +5047,7 @@ Lưu ý: Anh em thợ kiểm tra kỹ danh sách và xác nhận giúp FU Studio
         return;
       }
 
-      const totalDebt = unpaidOrders.reduce((sum, o) => sum + (o.items || []).reduce((s, it) => s + (it.qty * it.price), 0), 0);
+      const totalDebt = unpaidOrders.reduce((sum, o) => sum + calcOrderTotal(o), 0);
       const workshopFilter = document.getElementById('filterWorkshop') ? document.getElementById('filterWorkshop').value : '';
       const monthFilter = document.getElementById('filterMonth') ? document.getElementById('filterMonth').value : '';
 
@@ -4852,8 +5091,14 @@ Lưu ý: Anh em thợ kiểm tra kỹ danh sách và xác nhận giúp FU Studio
         o.payment = 'Đã thanh toán';
       });
       saveToStorage();
-      renderAll();
       clearSelectedOrders();
+
+      // Nếu đang đứng ở tab lọc "Chưa thanh toán", tự động chuyển về "Tất cả đơn" để thấy kết quả vừa quyết toán
+      if (currentPaymentQuickFilter === 'Chưa thanh toán') {
+        setQuickPaymentFilter('');
+      } else {
+        renderAll();
+      }
 
       if (gasUrl) {
         showToast('Đang đồng bộ quyết toán lên Google Sheet...', 'info');
@@ -4865,19 +5110,86 @@ Lưu ý: Anh em thợ kiểm tra kỹ danh sách và xác nhận giúp FU Studio
       }
     }
 
+    function escapeCSVField(val) {
+      if (val === null || val === undefined) return '""';
+      const str = String(val).replace(/"/g, '""');
+      return `"${str}"`;
+    }
+
     function exportCSV() {
-      const rows = ['﻿Mã Đơn,Tên Khách,Ngày Gửi In,Ngày Nhận Hình,In Gấp,Hạng Mục In,Số Lượng,Đơn Giá,Thành Tiền,Công Nợ,Xưởng In,Link File In'];
-      orders.forEach(o => {
+      const targetList = getFilteredOrders().length > 0 ? getFilteredOrders() : orders;
+      if (!targetList || targetList.length === 0) {
+        showToast('Không có dữ liệu đơn hàng để xuất file!', 'warning');
+        return;
+      }
+
+      const headers = [
+        'Mã Đơn',
+        'Tên Khách Hàng (Dâu Rể)',
+        'Ngày Gửi In',
+        'Ngày Nhận Hình',
+        'Phân Loại',
+        'Hạng Mục Sản Phẩm In',
+        'Số Lượng',
+        'Đơn Giá (VND)',
+        'Thành Tiền (VND)',
+        'Trạng Thái Thanh Toán',
+        'Xưởng In',
+        'Link Google Drive'
+      ];
+
+      const rows = ['\uFEFF' + headers.map(escapeCSVField).join(',')];
+      let grandTotal = 0;
+      let unpaidTotal = 0;
+
+      targetList.forEach(o => {
+        const orderTotal = calcOrderTotal(o);
+        grandTotal += orderTotal;
+        if (o.payment !== 'Đã thanh toán') {
+          unpaidTotal += orderTotal;
+        }
         (o.items || []).forEach(it => {
-          rows.push(`"${o.code}","${o.name}","${formatDateVN(o.date)}","${formatDateVN(o.deliveryDate)}","${o.isUrgent ? 'GẤP' : 'Thường'}","${it.name}",${it.qty},${it.price},${it.qty * it.price},"${o.payment}","${o.workshop}","${o.driveUrl || ''}"`);
+          const sub = calcItemSubtotal(it.qty, it.price);
+          rows.push([
+            escapeCSVField(o.code),
+            escapeCSVField(o.name),
+            escapeCSVField(formatDateVN(o.date)),
+            escapeCSVField(formatDateVN(o.deliveryDate)),
+            escapeCSVField(o.isUrgent ? 'IN GẤP' : 'Tiêu chuẩn'),
+            escapeCSVField(it.name),
+            Math.max(1, Math.round(Number(it.qty) || 1)),
+            Math.round(Number(it.price) || 0),
+            sub,
+            escapeCSVField(o.payment),
+            escapeCSVField(o.workshop || 'TPS'),
+            escapeCSVField(o.driveUrl || '')
+          ].join(','));
         });
       });
-      const csv = rows.join('\n');
+
+      // Thêm dòng tổng kết cuối file CSV để kế toán / xưởng đối soát nhanh
+      rows.push('');
+      rows.push([
+        escapeCSVField('TỔNG KẾT ĐỐI SOÁT'),
+        escapeCSVField(`${targetList.length} đơn hàng`),
+        escapeCSVField(`Ngày xuất: ${formatDateVN(getTodayISO())}`),
+        '""', '""',
+        escapeCSVField('TỔNG CHI PHÍ IN ẤN:'),
+        '""', '""',
+        grandTotal,
+        escapeCSVField(`CÒN NỢ: ${formatMoney(unpaidTotal)}`),
+        '""', '""'
+      ].join(','));
+
+      const csv = rows.join('\r\n');
       const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
       const link = document.createElement('a');
       link.href = URL.createObjectURL(blob);
-      link.download = `FU_STUDIO_PRINT_LAB_${new Date().toISOString().split('T')[0]}.csv`;
+      link.download = `FU_STUDIO_DOI_SOAT_IN_${getTodayISO()}.csv`;
+      document.body.appendChild(link);
       link.click();
+      document.body.removeChild(link);
+      showToast(`Đã xuất file Excel/CSV (${targetList.length} đơn) thành công! 📊`, 'success');
     }
 
     function updateWorkshopFilterOptions() {
