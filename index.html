@@ -2057,6 +2057,88 @@ function createJsonResponse(obj) {
       return `${yyyy}-${mm}-${dd}`;
     }
 
+    function escapeHtml(str) {
+      if (str === null || str === undefined) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+    }
+
+    // Viết hàm parse ngày tháng chuẩn xác hỗ trợ DD/MM/YYYY, ISO YYYY-MM-DD và mọi biến thể trước khi sort
+    function parseOrderDateToTimestamp(val) {
+      if (!val) return 0;
+      if (val instanceof Date) {
+        const t = val.getTime();
+        return isNaN(t) ? 0 : t;
+      }
+      const str = String(val).trim();
+      if (!str) return 0;
+
+      // 1. Trường hợp định dạng chuẩn Việt Nam: DD/MM/YYYY, DD-MM-YYYY, DD.MM.YYYY
+      const vnMatch = str.match(/^(\d{1,2})[\/\.-](\d{1,2})[\/\.-](\d{4})/);
+      if (vnMatch) {
+        const d = parseInt(vnMatch[1], 10);
+        const m = parseInt(vnMatch[2], 10) - 1;
+        const y = parseInt(vnMatch[3], 10);
+        const dateObj = new Date(y, m, d);
+        return isNaN(dateObj.getTime()) ? 0 : dateObj.getTime();
+      }
+
+      // 2. Trường hợp định dạng ISO: YYYY-MM-DD
+      const isoMatch = str.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+      if (isoMatch) {
+        const y = parseInt(isoMatch[1], 10);
+        const m = parseInt(isoMatch[2], 10) - 1;
+        const d = parseInt(isoMatch[3], 10);
+        const dateObj = new Date(y, m, d);
+        return isNaN(dateObj.getTime()) ? 0 : dateObj.getTime();
+      }
+
+      // 3. Chuẩn hóa qua normalizeDateToISO nếu có định dạng biến thể khác
+      const iso = typeof normalizeDateToISO === 'function' ? normalizeDateToISO(str) : '';
+      if (iso) {
+        const parts = iso.split('-');
+        if (parts.length === 3) {
+          const y = parseInt(parts[0], 10);
+          const m = parseInt(parts[1], 10) - 1;
+          const d = parseInt(parts[2], 10);
+          const dateObj = new Date(y, m, d);
+          if (!isNaN(dateObj.getTime())) return dateObj.getTime();
+        }
+      }
+
+      // 4. Timestamp dạng số miligiây hoặc giây
+      if (/^\d{10,13}$/.test(str)) {
+        const num = Number(str);
+        const d = new Date(num > 1e11 ? num : num * 1000);
+        if (!isNaN(d.getTime())) return d.getTime();
+      }
+
+      // 5. Chuỗi ngày từ Google Sheet hoặc chuỗi Date tiêu chuẩn
+      const cleaned = str.replace(/\s*GM.*$/i, '').trim();
+      const parsed = Date.parse(cleaned);
+      return isNaN(parsed) ? 0 : parsed;
+    }
+
+    // Hàm sắp xếp danh sách đơn in theo thời gian gửi in (ngày gửi) giảm dần (mới nhất lên đầu)
+    function sortOrdersByDateDesc(list) {
+      if (!Array.isArray(list)) return [];
+      return list.sort((a, b) => {
+        const timeA = parseOrderDateToTimestamp(a && a.date);
+        const timeB = parseOrderDateToTimestamp(b && b.date);
+        if (timeB !== timeA) {
+          return timeB - timeA; // Ngày mới nhất lên trên đầu
+        }
+        // Nếu trùng ngày gửi in thì ưu tiên đơn có ID lớn hơn (tạo sau)
+        const idA = Number(a && a.id) || 0;
+        const idB = Number(b && b.id) || 0;
+        return idB - idA;
+      });
+    }
+
     function normalizeDateToISO(val) {
       if (!val) return '';
       if (val instanceof Date && !isNaN(val.getTime())) {
@@ -2141,7 +2223,7 @@ function createJsonResponse(obj) {
         }
       });
 
-      return list.map(o => {
+      const sanitized = list.map(o => {
         const num = Number(o.id);
         const validId = (!isNaN(num) && num > 0 && num < 1000000000) ? num : ++maxId;
 
@@ -2197,6 +2279,8 @@ function createJsonResponse(obj) {
           note: note
         };
       });
+
+      return sortOrdersByDateDesc(sanitized);
     }
 
     const DEFAULT_SAMPLE_ORDERS = [
@@ -2264,7 +2348,7 @@ function createJsonResponse(obj) {
 
     // Nạp dữ liệu Offline-First: Ưu tiên lấy từ LocalStorage ra ngay lập tức
     let rawStoredOrders = safeGetJSON(STORAGE_KEYS.ORDERS, null) || DEFAULT_SAMPLE_ORDERS;
-    let orders = sanitizeOrders(rawStoredOrders);
+    let orders = sortOrdersByDateDesc(sanitizeOrders(rawStoredOrders));
     if (JSON.stringify(orders) !== JSON.stringify(rawStoredOrders)) {
       safeSetStorage(STORAGE_KEYS.ORDERS, orders);
     }
@@ -2800,6 +2884,9 @@ function createJsonResponse(obj) {
       safeSetStorage(STORAGE_KEYS.CATALOG, priceCatalog);
       renderPresetCombosGrid();
       renderQuickCatalogGrid();
+      if (typeof populateComboItemSelect === 'function') {
+        populateComboItemSelect();
+      }
       if (gasUrl && navigator.onLine) {
         sendCloudPost({
           action: 'saveSettings',
@@ -3858,6 +3945,7 @@ function createJsonResponse(obj) {
       } else {
         orders.unshift(orderData);
       }
+      sortOrdersByDateDesc(orders);
 
       saveToStorage();
       updateWorkshopFilterOptions();
@@ -4305,6 +4393,7 @@ function createJsonResponse(obj) {
     }
 
     function filterCatalogManage(category) {
+      syncCatalogInputsFromDOM();
       currentCatalogManageFilter = category;
       document.querySelectorAll('.cat-manage-pill').forEach(btn => {
         btn.className = 'cat-manage-pill px-2.5 py-1 rounded text-xs font-medium text-zinc-600 hover:text-zinc-900 transition cursor-pointer';
@@ -4333,29 +4422,57 @@ function createJsonResponse(obj) {
 
       itemsToRender.forEach((item) => {
         const div = document.createElement('div');
-        div.className = 'p-3 flex items-center justify-between gap-3 text-xs bg-white hover:bg-zinc-50/80 transition border-b border-zinc-100 last:border-b-0';
+        div.className = 'p-2.5 sm:p-3 flex items-center justify-between gap-2.5 text-xs bg-white hover:bg-zinc-50/80 transition border-b border-zinc-100 last:border-b-0';
         
         let actionsHtml = '';
+        let nameInputHtml = '';
+
         if (isAdmin) {
+          nameInputHtml = `
+            <input type="text"
+              data-id="${item.id}"
+              value="${escapeHtml(item.name)}"
+              oninput="updateCatalogNameById('${item.id}', this.value)"
+              class="cat-item-name-input flex-1 min-w-0 border border-zinc-300 hover:border-zinc-400 focus:border-zinc-950 focus:bg-white bg-zinc-50/60 rounded-lg px-2.5 py-1.5 text-xs font-semibold text-zinc-900 outline-none transition shadow-2xs"
+              placeholder="Nhập tên sản phẩm in..."
+              title="Bấm để chỉnh sửa tên sản phẩm"
+            >
+          `;
           actionsHtml = `
             <div class="relative flex items-center">
-              <input type="number" value="${item.price}" oninput="updateCatalogPriceById('${item.id}', this.value)" class="w-28 text-right border border-zinc-300 rounded px-2.5 py-1.5 font-mono-val font-semibold text-zinc-950 focus:border-zinc-900 focus:bg-white bg-zinc-50/50 outline-none transition">
+              <input type="number"
+                data-id="${item.id}"
+                value="${item.price}"
+                oninput="updateCatalogPriceById('${item.id}', this.value)"
+                class="cat-item-price-input w-24 sm:w-28 text-right border border-zinc-300 hover:border-zinc-400 focus:border-zinc-950 focus:bg-white bg-zinc-50/60 rounded-lg px-2.5 py-1.5 font-mono-val font-semibold text-zinc-950 outline-none transition shadow-2xs"
+                placeholder="0"
+                title="Đơn giá gia công xưởng"
+              >
               <span class="ml-1.5 text-zinc-400 font-mono-val text-xs">đ</span>
             </div>
-            <button type="button" onclick="deleteCatalogItemById('${item.id}')" class="text-zinc-400 hover:text-rose-600 p-1.5 cursor-pointer transition rounded hover:bg-rose-50" title="Xoá món này"><i class="fa-regular fa-trash-can text-xs"></i></button>
+            <button type="button" onclick="deleteCatalogItemById('${item.id}')" class="w-8 h-8 flex items-center justify-center text-zinc-400 hover:text-rose-600 cursor-pointer transition rounded-lg hover:bg-rose-50" title="Xoá món này"><i class="fa-regular fa-trash-can text-xs"></i></button>
           `;
         } else {
+          nameInputHtml = `
+            <input type="text"
+              value="${escapeHtml(item.name)}"
+              readonly
+              disabled
+              class="flex-1 min-w-0 border border-zinc-200/60 rounded-lg px-2.5 py-1.5 text-xs font-semibold text-zinc-800 bg-zinc-100/60 outline-none cursor-default select-none truncate"
+              title="${escapeHtml(item.name)}"
+            >
+          `;
           actionsHtml = `
             <div class="text-right">
-              <span class="font-mono-val font-bold text-zinc-950 text-xs px-2.5 py-1 rounded bg-zinc-100/90 border border-zinc-200/90 tabular-nums">${formatMoney(item.price)}</span>
+              <span class="font-mono-val font-bold text-zinc-950 text-xs px-2.5 py-1.5 rounded-lg bg-zinc-100/90 border border-zinc-200/90 tabular-nums">${formatMoney(item.price)}</span>
             </div>
           `;
         }
 
         div.innerHTML = `
           <div class="flex-1 min-w-0 flex items-center gap-2">
-            <span class="font-medium text-zinc-900 truncate" title="${item.name}">${item.name}</span>
-            <span class="text-[10px] font-mono-val font-semibold px-2 py-0.5 rounded bg-zinc-100 text-zinc-600 border border-zinc-200/80 shrink-0">${groupLabels[item.category] || 'Khác'}</span>
+            ${nameInputHtml}
+            <span class="text-[10px] font-mono-val font-semibold px-2 py-1 rounded-md bg-zinc-100 text-zinc-600 border border-zinc-200/80 shrink-0 select-none">${groupLabels[item.category] || 'Khác'}</span>
           </div>
           <div class="flex items-center gap-2 shrink-0">
             ${actionsHtml}
@@ -4365,12 +4482,60 @@ function createJsonResponse(obj) {
       });
     }
 
+    // Đồng bộ tức thì toàn bộ input tên và giá từ giao diện DOM vào mảng priceCatalog
+    function syncCatalogInputsFromDOM() {
+      const container = document.getElementById('catalogManageList');
+      if (!container) return;
+      const nameInputs = container.querySelectorAll('.cat-item-name-input');
+      const priceInputs = container.querySelectorAll('.cat-item-price-input');
+
+      nameInputs.forEach(input => {
+        const id = input.getAttribute('data-id');
+        const item = priceCatalog.find(p => p.id === id);
+        if (item && input.value && input.value.trim()) {
+          item.name = input.value.trim();
+        }
+      });
+
+      priceInputs.forEach(input => {
+        const id = input.getAttribute('data-id');
+        const item = priceCatalog.find(p => p.id === id);
+        if (item) {
+          const val = Number(input.value);
+          item.price = isNaN(val) ? 0 : Math.max(0, Math.round(val));
+        }
+      });
+    }
+
+    function updateCatalogNameById(id, newName) {
+      if (!isAdmin) {
+        showToast('Cần quyền Admin để chỉnh sửa tên sản phẩm!', 'warning');
+        return;
+      }
+      const item = priceCatalog.find(p => p.id === id);
+      if (item && typeof newName === 'string') {
+        item.name = newName;
+      }
+    }
+
+    function updateCatalogPriceById(id, newPrice) {
+      if (!isAdmin) {
+        showToast('Cần quyền Admin để chỉnh sửa giá!', 'warning');
+        return;
+      }
+      const item = priceCatalog.find(p => p.id === id);
+      if (item) {
+        item.price = Number(newPrice) || 0;
+      }
+    }
+
     function addNewCatalogItem() {
       if (!isAdmin) {
         showToast('Cần mở khoá quyền Admin để thêm sản phẩm mới!', 'warning');
         openAdminPinModal('catalog');
         return;
       }
+      syncCatalogInputsFromDOM();
       const name = document.getElementById('newCatName').value.trim();
       const category = document.getElementById('newCatGroup').value;
       const price = Number(document.getElementById('newCatPrice').value) || 0;
@@ -4382,23 +4547,12 @@ function createJsonResponse(obj) {
       renderCatalogManageList();
     }
 
-    function updateCatalogPriceById(id, newPrice) {
-      if (!isAdmin) {
-        showToast('Cần quyền Admin để chỉnh sửa giá!', 'warning');
-        return;
-      }
-      const item = priceCatalog.find(p => p.id === id);
-      if (item) {
-        item.price = Number(newPrice) || 0;
-        saveCatalogToStorage(false);
-      }
-    }
-
     async function deleteCatalogItemById(id) {
       if (!isAdmin) {
         showToast('Cần quyền Admin để xoá sản phẩm!', 'warning');
         return;
       }
+      syncCatalogInputsFromDOM();
       const item = priceCatalog.find(p => p.id === id);
       if (!item) return;
       const confirmed = await showStudioConfirm({
@@ -4427,6 +4581,7 @@ function createJsonResponse(obj) {
         closeCatalogModal();
         return;
       }
+      syncCatalogInputsFromDOM();
       saveCatalogToStorage(true);
       closeCatalogModal();
     }
@@ -4942,6 +5097,9 @@ Lưu ý: Anh em thợ kiểm tra kỹ danh sách và xác nhận giúp FU Studio
 
         return matchSearch && matchMonth && matchPayment && matchWorkshop;
       });
+
+      // Sắp xếp danh sách đơn in theo thời gian gửi in (ngày gửi) giảm dần (mới nhất lên trên đầu)
+      return sortOrdersByDateDesc(filtered);
     }
 
     // ================= TÍNH TOÁN VÀ CẬP NHẬT BENTO KPI CARDS =================
